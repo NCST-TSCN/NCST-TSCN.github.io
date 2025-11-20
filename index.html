@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化学方程式配平大挑战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #2c3e50, #4ca1af);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .game-area {
+            padding: 30px;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .score-item {
+            text-align: center;
+        }
+        
+        .score-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .equation-container {
+            background-color: #f1f8ff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .equation {
+            font-size: 2.2rem;
+            margin: 20px 0;
+            font-family: 'Times New Roman', serif;
+            color: #2c3e50;
+        }
+        
+        .input-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .coefficient-input {
+            width: 70px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        .coefficient-input:focus {
+            border-color: #2980b9;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.5);
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .submit-btn {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .hint-btn {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .hint-btn:hover {
+            background-color: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .next-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .next-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .reset-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .reset-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1rem;
+            display: none;
+        }
+        
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .hint {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .explanation {
+            margin-top: 15px;
+            font-size: 1rem;
+            text-align: left;
+            line-height: 1.5;
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 15px;
+            background-color: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        
+        .periodic-table {
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .periodic-table-btn {
+            background-color: #9b59b6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .periodic-table-btn:hover {
+            background-color: #8e44ad;
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .equation {
+                font-size: 1.8rem;
+            }
+            
+            .coefficient-input {
+                width: 60px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+            
+            .buttons {
+                flex-wrap: wrap;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .equation {
+                font-size: 1.5rem;
+            }
+            
+            .coefficient-input {
+                width: 50px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>化学方程式配平大挑战</h1>
+            <p class="subtitle">掌握化学方程式配平，成为化学小达人！</p>
+        </header>
+        
+        <div class="game-area">
+            <div class="score-board">
+                <div class="score-item">
+                    <div>得分</div>
+                    <div class="score-value" id="score">0</div>
+                </div>
+                <div class="score-item">
+                    <div>正确</div>
+                    <div class="score-value" id="correct">0</div>
+                </div>
+                <div class="score-item">
+                    <div>尝试</div>
+                    <div class="score-value" id="attempts">0</div>
+                </div>
+                <div class="score-item">
+                    <div>连续正确</div>
+                    <div class="score-value" id="streak">0</div>
+                </div>
+            </div>
+            
+            <div class="difficulty-selector">
+                <div class="difficulty-btn active" data-level="easy">简单</div>
+                <div class="difficulty-btn" data-level="medium">中等</div>
+                <div class="difficulty-btn" data-level="hard">困难</div>
+            </div>
+            
+            <div class="equation-container">
+                <h2>请配平以下化学方程式：</h2>
+                <div class="equation" id="equation">H₂ + O₂ → H₂O</div>
+                
+                <div class="input-area" id="input-area">
+                    <!-- 输入框会通过JavaScript动态生成 -->
+                </div>
+                
+                <div class="buttons">
+                    <button class="submit-btn" id="submit-btn">提交答案</button>
+                    <button class="hint-btn" id="hint-btn">提示</button>
+                    <button class="next-btn" id="next-btn">下一题</button>
+                    <button class="reset-btn" id="reset-btn">重置游戏</button>
+                </div>
+                
+                <div class="feedback" id="feedback"></div>
+            </div>
+            
+            <div class="periodic-table">
+                <div class="periodic-table-btn" id="periodic-table-btn">查看元素周期表</div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>化学方程式配平大挑战 - 初中化学课堂游戏 | 设计用于教学目的</p>
+        </footer>
+    </div>
+
+    <script>
+        // 化学方程式数据库
+        const equations = {
+            easy: [
+                {
+                    equation: "H₂ + O₂ → H₂O",
+                    coefficients: [2, 1, 2],
+                    explanation: "氢气和氧气反应生成水。左边有2个H和2个O，右边有2个H和1个O。需要在H₂O前加系数2，使右边有4个H和2个O，然后在H₂前加系数2，使两边原子数相等。"
+                },
+                {
+                    equation: "N₂ + H₂ → NH₃",
+                    coefficients: [1, 3, 2],
+                    explanation: "氮气和氢气反应生成氨气。右边有1个N和3个H，左边有2个N和2个H。需要在NH₃前加系数2，使右边有2个N和6个H，然后在H₂前加系数3，使两边原子数相等。"
+                },
+                {
+                    equation: "Fe + O₂ → Fe₂O₃",
+                    coefficients: [4, 3, 2],
+                    explanation: "铁和氧气反应生成氧化铁。右边有2个Fe和3个O，左边有1个Fe和2个O。需要在Fe前加系数4，使左边有4个Fe，在Fe₂O₃前加系数2，使右边有4个Fe和6个O，然后在O₂前加系数3，使左边有6个O。"
+                },
+                {
+                    equation: "Al + O₂ → Al₂O₃",
+                    coefficients: [4, 3, 2],
+                    explanation: "铝和氧气反应生成氧化铝。右边有2个Al和3个O，左边有1个Al和2个O。需要在Al前加系数4，使左边有4个Al，在Al₂O₃前加系数2，使右边有4个Al和6个O，然后在O₂前加系数3，使左边有6个O。"
+                },
+                {
+                    equation: "CH₄ + O₂ → CO₂ + H₂O",
+                    coefficients: [1, 2, 1, 2],
+                    explanation: "甲烷燃烧生成二氧化碳和水。先平衡C原子：CH₄和CO₂系数都为1；再平衡H原子：CH₄中有4个H，需要在H₂O前加系数2；最后平衡O原子：右边有2+2=4个O，需要在O₂前加系数2。"
+                }
+            ],
+            medium: [
+                {
+                    equation: "C₂H₆ + O₂ → CO₂ + H₂O",
+                    coefficients: [2, 7, 4, 6],
+                    explanation: "乙烷燃烧反应。先平衡C原子：C₂H₆前系数为2，CO₂前系数为4；再平衡H原子：C₂H₆中有12个H，需要在H₂O前加系数6；最后平衡O原子：右边有8+6=14个O，需要在O₂前加系数7。"
+                },
+                {
+                    equation: "KClO₃ → KCl + O₂",
+                    coefficients: [2, 2, 3],
+                    explanation: "氯酸钾分解反应。先平衡K和Cl原子：KClO₃和KCl系数都为2；再平衡O原子：左边有6个O，需要在O₂前加系数3。"
+                },
+                {
+                    equation: "Fe₂O₃ + CO → Fe + CO₂",
+                    coefficients: [1, 3, 2, 3],
+                    explanation: "氧化铁被一氧化碳还原。先平衡Fe原子：Fe₂O₃前系数为1，Fe前系数为2；再平衡C原子：CO和CO₂前系数都为3；最后平衡O原子：左边有3+3=6个O，右边有6个O。"
+                },
+                {
+                    equation: "NH₃ + O₂ → NO + H₂O",
+                    coefficients: [4, 5, 4, 6],
+                    explanation: "氨气催化氧化。先平衡N原子：NH₃和NO前系数都为4；再平衡H原子：NH₃中有12个H，需要在H₂O前加系数6；最后平衡O原子：右边有4+6=10个O，需要在O₂前加系数5。"
+                },
+                {
+                    equation: "Cu + HNO₃ → Cu(NO₃)₂ + NO + H₂O",
+                    coefficients: [3, 8, 3, 2, 4],
+                    explanation: "铜与稀硝酸反应。先平衡Cu原子：Cu和Cu(NO₃)₂前系数都为3；再平衡N原子：右边有6+2=8个N，需要在HNO₃前加系数8；最后平衡H和O原子：左边有8个H，需要在H₂O前加系数4。"
+                }
+            ],
+            hard: [
+                {
+                    equation: "KMnO₄ + HCl → KCl + MnCl₂ + Cl₂ + H₂O",
+                    coefficients: [2, 16, 2, 2, 5, 8],
+                    explanation: "高锰酸钾与盐酸反应。这是一个氧化还原反应，需要根据电子转移来配平。KMnO₄中Mn从+7价降到+2价，得到5个电子；HCl中Cl从-1价升到0价，失去1个电子。需要找到最小公倍数5，所以Cl₂前系数为5，KMnO₄前系数为2。然后根据原子守恒配平其他物质。"
+                },
+                {
+                    equation: "FeS₂ + O₂ → Fe₂O₃ + SO₂",
+                    coefficients: [4, 11, 2, 8],
+                    explanation: "黄铁矿燃烧。先平衡Fe原子：FeS₂前系数为4，Fe₂O₃前系数为2；再平衡S原子：FeS₂中有8个S，需要在SO₂前加系数8；最后平衡O原子：右边有6+16=22个O，需要在O₂前加系数11。"
+                },
+                {
+                    equation: "Cu + H₂SO₄ → CuSO₄ + SO₂ + H₂O",
+                    coefficients: [1, 2, 1, 1, 2],
+                    explanation: "铜与浓硫酸反应。这是一个氧化还原反应，Cu从0价升到+2价，失去2个电子；H₂SO₄中S从+6价降到+4价，得到2个电子。所以Cu和SO₂前系数都为1。然后根据原子守恒配平其他物质。"
+                },
+                {
+                    equation: "K₂Cr₂O₇ + HCl → KCl + CrCl₃ + Cl₂ + H₂O",
+                    coefficients: [1, 14, 2, 2, 3, 7],
+                    explanation: "重铬酸钾与盐酸反应。这是一个氧化还原反应，K₂Cr₂O₇中Cr从+6价降到+3价，每个Cr得到3个电子，总共得到6个电子；HCl中Cl从-1价升到0价，失去1个电子。需要找到最小公倍数6，所以Cl₂前系数为3，K₂Cr₂O₇前系数为1。然后根据原子守恒配平其他物质。"
+                },
+                {
+                    equation: "As₂S₃ + HNO₃ + H₂O → H₃AsO₄ + H₂SO₄ + NO",
+                    coefficients: [3, 28, 4, 6, 9, 28],
+                    explanation: "雄黄与硝酸反应。这是一个复杂的氧化还原反应，需要分别计算As和S的氧化数变化。As从+3价升到+5价，每个As失去2个电子；S从-2价升到+6价，每个S失去8个电子。每个As₂S₃分子总共失去(2×2)+(3×8)=28个电子。HNO₃中N从+5价降到+2价，得到3个电子。需要找到最小公倍数84，所以As₂S₃前系数为3，NO前系数为28。然后根据原子守恒配平其他物质。"
+                }
+            ]
+        };
+
+        // 游戏状态
+        let gameState = {
+            score: 0,
+            correct: 0,
+            attempts: 0,
+            streak: 0,
+            currentLevel: 'easy',
+            currentEquation: null,
+            inputElements: []
+        };
+
+        // DOM元素
+        const scoreElement = document.getElementById('score');
+        const correctElement = document.getElementById('correct');
+        const attemptsElement = document.getElementById('attempts');
+        const streakElement = document.getElementById('streak');
+        const equationElement = document.getElementById('equation');
+        const inputArea = document.getElementById('input-area');
+        const submitBtn = document.getElementById('submit-btn');
+        const hintBtn = document.getElementById('hint-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const feedbackElement = document.getElementById('feedback');
+        const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+        const periodicTableBtn = document.getElementById('periodic-table-btn');
+
+        // 初始化游戏
+        function initGame() {
+            updateScoreboard();
+            loadEquation('easy');
+            setupEventListeners();
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            submitBtn.addEventListener('click', checkAnswer);
+            hintBtn.addEventListener('click', showHint);
+            nextBtn.addEventListener('click', nextEquation);
+            resetBtn.addEventListener('click', resetGame);
+            
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    difficultyBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    gameState.currentLevel = this.getAttribute('data-level');
+                    loadEquation(gameState.currentLevel);
+                });
+            });
+            
+            periodicTableBtn.addEventListener('click', showPeriodicTable);
+        }
+
+        // 加载方程式
+        function loadEquation(level) {
+            const levelEquations = equations[level];
+            const randomIndex = Math.floor(Math.random() * levelEquations.length);
+            gameState.currentEquation = levelEquations[randomIndex];
+            
+            // 显示方程式
+            equationElement.textContent = gameState.currentEquation.equation;
+            
+            // 创建输入框
+            createInputFields(gameState.currentEquation.coefficients.length);
+            
+            // 隐藏反馈
+            feedbackElement.style.display = 'none';
+        }
+
+        // 创建输入框
+        function createInputFields(count) {
+            inputArea.innerHTML = '';
+            gameState.inputElements = [];
+            
+            for (let i = 0; i < count; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = '1';
+                input.max = '20';
+                input.className = 'coefficient-input';
+                input.placeholder = '?';
+                gameState.inputElements.push(input);
+                inputArea.appendChild(input);
+            }
+        }
+
+        // 检查答案
+        function checkAnswer() {
+            const userCoefficients = gameState.inputElements.map(input => {
+                return parseInt(input.value) || 0;
+            });
+            
+            const correctCoefficients = gameState.currentEquation.coefficients;
+            
+            let isCorrect = true;
+            for (let i = 0; i < correctCoefficients.length; i++) {
+                if (userCoefficients[i] !== correctCoefficients[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+            
+            gameState.attempts++;
+            
+            if (isCorrect) {
+                gameState.score += 10;
+                gameState.correct++;
+                gameState.streak++;
+                
+                feedbackElement.className = 'feedback correct';
+                feedbackElement.innerHTML = `
+                    <div>✓ 恭喜！答案正确！</div>
+                    <div class="explanation">${gameState.currentEquation.explanation}</div>
+                `;
+            } else {
+                gameState.streak = 0;
+                
+                feedbackElement.className = 'feedback incorrect';
+                feedbackElement.innerHTML = `
+                    <div>✗ 答案不正确，请再试一次！</div>
+                    <div class="explanation">正确答案是: ${correctCoefficients.join(', ')}</div>
+                    <div class="explanation">${gameState.currentEquation.explanation}</div>
+                `;
+            }
+            
+            feedbackElement.style.display = 'block';
+            updateScoreboard();
+        }
+
+        // 显示提示
+        function showHint() {
+            const correctCoefficients = gameState.currentEquation.coefficients;
+            
+            feedbackElement.className = 'feedback hint';
+            feedbackElement.innerHTML = `
+                <div>💡 提示：尝试系数 ${correctCoefficients.join(', ')}</div>
+                <div class="explanation">${gameState.currentEquation.explanation}</div>
+            `;
+            feedbackElement.style.display = 'block';
+        }
+
+        // 下一题
+        function nextEquation() {
+            loadEquation(gameState.currentLevel);
+        }
+
+        // 重置游戏
+        function resetGame() {
+            gameState.score = 0;
+            gameState.correct = 0;
+            gameState.attempts = 0;
+            gameState.streak = 0;
+            
+            updateScoreboard();
+            loadEquation(gameState.currentLevel);
+        }
+
+        // 更新记分牌
+        function updateScoreboard() {
+            scoreElement.textContent = gameState.score;
+            correctElement.textContent = gameState.correct;
+            attemptsElement.textContent = gameState.attempts;
+            streakElement.textContent = gameState.streak;
+        }
+
+        // 显示元素周期表
+        function showPeriodicTable() {
+            alert("元素周期表功能将在后续版本中添加！");
+        }
+
+        // 初始化游戏
+        window.onload = initGame;
+    </script>
+</body>
+</html>
