@@ -1,0 +1,678 @@
+<!DOCTYPE HTML>
+<HTML 朗="zh-CN">
+<头>
+    <元 字符集="UTF-8">
+    <元 名字="视窗" 内容="宽度=设备宽度，初始比例=1.0">
+    <标题>化学方程式配平练习</标题>
+    <风格>
+        * {
+            盒装尺寸:边界盒;
+            边缘: 0;
+            填充: 0;
+            字体家族: “阿里亚尔”,无衬线体;
+        }
+        
+        身体 {
+            背景色: #F5F5F5;
+            颜色: #333;
+            线高: 1.6;
+            填充: 20PX;
+            背景: 线性梯度(135度, #e0f7fa 0%, #BBDEFB 100%);
+            最小高度: 100VH;
+            显示:屈;
+            灵活方向:列;
+        }
+        
+.移动通知 {
+            显示:没有;
+            文本对齐:中心;
+            背景色: #ffeb3b;
+            颜色: #333;
+            填充: 10PX;
+            边缘-底部: 15PX;
+            边界半径: 8PX;
+            字体粗细:大胆;
+            盒子阴影: 0 2PX 5PX RGBA(0,0,0,0.1);
+        }
+        
+        @media (最大宽度: 768PX) 和 (取向:肖像） {
+.移动通知 {
+                显示:块;
+            }
+        }
+        
+.容器 {
+            最大宽度: 900PX;
+            边缘: 0自动;
+            背景色:白;
+            边界半径: 15PX;
+            盒子阴影: 0 10PX 30PX RGBA(0, 0, 0, 0.1);
+            填充: 30PX;
+            位置:相对;
+            溢出:隐藏;
+            屈: 1;
+        }
+        
+.容器::以前 {
+            内容: "";
+            位置:绝对;
+            返回页首: 0;
+            左: 0;
+            宽度: 100%;
+            高度: 8PX;
+            背景: 线性梯度(90度, #4CAF50, #2196F3, #最终幻想9800);
+        }
+        
+        页眉 {
+            文本对齐:中心;
+            边缘-底部: 30PX;
+            垫底: 20PX;
+            边界-底部: 2PX虚线#E0E0E0;
+        }
+        
+        H1 {
+            颜色: #2E7D32;
+            边缘-底部: 10PX;
+            字体大小: 2.2EM;
+            文本阴影: 1PX 1PX 3PX RGBA(0,0,0,0.1);
+        }
+        
+.描述 {
+            颜色: #666;
+            字体大小: 1.1EM;
+            最大宽度: 600PX;
+            边缘: 0自动;
+        }
+        
+.难度选择器 {
+            边缘: 25PX 0;
+            文本对齐:中心;
+            显示:屈;
+            正义内容:中心;
+            对齐项:中心;
+            差距: 15PX;
+        }
+        
+.难度选择器 选择 {
+            填充: 10PX 20PX;
+            边界半径: 8PX;
+            边境: 2PX固体#4CAF50;
+            字体大小: 1EM;
+            背景色: #f9f9f9;
+            过渡:都0.3s;
+        }
+        
+.难度选择器 选择:重点 {
+            大纲:没有;
+            盒子阴影: 0 0 0 3PX RGBA(76, 175, 80, 0.2);
+        }
+        
+.问题信息 {
+            文本对齐:中心;
+            边缘-底部: 20PX;
+            颜色: #666;
+            字体大小: 1.1EM;
+            背景色: #e8f5E9;
+            填充: 10PX;
+            边界半径: 8PX;
+            边境左翼: 4PX固体#4CAF50;
+        }
+        
+.方程容器 {
+            背景色: #f9f9f9;
+            边界半径: 12PX;
+            填充: 25PX;
+            边缘-底部: 25PX;
+            边境: 2PX固体#E0E0E0;
+            盒子阴影: 0 5PX 15PX RGBA(0, 0, 0, 0.05);
+        }
+        
+.方程 {
+            字体大小: 1.6EM;
+            文本对齐:中心;
+            边缘: 20PX 0;
+            字体家族: 《信使新报》,monospace;
+            填充: 15PX;
+            背景色:白;
+            边界半径: 8PX;
+            盒子阴影: 0 3PX 10PX RGBA(0, 0, 0, 0.05);
+            显示:屈;
+            正义内容:中心;
+            对齐项:中心;
+            柔性缠绕:无包裹;
+            溢出-X:自动;
+            空白空间:无包裹;
+        }
+        
+.系数输入 {
+            宽度: 60PX;
+            高度: 40PX;
+            文本对齐:中心;
+            字体大小: 1.3EM;
+            边境: 2PX固体#CCC;
+            边界半径: 8PX;
+            边缘: 0 8PX;
+            过渡:都0.3s;
+            字体粗细:大胆;
+            颜色: #d32F2f; /* 红色 */
+        }
+        
+.系数输入:重点 {
+            边框颜色: #4CAF50;
+            大纲:没有;
+            盒子阴影: 0 0 0 3PX RGBA(76, 175, 80, 0.2);
+            变换: 规模(1.05);
+        }
+        
+        /* 设置输入框中数字的样式 */
+.系数输入::占 位 符 {
+            颜色: #d32F2f;
+            字体粗细:大胆;
+            不透明度: 0.7;
+        }
+        
+.化学式 {
+            显示:直列柔性;
+            对齐项:中心;
+        }
+        
+.下标 {
+            字体大小: 0.7EM;
+            垂直对齐:子;
+            位置:相对;
+            底: -0.2EM;
+        }
+        
+.箭 {
+            字体大小: 1.8EM;
+            边缘: 0 20PX;
+            颜色: #2E7D32;
+            字体粗细:大胆;
+            位置:相对;
+        }
+        
+.箭::以前 {
+            内容: "⟶";
+        }
+        
+.加 {
+            边缘: 0 15PX;
+            字体大小: 1.4EM;
+            颜色: #666;
+        }
+        
+.控制 {
+            显示:屈;
+            正义内容:中心;
+            差距: 15PX;
+            边缘: 25PX 0;
+            柔性缠绕:包装;
+        }
+        
+        按钮 {
+            填充: 12PX 25PX;
+            背景色: #4CAF50;
+            颜色:白;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background-color: #388E3C;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background-color: #2196F3;
+        }
+        
+        button.secondary:hover {
+            background-color: #1976D2;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            font-size: 1.1em;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .correct {
+            background-color: #E8F5E9;
+            border: 2px solid #4CAF50;
+            color: #2E7D32;
+        }
+        
+        .incorrect {
+            background-color: #FFEBEE;
+            border: 2px solid #F44336;
+            color: #C62828;
+        }
+        
+        .tips {
+            background-color: #E3F2FD;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 2px solid #bbdefb;
+        }
+        
+        .tips h3 {
+            color: #1565C0;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tips h3::before {
+            content: "💡";
+            font-size: 1.2em;
+        }
+        
+        .tips ul {
+            padding-left: 20px;
+        }
+        
+        .tips li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+            padding: 15px;
+        }
+        
+        .footer-text {
+            font-size: 1.2em;
+            color: #2E7D32;
+            font-weight: bold;
+            /* 移除了斜体样式 */
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .equation {
+                font-size: 1.3em;
+                flex-wrap: wrap;
+                white-space: normal;
+                justify-content: flex-start;
+            }
+            
+            .coefficient-input {
+                width: 50px;
+                height: 35px;
+                font-size: 1.1em;
+            }
+            
+            .arrow {
+                font-size: 1.5em;
+                margin: 0 10px;
+            }
+            
+            .plus {
+                margin: 0 10px;
+                font-size: 1.2em;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 280px;
+            }
+            
+            .difficulty-selector {
+                flex-direction: column;
+            }
+            
+            .footer-text {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-notice">手机建议横屏观看</div>
+    
+    <div class="container">
+        <header>
+            <h1>化学方程式配平练习</h1>
+            <p class="description">请为以下化学方程式配平，在输入框中填入适当的系数。每个难度级别包含20道题目，题目随机出现。</p>
+        </header>
+        
+        <div class="difficulty-selector">
+            <label for="difficulty" style="font-weight: bold; font-size: 1.1em;">选择难度：</label>
+            <select id="difficulty">
+                <option value="easy" selected>简单</option>
+                <option value="medium">中等</option>
+                <option value="hard">困难</option>
+            </select>
+        </div>
+        
+        <div class="progress-container">
+            <div class="question-info">
+                <span id="questionCounter">题目 1/20</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress" id="progressBar"></div>
+            </div>
+        </div>
+        
+        <div class="equation-container">
+            <div class="equation" id="equationDisplay">
+                <!-- 方程式的HTML将由JavaScript动态生成 -->
+            </div>
+            
+            <div class="controls">
+                <button id="checkBtn">检查答案</button>
+                <button id="resetBtn" class="secondary">重置</button>
+                <button id="newEquationBtn">随机新题</button>
+            </div>
+            
+            <div class="feedback" id="feedback"></div>
+        </div>
+        
+        <div class="tips">
+            <h3>配平技巧：</h3>
+            <ul>
+                <li>从最复杂的化合物开始配平 - 通常含有多种元素的化合物</li>
+                <li>先配平金属原子，再配平非金属原子 - 金属通常更容易配平</li>
+                <li>氢原子和氧原子通常最后配平 - 它们经常出现在多个化合物中</li>
+                <li>使用最小公倍数法确定系数 - 找到原子数的最小公倍数</li>
+                <li>检查所有原子的数量在反应前后是否相等 - 确保方程式平衡</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <span class="footer-text">含苞只为待放</span>
+    </div>
+
+    <script>
+        // 化学方程式数据 - 每个难度20道题
+        const equations = {
+            easy: [
+                { equation: "H2 + O2 → H2O", coefficients: [2, 1, 2] },
+                { equation: "N2 + H2 → NH3", coefficients: [1, 3, 2] },
+                { equation: "Fe + O2 → Fe2O3", coefficients: [4, 3, 2] },
+                { equation: "Na + Cl2 → NaCl", coefficients: [2, 1, 2] },
+                { equation: "Mg + O2 → MgO", coefficients: [2, 1, 2] },
+                { equation: "Ca + H2O → Ca(OH)2 + H2", coefficients: [1, 2, 1, 1] },
+                { equation: "Zn + HCl → ZnCl2 + H2", coefficients: [1, 2, 1, 1] },
+                { equation: "Al + O2 → Al2O3", coefficients: [4, 3, 2] },
+                { equation: "CuO + H2 → Cu + H2O", coefficients: [1, 1, 1, 1] },
+                { equation: "CH4 + O2 → CO2 + H2O", coefficients: [1, 2, 1, 2] },
+                { equation: "K + H2O → KOH + H2", coefficients: [2, 2, 2, 1] },
+                { equation: "P + O2 → P2O5", coefficients: [4, 5, 2] },
+                { equation: "S + O2 → SO2", coefficients: [1, 1, 1] },
+                { equation: "C + O2 → CO2", coefficients: [1, 1, 1] },
+                { equation: "Fe + S → FeS", coefficients: [1, 1, 1] },
+                { equation: "NaOH + HCl → NaCl + H2O", coefficients: [1, 1, 1, 1] },
+                { equation: "CaO + H2O → Ca(OH)2", coefficients: [1, 1, 1] },
+                { equation: "CO2 + H2O → H2CO3", coefficients: [1, 1, 1] },
+                { equation: "H2 + Cl2 → HCl", coefficients: [1, 1, 2] },
+                { equation: "NH3 + HCl → NH4Cl", coefficients: [1, 1, 1] }
+            ],
+            medium: [
+                { equation: "C3H8 + O2 → CO2 + H2O", coefficients: [1, 5, 3, 4] },
+                { equation: "Al + HCl → AlCl3 + H2", coefficients: [2, 6, 2, 3] },
+                { equation: "KClO3 → KCl + O2", coefficients: [2, 2, 3] },
+                { equation: "Fe2O3 + CO → Fe + CO2", coefficients: [1, 3, 2, 3] },
+                { equation: "NH4NO3 → N2O + H2O", coefficients: [1, 1, 2] },
+                { equation: "NaOH + H2SO4 → Na2SO4 + H2O", coefficients: [2, 1, 1, 2] },
+                { equation: "CaCO3 → CaO + CO2", coefficients: [1, 1, 1] },
+                { equation: "AgNO3 + NaCl → AgCl + NaNO3", coefficients: [1, 1, 1, 1] },
+                { equation: "H2SO4 + NaOH → Na2SO4 + H2O", coefficients: [1, 2, 1, 2] },
+                { equation: "Fe + CuSO4 → FeSO4 + Cu", coefficients: [1, 1, 1, 1] },
+                { equation: "Zn + CuSO4 → ZnSO4 + Cu", coefficients: [1, 1, 1, 1] },
+                { equation: "CaCl2 + Na2CO3 → CaCO3 + NaCl", coefficients: [1, 1, 1, 2] },
+                { equation: "BaCl2 + H2SO4 → BaSO4 + HCl", coefficients: [1, 1, 1, 2] },
+                { equation: "Cu + AgNO3 → Cu(NO3)2 + Ag", coefficients: [1, 2, 1, 2] },
+                { equation: "NH3 + O2 → N2 + H2O", coefficients: [4, 3, 2, 6] },
+                { equation: "C2H4 + O2 → CO2 + H2O", coefficients: [1, 3, 2, 2] },
+                { equation: "C2H2 + O2 → CO2 + H2O", coefficients: [2, 5, 4, 2] },
+                { equation: "Fe + H2SO4 → FeSO4 + H2", coefficients: [1, 1, 1, 1] },
+                { equation: "Na2CO3 + HCl → NaCl + H2O + CO2", coefficients: [1, 2, 2, 1, 1] },
+                { equation: "KOH + H3PO4 → K3PO4 + H2O", coefficients: [3, 1, 1, 3] }
+            ],
+            hard: [
+                { equation: "FeS2 + O2 → Fe2O3 + SO2", coefficients: [4, 11, 2, 8] },
+                { equation: "C2H5OH + O2 → CO2 + H2O", coefficients: [1, 3, 2, 3] },
+                { equation: "NH3 + O2 → NO + H2O", coefficients: [4, 5, 4, 6] },
+                { equation: "KMnO4 → K2MnO4 + MnO2 + O2", coefficients: [2, 1, 1, 1] },
+                { equation: "Cu + HNO3 → Cu(NO3)2 + NO + H2O", coefficients: [3, 8, 3, 2, 4] },
+                { equation: "K2Cr2O7 + HCl → KCl + CrCl3 + Cl2 + H2O", coefficients: [1, 14, 2, 2, 3, 7] },
+                { equation: "P + HNO3 + H2O → H3PO4 + NO", coefficients: [3, 5, 2, 3, 5] },
+                { equation: "Fe2(SO4)3 + KSCN → K3Fe(SCN)6 + K2SO4", coefficients: [1, 6, 2, 3] },
+                { equation: "KClO3 + HCl → KCl + Cl2 + H2O", coefficients: [1, 6, 1, 3, 3] },
+                { equation: "Na2S2O3 + I2 → Na2S4O6 + NaI", coefficients: [2, 1, 1, 2] },
+                { equation: "MnO2 + HCl → MnCl2 + Cl2 + H2O", coefficients: [1, 4, 1, 1, 2] },
+                { equation: "K2Cr2O7 + H2SO4 + FeSO4 → Cr2(SO4)3 + Fe2(SO4)3 + K2SO4 + H2O", coefficients: [1, 4, 6, 1, 3, 1, 4] },
+                { equation: "As2S3 + HNO3 + H2O → H3AsO4 + H2SO4 + NO", coefficients: [3, 28, 4, 6, 9, 28] },
+                { equation: "Cu2S + HNO3 → Cu(NO3)2 + H2SO4 + NO + H2O", coefficients: [3, 22, 6, 3, 10, 8] },
+                { equation: "Fe3O4 + KMnO4 + H2SO4 → Fe2(SO4)3 + MnSO4 + K2SO4 + H2O", coefficients: [10, 6, 24, 15, 6, 3, 24] },
+                { equation: "K4Fe(CN)6 + KMnO4 + H2SO4 → K2SO4 + Fe2(SO4)3 + MnSO4 + HNO3 + CO2 + H2O", coefficients: [10, 122, 299, 162, 5, 122, 60, 100, 188] },
+                { equation: "KClO3 + H2C2O4 → KCl + CO2 + H2O", coefficients: [2, 1, 2, 2, 1] },
+                { equation: "Na2S2O3 + Cl2 + H2O → Na2SO4 + HCl + S", coefficients: [1, 4, 5, 1, 8, 1] },
+                { equation: "Cu + H2SO4 → CuSO4 + SO2 + H2O", coefficients: [1, 2, 1, 1, 2] },
+                { equation: "KBr + KBrO3 + H2SO4 → Br2 + K2SO4 + H2O", coefficients: [5, 1, 3, 3, 3, 3] }
+            ]
+        };
+
+        // 当前显示的方程式
+        let currentEquation = null;
+        let currentDifficulty = 'easy'; // 默认设置为简单模式
+        let currentQuestionIndex = 0;
+        let questions = equations[currentDifficulty];
+        let usedQuestions = new Set();
+
+        // DOM元素
+        const equationDisplay = document.getElementById('equationDisplay');
+        const difficultySelect = document.getElementById('difficulty');
+        const questionCounter = document.getElementById('questionCounter');
+        const progressBar = document.getElementById('progressBar');
+        const checkBtn = document.getElementById('checkBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const newEquationBtn = document.getElementById('newEquationBtn');
+        const feedback = document.getElementById('feedback');
+
+        // 初始化
+        function init() {
+            loadRandomEquation();
+            
+            // 事件监听
+            difficultySelect.addEventListener('change', function() {
+                currentDifficulty = this.value;
+                questions = equations[currentDifficulty];
+                usedQuestions.clear();
+                loadRandomEquation();
+            });
+            
+            checkBtn.addEventListener('click', checkAnswer);
+            resetBtn.addEventListener('click', resetInputs);
+            newEquationBtn.addEventListener('click', loadRandomEquation);
+        }
+
+        // 将化学式转换为带有下标的HTML
+        function formatChemicalFormula(formula) {
+            // 将数字转换为下标
+            return formula.replace(/([A-Za-z])(\d+)/g, '$1<span class="subscript">$2</span>');
+        }
+
+        // 加载随机方程式
+        function loadRandomEquation() {
+            // 如果所有题目都已使用，重置使用记录
+            if (usedQuestions.size >= questions.length) {
+                usedQuestions.clear();
+            }
+            
+            // 随机选择一个未使用的题目
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * questions.length);
+            } while (usedQuestions.has(randomIndex));
+            
+            usedQuestions.add(randomIndex);
+            currentQuestionIndex = randomIndex;
+            currentEquation = questions[currentQuestionIndex];
+            
+            // 更新题目计数器
+            questionCounter.textContent = `题目 ${usedQuestions.size}/20`;
+            
+            // 更新进度条
+            progressBar.风格.宽度 = `${(usedQuestions.size / 20) * 100}%`;
+            
+            // 清空之前的输入框
+            equationDisplay.innerHTML = '';
+            
+            // 解析方程式并创建输入框
+            const parts = currentEquation.方程.split(' ');
+            let inputIndex = 0;
+            
+            parts.forEach(part => {
+                if (part === '→') {
+                    equationDisplay.innerHTML += `<span class="arrow"></span>`;
+                } else if (part === '+') {
+                    equationDisplay.innerHTML += `<span class="plus">+</span>`;
+                } else {
+                    // 格式化化学式，将数字转换为下标
+                    const formattedFormula = formatChemicalFormula(part);
+                    equationDisplay.innerHTML += `<input type="number" min="1" class="coefficient-input" id="coeff${inputIndex}" value="1"> <span class="chemical-formula">${formattedFormula}</span>`;
+                    inputIndex++;
+                }
+            });
+            
+            // 重置反馈
+            feedback.风格.显示 = 'none';
+        }
+
+        // 检查答案
+        function checkAnswer() {
+            const inputs = document.querySelectorAll('.coefficient-input');
+            let allCorrect = true;
+            let userCoefficients = [];
+            
+            // 收集用户输入的系数
+            inputs.forEach(input => {
+                const value = parseInt(input.value);
+                userCoefficients.push(value);
+                
+                if (isNaN(value) || value < 1) {
+                    allCorrect = false;
+                }
+            });
+            
+            // 验证系数
+            if (allCorrect) {
+                for (let i = 0; i < currentEquation.coefficients.length; i++) {
+                    if (userCoefficients[i] !== currentEquation.coefficients[i]) {
+                        allCorrect = false;
+                        break;
+                    }
+                }
+            }
+            
+            // 显示反馈
+            feedback.风格.显示 = 'block';
+            if (allCorrect) {
+                feedback.className = 'feedback correct';
+                feedback.innerHTML = '<strong>正确！</strong> 方程式配平成功。';
+                playCorrectSound();
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.innerHTML = '<strong>不正确。</strong> 请再试一次。';
+            }
+        }
+
+        // 播放正确音效
+        function playCorrectSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // 播放一个愉快的音调
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+            oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // E5
+            oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2); // G5
+            
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        // 重置输入
+        function resetInputs() {
+            const inputs = document.querySelectorAll('.coefficient-input');
+            inputs.forEach(input => {
+                input.value = '1';
+            });
+            
+            feedback.style.display = 'none';
+        }
+
+        // 初始化应用
+        window.onload = init;
+    </script>
+</body>
+</html>
