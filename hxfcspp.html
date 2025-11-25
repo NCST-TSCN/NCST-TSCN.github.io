@@ -23,6 +23,24 @@
             flex-direction: column;
         }
         
+        .mobile-notice {
+            display: none;
+            text-align: center;
+            background-color: #ffeb3b;
+            color: #333;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) and (orientation: portrait) {
+            .mobile-notice {
+                display: block;
+            }
+        }
+        
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -311,8 +329,8 @@
         .footer-text {
             font-size: 1.2em;
             color: #2E7D32;
-            font-style: italic;
             font-weight: bold;
+            /* 移除了斜体样式 */
         }
         
         @media (max-width: 600px) {
@@ -368,6 +386,8 @@
     </style>
 </head>
 <body>
+    <div class="mobile-notice">手机建议横屏观看</div>
+    
     <div class="container">
         <header>
             <h1>化学方程式配平练习</h1>
@@ -377,8 +397,8 @@
         <div class="difficulty-selector">
             <label for="difficulty" style="font-weight: bold; font-size: 1.1em;">选择难度：</label>
             <select id="difficulty">
-                <option value="easy">简单</option>
-                <option value="medium" selected>中等</option>
+                <option value="easy" selected>简单</option>
+                <option value="medium">中等</option>
                 <option value="hard">困难</option>
             </select>
         </div>
@@ -495,7 +515,7 @@
 
         // 当前显示的方程式
         let currentEquation = null;
-        let currentDifficulty = 'medium';
+        let currentDifficulty = 'easy'; // 默认设置为简单模式
         let currentQuestionIndex = 0;
         let questions = equations[currentDifficulty];
         let usedQuestions = new Set();
