@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化学方程式计算练习</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eaeaea;
+            position: relative;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: #3498db;
+            border-radius: 3px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .question-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .question-card:nth-child(2n) {
+            border-left-color: #2ecc71;
+        }
+        
+        .question-card:nth-child(3n) {
+            border-left-color: #e74c3c;
+        }
+        
+        .question-card:nth-child(4n) {
+            border-left-color: #f39c12;
+        }
+        
+        .question-number {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            background: #3498db;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .question-card:nth-child(2n) .question-number {
+            background: #2ecc71;
+        }
+        
+        .question-card:nth-child(3n) .question-number {
+            background: #e74c3c;
+        }
+        
+        .question-card:nth-child(4n) .question-number {
+            background: #f39c12;
+        }
+        
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 18px;
+            padding-left: 10px;
+            border-left: 3px solid #3498db;
+        }
+        
+        .question-content {
+            margin-bottom: 15px;
+            padding-left: 13px;
+        }
+        
+        .atomic-mass {
+            background-color: #e8f4fc;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+            display: inline-block;
+        }
+        
+        .mask {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid #c5e1f5;
+        }
+        
+        .mask:hover {
+            background-color: #d4edfc;
+        }
+        
+        .mask-title {
+            font-weight: bold;
+            color: #2980b9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mask-content {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #bdc3c7;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-title {
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .step-content {
+            padding-left: 10px;
+        }
+        
+        .chemical-equation {
+            text-align: center;
+            font-size: 18px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f1f8e9;
+            border-radius: 5px;
+            font-family: 'Cambria', 'Times New Roman', serif;
+        }
+        
+        .calculation {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #e0e0e0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+        
+        .score {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .tip {
+            background-color: #fff8e1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #ffc107;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .tip-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ff9800;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tip-title::before {
+            content: "💡";
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 14px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        .toggle-icon {
+            font-weight: bold;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .key-point {
+            background-color: #e8f5e9;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .key-point-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 5px;
+        }
+        
+        .equation-mask {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            margin-top: 10px;
+        }
+        
+        .equation-mask:hover {
+            background-color: #ffecb3;
+        }
+        
+        .equation-mask .mask-title {
+            color: #856404;
+        }
+        
+        .equation-content {
+            text-align: center;
+            padding: 15px;
+            font-size: 18px;
+            font-family: 'Cambria', 'Times New Roman', serif;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+            
+            .chemical-equation {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>化学方程式计算练习</h1>
+        <div class="subtitle">牢记格式轻松拿满分</div>
+        
+        <div class="tip">
+            <div class="tip-title">核心依据</div>
+            <p>在化学方程式中，各物质之间的<strong>真实质量之比</strong>，等于它们的<strong>相对分子质量（或相对原子质量）总和之比</strong>。</p>
+        </div>
+        
+        <div class="key-point">
+            <div class="key-point-title">解题格式与评分细则</div>
+            <p>① 设：设未知量（0.5分）</p> 
+            <p>② 式：正确书写化学方程式（1分）</p> 
+            <p>③ 写：写出相关物质的相对质量与真实质量（1分）</p> 
+            <p>④ 出：列出比例式（1分）</p> 
+            <p>⑤ 解：解方程（1分）</p> 
+            <p>⑥ 答：作答（0.5分）</p>
+        </div>
+        
+        <!-- 题目1 -->
+        <div class="question-card">
+            <div class="question-number">1</div>
+            <div class="question-title">高锰酸钾制氧气</div>
+            <div class="question-content">
+                <p>实验室用加热高锰酸钾的方法制取氧气。现要制得3.2g氧气，至少需要消耗多少克高锰酸钾？</p>
+                <div class="atomic-mass">可能用到的相对原子质量： K-39, Mn-55, O-16</div>
+            </div>
+            
+            <div class="equation-mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看化学方程式</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="equation-content">
+                        2KMnO₄ △ K₂MnO₄ + MnO₂ + O₂↑
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看解题步骤与评分细则</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要高锰酸钾的质量为 x。</p>
+                            <p><strong>评分细则：</strong>必须明确写出"设...的质量为x"，x本身代表质量，不能写成"设需要高锰酸钾x克"。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">2KMnO₄ △ K₂MnO₄ + MnO₂ + O₂↑</div>
+                            <p><strong>评分细则：</strong>化学方程式必须配平，且要注明反应条件和气体符号。方程式未配平扣0.5分，条件或符号缺失扣0.5分。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>2KMnO₄  △  K₂MnO₄ + MnO₂ + O₂↑</p>
+                               <p>316　　　　　　　　　　　　　32</p>
+                                <p>x　　　　　　　　　　　　　　3.2g</p>
+                            </div>
+                            <p><strong>评分细则：</strong>相对分子质量总和计算正确得0.5分，已知质量和未知量x与对应物质对齐得0.5分。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x/316=3.2g/32</p>
+                            </div>
+                            <p><strong>评分细则：</strong>比例式正确得1分，比例关系错误不得分。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 31.6g</p>
+                            </div>
+                            <p><strong>评分细则：</strong>计算过程正确得0.5分，结果正确得0.5分。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：至少需要消耗高锰酸钾31.6克。</p>
+                            <p><strong>评分细则：</strong>答案与"设"呼应，并写清单位得0.5分。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         
+        <!-- 题目2 -->
+        <div class="question-card">
+            <div class="question-number">2</div>
+            <div class="question-title">铁与硫酸铜反应</div>
+            <div class="question-content">
+                <p>将足量的铁粉投入硫酸铜溶液中，完全反应后，得到6.4g铜。计算参加反应的铁粉的质量。</p>
+                <div class="atomic-mass">可能用到的相对原子质量： Fe-56, Cu-64, S-32, O-16</div>
+            </div>
+            
+            <div class="equation-mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看化学方程式</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="equation-content">
+                        Fe + CuSO₄ = FeSO₄ + Cu
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看解题步骤与评分细则</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：参加反应的铁粉的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">Fe + CuSO₄ = FeSO₄ + Cu</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>Fe + CuSO₄ = FeSO₄ + Cu</p>
+                                <p>56　　　　　　　　　   64</p>
+                                <p> x　　　　　　　　　 　6.4g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x/56=6.4g/64</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 5.6g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：参加反应的铁粉的质量为5.6克。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目3 -->
+        <div class="question-card">
+            <div class="question-number">3</div>
+            <div class="question-title">电解水制氢气</div>
+            <div class="question-content">
+                <p>电解水可以制得氢气。若要制取0.4g氢气，需要电解多少克水？</p>
+                <div class="atomic-mass">可能用到的相对原子质量： H-1, O-16</div>
+            </div>
+            
+            <div class="equation-mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看化学方程式</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="equation-content">
+                        2H₂O 通电 2H₂↑ + O₂↑
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看解题步骤与评分细则</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要水的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">2H₂O 通电 2H₂↑ + O₂↑</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>2H₂O 通电 2H₂↑ + O₂↑</p>
+                                <p>36　　　　 4</p>
+                                <p> x　　　　0.4g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x/36 = 0.4g/4</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 3.6g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：需要电解3.6克水。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+                
+        <!-- 题目4 -->
+        <div class="question-card">
+            <div class="question-number">4</div>
+            <div class="question-title">碳酸钙分解</div>
+            <div class="question-content">
+                <p>高温煅烧碳酸钙可以制得生石灰和二氧化碳。若要制得5.6g生石灰，需要多少克碳酸钙？</p>
+                <div class="atomic-mass">可能用到的相对原子质量： Ca-40, C-12, O-16</div>
+            </div>
+            
+            <div class="equation-mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看化学方程式</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="equation-content">
+                        CaCO₃ 高温 CaO + CO₂↑
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看解题步骤与评分细则</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要碳酸钙的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">CaCO₃ 高温 CaO + CO₂↑</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>CaCO₃ 高温 CaO + CO₂↑</p>
+                                <p>100　　　　56</p>
+                                <p> x　　　　  5.6g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x/100 = 5.6g/56</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 10g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：需要10克碳酸钙。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目5 -->
+        <div class="question-card">
+            <div class="question-number">5</div>
+            <div class="question-title">镁与氧气反应</div>
+            <div class="question-content">
+                <p>镁在空气中燃烧生成氧化镁。若有2.4g镁完全燃烧，能生成多少克氧化镁？</p>
+                <div class="atomic-mass">可能用到的相对原子质量： Mg-24, O-16</div>
+            </div>
+            
+            <div class="equation-mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看化学方程式</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="equation-content">
+                        2Mg + O₂ 点燃 2MgO
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看解题步骤与评分细则</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：生成氧化镁的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">2Mg + O₂ 点燃 2MgO</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>2Mg + O₂ 点燃 2MgO</p>
+                                <p>48　　　　　　　80</p>
+                                <p>2.4g　　　　　　 x</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x/80 = 2.4g/48</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 4g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：能生成4克氧化镁。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目6 -->
+        <div class="question-card">
+            <div class="question-number">6</div>
+            <div class="question-title">铝与稀盐酸反应</div>
+            <div class="question-content">
+                <p>铝与稀盐酸反应生成氯化铝和氢气。若要制取0.6g氢气，需要多少克铝？</p>
+                <div class="atomic-mass">可能用到的相对原子质量： Al-27, H-1, Cl-35.5</div>
+            </div>
+            
+            <div class="equation-mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看化学方程式</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="equation-content">
+                        2Al + 6HCl = 2AlCl₃ + 3H₂↑
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看解题步骤与评分细则</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要铝的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">2Al + 6HCl = 2AlCl₃ + 3H₂↑</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>2Al + 6HCl = 2AlCl₃ + 3H₂↑</p>
+                                <p>54　　　　　　　　　　6</p>
+                                <p> x　　　　　　　　　 0.6g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x/54 = 0.6g/6</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 5.4g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：需要5.4克铝。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目7 -->
+        <div class="question-card">
+            <div class="question-number">7</div>
+            <div class="question-title">一氧化碳还原氧化铁</div>
+            <div class="question-content">
+                <p>工业上用一氧化碳还原氧化铁炼铁。若要得到5.6g铁，需要多少克一氧化碳？</p>
+                <div class="atomic-mass">可能用到的相对原子质量： Fe-56, C-12, O-16</div>
+            </div>
+            
+            <div class="equation-mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看化学方程式</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="equation-content">
+                        3CO + Fe₂O₃ 高温 2Fe + 3CO₂
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看解题步骤与评分细则</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要一氧化碳的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">3CO + Fe₂O₃ 高温 2Fe + 3CO₂</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>3CO + Fe₂O₃ 高温 2Fe + 3CO₂</p>
+                                <p>84　　　　　　　 112</p>
+                                <p> x　　　　　　　   5.6g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x/84 = 5.6g/112</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 4.2g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：需要4.2克一氧化碳。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tip">
+            <div class="tip-title">解题要点总结</div>
+            <p>1. 严格按照"设-式-写-出-解-答"六步法书写，确保步骤完整</p>
+            <p>2. 化学方程式必须配平，并注明反应条件和物质状态</p>
+            <p>3. 相对分子质量总和 = 化学计量数 × 相对分子质量</p>
+            <p>4. 已知质量和未知量必须与对应的物质对齐</p>
+            <p>5. 注意题目中的隐含条件，如物质纯度、足量等</p>
+            <p>6. 计算结果要带单位，并注意有效数字</p>
+        </div>
+        
+        <div class="footer">
+            <p><strong>含苞只为待放</strong></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleContent(element) {
+            const content = element.querySelector('.mask-content');
+            const icon = element.querySelector('.toggle-icon');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                element.classList.remove('active');
+            } else {
+                content.style.display = 'block';
+                element.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
