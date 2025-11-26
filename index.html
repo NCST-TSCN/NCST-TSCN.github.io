@@ -1,143 +1,143 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>导航主页</title>
-    <style>
+<html   超文本标记语言    < html   超文本标记语言 lang   朗 = "应用" >lang="zh-CN">
+<head   头>
+    <meta   元 charset   字符集="UTF-8"   “utf - 8”>
+    <meta   元 name   名字="viewport"   “视口” content   内容="width=device-width, initial-scale=1.0"“宽度=设备宽度,初始= 1.0”>
+    <title   标题>导航主页</title   标题>
+       < >风格<style   风格>
         * {
-            margin: 0;
-            padding: 0;
+               保证金:0;margin   保证金: 0;
+               填充:0;padding   填充: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family：宋体；font-family   字体类型: 'Arial'   “天线”, sans-serif;
         }
         
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-            color: #333;
+           身体{body   身体 {
+            背景：线性渐变（135度，#f5f7fa 0%, #c3cfe2 100%）；background   背景: linear-gradient   线性渐变(135deg, #f5f7fa 0%, #c3cfe2 100%);
+               最小高度:100 vh;min-height   最小高度: 100vh;
+               填充：40px 20px；padding   填充: 40px 20px;
+               颜色:# 333;color: #333;
         }
         
-        .container {
+        .   ．容器{container   容器 {
             max-width: 1200px;
-            margin: 0 auto;
+               Margin   保证金: 0 auto；margin: 0 auto   汽车;
         }
         
-        header {
-            text-align: center;
+           标题{header   头 {
+               text-align:中心;text-align: center   中心;
             margin-bottom: 50px;
         }
         
         h1 {
-            font-size: 2.5rem;
-            color: #2c3e50;
+               字体大小:2.5快速眼动;font-size   字体大小: 2.5rem;
+               颜色:# 2c3e50;color   颜色: #2c3e50;
             margin-bottom: 10px;
         }
         
-        .subtitle {
-            font-size: 1.2rem;
-            color: #7f8c8d;
+        .subtitle {   ．(字幕){
+            font-size: 1.2rem;   字体大小:1.2快速眼动;
+            color: #7f8c8d;   颜色:# 7 f8c8d;
         }
         
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
+        .grid {   ．网格{
+            display: grid;   显示:网格;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));Grid-template-columns: repeat   重复(auto-fill   自动, minmax   极大极小(300px, 1fr   真的吗))；Grid-template-columns: repeat   重复(auto-fill   自动, minmax   极大极小(300px, 1   真的吗fr   真的吗))；Grid-template-columns: repeat（自动填充）；（300px, 1fr）；
+            gap: 30px;   差距:30 px;
         }
         
         .card {
-            background: white;
+            background: white;   背景:白色;
             border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            padding: 25px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            height: 180px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);Box-shadow   不必: 0 10px 20px rgba(0,0,0,0.1)；Box-shadow: 0 10px 20px rgba(0,0,0,0.1)；Box-shadow   ,不必: 0 10px 20px rgba(0,0,0,0.1)；
+            padding: 25px;   填充:25 px;
+            transition: all 0.3s ease;   过渡：全部0.3s轻松；
+            cursor: pointer;   光标:指针;
+            height: 180px;   身高:180 px;
+            display: flex;   显示:flex;
+            flex-direction: column;   flex-direction:列;flex-direction:列;挠曲方向：
+            justify-content: space-between;justify-content:之间的空间;
+            position: relative;   位置:相对;
+            overflow: hidden;   溢出:隐藏;
         }
         
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        .card:hover {   .card   卡:{徘徊
+            transform: translateY(-10px);变换:translateY (-10 px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);Box-shadow   不必: 0 15px 30px rgba(0,0,0,0.15)；Box-shadow: 0 15px 30px rgba(0,0,0,0.15)；Box-shadow: 15px 30px rgba(0,0,0,0.15)；
         }
         
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, #3498db, #9b59b6);
+        .card::before {   {前.card   卡::
+            content: '';   内容:”;
+            position: absolute;   位置:绝对的;
+            top: 0;   上图:0;
+            left: 0;   左:0;   本轮0;左:0;
+            width: 100%;   宽度:100%;
+            height: 5px;   身高:5 px;
+            background: linear-gradient(90deg, #3498db, #9b59b6);背景：线性渐变（90度，#3498db, #9b59b6）；   b59b6);
         }
         
         .card-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 1.8rem;   字体大小:1.8快速眼动;
+            font-weight: bold;   粗细:大胆的;
+            color: #2c3e50;   颜色:# 2c3e50;
             margin-bottom: 10px;
         }
         
         .card-subtitle {
-            font-size: 1.1rem;
-            color: #7f8c8d;
+            font-size: 1.1rem;   字体大小:1.1快速眼动;
+            color: #7f8c8d;   颜色:# 7 f8c8d;
             margin-bottom: 15px;
-            line-height: 1.4;
+            line-height: 1.4;   行高:1.4;
         }
         
         .card-update {
-            font-size: 0.9rem;
-            color: #95a5a6;
+            font-size: 0.9rem;   字体大小:0.9快速眼动;
+            color: #95a5a6;   颜色:# 95a5a6;
             align-self: flex-end;
         }
         
         /* 响应式设计 */
         @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 20px;
+            .grid {   ．网格{
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));Grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))；Grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))；Grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))；
+                gap: 20px;   差距:20 px;
             }
             
             h1 {
-                font-size: 2rem;
+                font-size: 2rem;   字体大小:2快速眼动;
             }
             
             .card {
-                height: 160px;
-                padding: 20px;
+                height: 160px;   身高:160 px;
+                padding: 20px;   填充:20 px;
             }
             
             .card-title {
-                font-size: 1.5rem;
+                font-size: 1.5rem   快速眼动   快速眼动;   字体大小:1.5快速眼动;
             }
         }
         
         @media (max-width: 480px) {
-            .grid {
+            .grid {   ．网格{
                 grid-template-columns: 1fr;
             }
             
-            body {
-                padding: 20px 15px;
+            body {   身体{
+                padding: 20px 15px;   填充：20px 15px；填充：20px 15px；家用：20px 15px；
             }
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
+    </style>   > < /风格
+</head>   < / >负责人
+<body>   身体< >
+    <div class="container">   < div class   类 = " container”>
+        <header>   <标题>
             <h1>我的导航主页</h1>
             <p class="subtitle">点击下方卡片访问相关内容</p>
-        </header>
+        </header   头>
         
         <div class="grid">
             <!-- 卡片1 -->
-            <div class="card" onclick="window.location.href='hxfcspp.html'">
+            <div class="card" onclick="window   窗口.location.href='hxfcspp.html'">
                 <div>
                     <div class="card-title">项目一</div>
                     <div class="card-subtitle">这里是项目一的简要描述，介绍项目的主要内容和特点</div>
@@ -146,7 +146,7 @@
             </div>
             
             <!-- 卡片2 -->
-            <div class="card" onclick="window.location.href='https://www.baidu.com'">
+            <div class   类="card" onclick="window.location.href='hxfcsjs.html'">
                 <div>
                     <div class="card-title">学习资源</div>
                     <div class="card-subtitle">收集整理的学习资料和教程，涵盖多个领域和技能</div>
@@ -210,3 +210,4 @@
 </body>
 
 </html>
+
