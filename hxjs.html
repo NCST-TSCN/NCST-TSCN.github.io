@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化学方程式计算专项训练</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f7ff 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eaeaea;
+            position: relative;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: #3498db;
+            border-radius: 3px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .question-card {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .question-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .question-card:nth-child(2n) {
+            border-left-color: #2ecc71;
+        }
+        
+        .question-card:nth-child(3n) {
+            border-left-color: #e74c3c;
+        }
+        
+        .question-card:nth-child(4n) {
+            border-left-color: #f39c12;
+        }
+        
+        .question-number {
+            position: absolute;
+            top: -12px;
+            left: -12px;
+            background: #3498db;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            font-size: 16px;
+        }
+        
+        .question-card:nth-child(2n) .question-number {
+            background: #2ecc71;
+        }
+        
+        .question-card:nth-child(3n) .question-number {
+            background: #e74c3c;
+        }
+        
+        .question-card:nth-child(4n) .question-number {
+            background: #f39c12;
+        }
+        
+        .question-content {
+            margin-bottom: 20px;
+            padding-left: 10px;
+        }
+        
+        .atomic-mass {
+            background-color: #e8f4fc;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 14px;
+            border: 1px solid #c5e1f5;
+        }
+        
+        .equation-box {
+            background-color: #f1f8e9;
+            padding: 25px 18px;
+            border-radius: 6px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 20px;
+            border: 1px solid #dcedc8;
+            font-family: 'Cambria', 'Times New Roman', serif;
+            position: relative;
+        }
+        
+        .double-line {
+            display: inline-block;
+            position: relative;
+            margin: 0 15px;
+            width: 50px;
+            height: 20px;
+        }
+        
+        .double-line::before {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #000;
+        }
+        
+        .double-line::after {
+            content: "";
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #000;
+        }
+        
+        .reaction-condition {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+            background: #f1f8e9;
+            padding: 0 5px;
+        }
+        
+        .question-item {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 6px;
+            border-left: 3px solid #3498db;
+        }
+        
+        .question-item:nth-child(2n) {
+            background-color: #f9f9f9;
+            border-left-color: #2ecc71;
+        }
+        
+        .question-label {
+            font-weight: bold;
+            color: #e74c3c;
+            margin-right: 8px;
+        }
+        
+        .answer-section {
+            margin: 20px 0;
+            padding: 0;
+        }
+        
+        .show-answer-btn {
+            background-color: #ffc107;
+            color: #856404;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 0;
+            display: block;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+            font-size: 16px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+        
+        .show-answer-btn:hover {
+            background-color: #ffca28;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+        }
+        
+        .answer-box {
+            background-color: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #ffc107;
+            display: none;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .answer-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .answer-content {
+            color: #333;
+            line-height: 1.5;
+        }
+        
+        .mask {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            border: 1px solid #c5e1f5;
+        }
+        
+        .mask:hover {
+            background-color: #d4edfc;
+        }
+        
+        .mask-title {
+            font-weight: bold;
+            color: #2980b9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .mask-content {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #bdc3c7;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-title {
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .step-content {
+            padding-left: 10px;
+        }
+        
+        .chemical-equation {
+            text-align: center;
+            font-size: 20px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f1f8e9;
+            border-radius: 5px;
+            font-family: 'Cambria', 'Times New Roman', serif;
+            position: relative;
+        }
+        
+        .calculation {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid #e0e0e0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            overflow-x: auto;
+        }
+        
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+        
+        .fraction span {
+            display: block;
+        }
+        
+        .fraction .numerator {
+            border-bottom: 1px solid #000;
+            padding: 0 5px;
+        }
+        
+        .fraction .denominator {
+            padding: 0 5px;
+        }
+        
+        .fraction-equation {
+            font-size: 18px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .score {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .tip {
+            background-color: #fff8e1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            border-left: 4px solid #ffc107;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .tip-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ff9800;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tip-title::before {
+            content: "💡";
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+            font-size: 14px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        .toggle-icon {
+            font-weight: bold;
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+        
+        .active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .key-point {
+            background-color: #e8f5e9;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .key-point-title {
+            font-weight: bold;
+            color: #2e7d32;
+            margin-bottom: 8px;
+            font-size: 17px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+            
+            .chemical-equation {
+                font-size: 16px;
+            }
+            
+            .equation-box {
+                font-size: 16px;
+                padding: 20px 12px;
+            }
+            
+            .double-line {
+                width: 40px;
+                margin: 0 10px;
+            }
+            
+            .show-answer-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            .fraction-equation {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>化学方程式计算专项训练</h1>
+        <div class="subtitle">湖北省中考题型专练 · 牢记格式轻松拿满分</div>
+        
+        <div class="tip">
+            <div class="tip-title">核心依据</div>
+            <p>在化学方程式中，各物质之间的<strong>真实质量之比</strong>，等于它们的<strong>相对分子质量（或相对原子质量）总和之比</strong>。</p>
+        </div>
+        
+        <div class="key-point">
+            <div class="key-point-title">解题六步法</div>
+             <p>① 设：设未知量（0.5分）</p>
+            <p>② 式：正确书写化学方程式（1分）</p>
+            <p>③ 写：写出相关物质的相对质量总和与真实质量（1分）</p>
+            <p>④ 出：列出比例式（1分） </p>
+            <p>⑤ 解：解方程（1分）</p>
+            <p>⑥ 答：作答（0.5分）</p>
+        </div>
+
+        
+        <!-- 题目1 -->
+        <div class="question-card">
+            <div class="question-number">1</div>
+            <div class="question-content">
+                <p> <strong>[2025·湖北中考] </strong>我国研制了世界最大口径碳化硅单体反射镜，应用于深空探测、气象观测等。碳化硅可用碳与硅在高温下反应制备。</p>
+                
+                <div class="equation-box">
+                    Si + C 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">高温</span>
+                    </div>
+                    SiC
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Si-28, C-12
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>SiC中硅、碳元素的质量比为 <span style="color:#e74c3c">______</span>。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>若要制得40 kg SiC，至少需要Si的质量是多少？（写出计算过程）</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer1')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer1" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>硅的相对原子质量为28，碳的相对原子质量为12，所以SiC中硅、碳元素的质量比为 28:12 = 7:3。</p>
+                            <p><strong>答：7:3</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要硅的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                Si + C 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                SiC
+                            </div>
+                            <p><strong>注意：</strong>题目中已给出化学方程式，直接使用即可。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                              <div class="chemical-equation">
+                                Si + C 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                SiC
+                            </div>
+                                <p>28&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp40      </p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp40 kg    </p>
+                            </div> 
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">28</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">40kg</span>
+                                    <span class="denominator">40</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 28 kg</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：至少需要硅28 kg。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目2 -->
+        <div class="question-card">
+            <div class="question-number">2</div>
+            <div class="question-content">
+                <p> <strong>[2024·湖北中考] </strong>钛（Ti）和钛合金广泛用于火箭、导弹、航天飞机和通信设备等。工业上生产钛的反应化学方程式为：</p>
+                
+                <div class="equation-box">
+                    TiCl₄ + 2Mg 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">高温</span>
+                    </div>
+                    2MgCl₂ + Ti
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Ti-48, Mg-24, Cl-35.5
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>TiCl₄中钛、氯元素的质量比为 <span style="color:#e74c3c">______</span>。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>若要生产12t钛，至少需要镁的质量是多少？（写出计算过程）</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer2')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer2" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>钛的相对原子质量为48，氯的相对原子质量为35.5，所以TiCl₄中钛、氯元素的质量比为 48:(35.5×4) = 48:142 = 24:71。</p>
+                            <p><strong>答：24:71</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要镁的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                TiCl₄ + 2Mg 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                2MgCl₂ + Ti
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <div class="chemical-equation">
+                                TiCl₄ + 2Mg 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                2MgCl₂ + Ti
+                            </div>
+ 
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp48&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp48  </p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp12t </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">48</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">12t</span>
+                                    <span class="denominator">48</span>
+                                </span>
+                            </div>
+                            <p><strong>注意：</strong>这里48是2Mg的相对质量总和，后一个48是Ti的相对原子质量。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 12t</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：至少需要镁12t。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目3 -->
+        <div class="question-card">
+            <div class="question-number">3</div>
+            <div class="question-content">
+                <p>使用氢能源汽车可以有效减少二氧化碳的排放。氢化钙（CaH₂）是一种重要的制氢剂，可与水反应生成氢气，反应的化学方程式为：</p>
+                
+                <div class="equation-box">
+                    CaH₂ + 2H₂O 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                    </div>
+                    Ca(OH)₂ + 2H₂↑
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Ca-40, H-1, O-16
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>氢化钙（CaH₂）中，钙、氢元素质量比为 <span style="color:#e74c3c">______</span>（填最简整数比）。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>若制取8kg氢气，计算理论上需要CaH₂的质量（写出计算过程）。</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer3')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer3" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>钙的相对原子质量为40，氢的相对原子质量为1，所以CaH₂中钙、氢元素的质量比为 40:(1×2) = 40:2 = 20:1。</p>
+                            <p><strong>答：20:1</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要氢化钙的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                CaH₂ + 2H₂O 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                </div>
+                                Ca(OH)₂ + 2H₂↑
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <div class="chemical-equation">
+                                CaH₂ + 2H₂O 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                </div>
+                                Ca(OH)₂ + 2H₂↑
+                            </div>
+                                <p>42&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp4 </p>
+                                <p>&nbsp;&nbsp;&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp8kg</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">42</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">8kg</span>
+                                    <span class="denominator">4</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 84kg</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：理论上需要氢化钙84kg。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目4 -->
+        <div class="question-card">
+            <div class="question-number">4</div>
+            <div class="question-content">
+                <p>氢化钛（TiH₂）作为储氢材料备受关注。用钛粉（Ti）生产TiH₂的反应为：</p>
+                
+                <div class="equation-box">
+                    Ti + H₂ 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">一定条件</span>
+                    </div>
+                    TiH₂
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Ti-48, H-1
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>TiH₂中钛、氢元素的质量比为 <span style="color:#e74c3c">______</span>。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>若制得100kg TiH₂，计算参加反应的H₂的质量（写出计算过程）。</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer4')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer4" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>钛的相对原子质量为48，氢的相对原子质量为1，所以TiH₂中钛、氢元素的质量比为 48:(1×2) = 48:2 = 24:1。</p>
+                            <p><strong>答：24:1</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：参加反应的氢气的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                Ti + H₂ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">一定条件</span>
+                                </div>
+                                TiH₂
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <div class="chemical-equation">
+                                Ti + H₂ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">一定条件</span>
+                                </div>
+                                TiH₂
+                            </div>
+
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp50      </p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp x&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp100kg </p>
+                            </div> 
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">2</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">100kg</span>
+                                    <span class="denominator">50</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 4kg</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：参加反应的氢气质量为4kg。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目5 -->
+        <div class="question-card">
+            <div class="question-number">5</div>
+            <div class="question-content">
+                <p>硼（B）是制造火箭耐热合金的材料。镁还原法生产硼的主要反应原理为：</p>
+                
+                <div class="equation-box">
+                    3Mg + B₂O₃ 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">高温</span>
+                    </div>
+                    2B + 3MgO
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Mg-24, B-11, O-16
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>B₂O₃中硼、氧元素的质量比为 <span style="color:#e74c3c">______</span>。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>若制得22kg B，计算需要镁的质量。（写出计算过程）</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer5')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer5" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>硼的相对原子质量为11，氧的相对原子质量为16，所以B₂O₃中硼、氧元素的质量比为 (11×2):(16×3) = 22:48 = 11:24。</p>
+                            <p><strong>答：11:24</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要镁的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                3Mg + B₂O₃ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                2B + 3MgO
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <div class="chemical-equation">
+                                3Mg + B₂O₃ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                2B + 3MgO
+                            </div>                              
+                                <p>72&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp22&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp22kg&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">72</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">22kg</span>
+                                    <span class="denominator">22</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 72kg</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：需要镁72kg。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目6 -->
+        <div class="question-card">
+            <div class="question-number">6</div>
+            <div class="question-content">
+                <p>"中国高铁，世界第一。"高铁列车车体材料使用了含镍不锈钢，工业上火法炼镍的原理是：</p>
+                
+                <div class="equation-box">
+                    C + 2NiO 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">高温</span>
+                    </div>
+                    2Ni + CO₂↑
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Ni-59, O-16, C-12
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>NiO中镍、氧元素质量比为 <span style="color:#e74c3c">______</span>。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>若要生产118t镍，需要NiO的质量是多少？（写出计算过程）</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer6')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer6" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>镍的相对原子质量为59，氧的相对原子质量为16，所以NiO中镍、氧元素的质量比为 59:16。</p>
+                            <p><strong>答：59:16</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要NiO的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                C + 2NiO 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                2Ni + CO₂↑
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <div class="chemical-equation">
+                                C + 2NiO 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">高温</span>
+                                </div>
+                                2Ni + CO₂↑
+                            </div>
+
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp150&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp118&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp118t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">150</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">118t</span>
+                                    <span class="denominator">118</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 150t</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：需要NiO 150t。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目7 -->
+        <div class="question-card">
+            <div class="question-number">7</div>
+            <div class="question-content">
+                <p>工业上电解饱和食盐水可以得到烧碱（NaOH），同时生成氢气和氯气，反应的化学方程式为：</p>
+                
+                <div class="equation-box">
+                    2NaCl + 2H₂O 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">通电</span>
+                    </div>
+                    2NaOH + H₂↑ + Cl₂↑
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Na-23, Cl-35.5, H-1, O-16
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>参与反应的NaCl与H₂O的分子个数比为 <span style="color:#e74c3c">______</span>。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>若要得到8g烧碱，需要氯化钠的质量是多少？（写出计算过程）</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer7')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer7" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>根据化学方程式，2NaCl和2H₂O反应，所以NaCl与H₂O的分子个数比为 2:2 = 1:1。</p>
+                            <p><strong>答：1:1</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要氯化钠的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                2NaCl + 2H₂O 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">通电</span>
+                                </div>
+                                2NaOH + H₂↑ + Cl₂↑
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                 <div class="step-content">
+                            <div class="chemical-equation">
+                                2NaCl + 2H₂O 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">通电</span>
+                                </div>
+                                2NaOH + H₂↑ + Cl₂↑
+                            </div>
+
+                                 <p>117&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp80&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp8g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">117</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">8g</span>
+                                    <span class="denominator">80</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 11.7g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：需要氯化钠11.7g。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目8 -->
+        <div class="question-card">
+            <div class="question-number">8</div>
+            <div class="question-content">
+                <p>提高粮食产量，需要合理施用化肥。尿素是氮肥中最主要的一种，合成尿素的原理为：</p>
+                
+                <div class="equation-box">
+                    CO₂ + 2NH₃ 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">一定条件</span>
+                    </div>
+                    CO(NH₂)₂ + H₂O
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>C-12, O-16, N-14, H-1
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>CO(NH₂)₂中氮元素和氢元素质量的最简整数比为 <span style="color:#e74c3c">______</span>。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>理论上，44 吨CO₂能与多少吨 NH₃恰好完全反应？（写出计算过程）</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer8')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer8" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>氮的相对原子质量为14，氢的相对原子质量为1，CO(NH₂)₂中氮、氢元素的质量比为 (14×2):(1×4) = 28:4 = 7:1。</p>
+                            <p><strong>答：7:1</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：需要氨气的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                CO₂ + 2NH₃ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">一定条件</span>
+                                </div>
+                                CO(NH₂)₂ + H₂O
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                               <div class="chemical-equation">
+                                CO₂ + 2NH₃ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">一定条件</span>
+                                </div>
+                                CO(NH₂)₂ + H₂O
+                            </div>
+
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp44&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp34&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                                <p>&nbsp;&nbsp44t&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">34</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">44t</span>
+                                    <span class="denominator">44</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 34t</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：能与34吨氨气恰好完全反应。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 题目9 -->
+        <div class="question-card">
+            <div class="question-number">9</div>
+            <div class="question-content">
+                <p>二氧化锰因应用广泛而备受关注。某研究小组通过焙烧MnCO₃制取MnO₂，反应的化学方程式为：</p>
+                
+                <div class="equation-box">
+                    2MnCO₃ + O₂ 
+                    <div style="display: inline-block; position: relative;">
+                        <span class="double-line"></span>
+                        <span class="reaction-condition">焙烧</span>
+                    </div>
+                    2MnO₂ + 2CO₂
+                </div>
+                
+                <div class="atomic-mass">
+                    <strong>已知相对原子质量：</strong>Mn-55, C-12, O-16
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（1）</span>MnCO₃中碳、氧元素的质量比为 <span style="color:#e74c3c">______</span>（填最简整数比）。</p>
+                </div>
+                
+                <div class="question-item">
+                    <p><span class="question-label">（2）</span>230g MnCO₃通过焙烧最多制得MnO₂的质量是多少？（写出计算过程）</p>
+                </div>
+                
+                <div class="answer-section">
+                    <button class="show-answer-btn" onclick="toggleAnswer('answer9')">点击查看第（1）问答案</button>
+                    
+                    <div id="answer9" class="answer-box">
+                        <div class="answer-title">第（1）问答案：</div>
+                        <div class="answer-content">
+                            <p>碳的相对原子质量为12，氧的相对原子质量为16，MnCO₃中碳、氧元素的质量比为 12:(16×3) = 12:48 = 1:4。</p>
+                            <p><strong>答：1:4</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mask" onclick="toggleContent(this)">
+                <div class="mask-title">
+                    <span>点击查看第（2）问解题步骤</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="mask-content">
+                    <div class="step">
+                        <div class="step-title">
+                            <span>① 设：设未知量</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>设：制得MnO₂的质量为 x。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>② 式：正确书写化学方程式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="chemical-equation">
+                                2MnCO₃ + O₂ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">焙烧</span>
+                                </div>
+                                2MnO₂ + 2CO₂
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>③ 写：写出相关物质的相对质量与真实质量</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                  <div class="chemical-equation">
+                                2MnCO₃ + O₂ 
+                                <div style="display: inline-block; position: relative;">
+                                    <span class="double-line"></span>
+                                    <span class="reaction-condition">焙烧</span>
+                                </div>
+                                2MnO₂ + 2CO₂
+                            </div>
+
+                                 <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp230&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp174&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp230g&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspx&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>④ 出：列出比例式</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="fraction-equation">
+                                <span class="fraction">
+                                    <span class="numerator">x</span>
+                                    <span class="denominator">174</span>
+                                </span>
+                                = 
+                                <span class="fraction">
+                                    <span class="numerator">230g</span>
+                                    <span class="denominator">230</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑤ 解：解方程，求出未知数x</span>
+                            <span class="score">分值：1分</span>
+                        </div>
+                        <div class="step-content">
+                            <div class="calculation">
+                                <p>x = 174g</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-title">
+                            <span>⑥ 答：简明地写出答案</span>
+                            <span class="score">分值：0.5分</span>
+                        </div>
+                        <div class="step-content">
+                            <p><strong>标准写法：</strong>答：最多制得MnO₂ 174g。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tip">
+            <div class="tip-title">解题要点总结</div>
+            <p>1. 第（1）问通常考查元素质量比计算：元素质量比 = (相对原子质量×原子个数)之比</p>
+            <p>2. 第（2）问考查化学方程式计算，严格按照"设-式-写-出-解-答"六步法书写</p>
+            <p>3. 注意相对原子质量的准确使用，特别是氯(Cl-35.5)、铜(Cu-64)等特殊值</p>
+            <p>4. 计算时注意单位统一，如kg、g、t等，最终答案单位要与题目一致</p>
+            <p>5. 遇到"至少需要"、"最多制得"等关键词，说明反应按化学方程式完全进行</p>
+            <p>6. 带入计算的数据有要求</p>
+            <p>7. 写方程式的时候，先空两行</p>
+            <p>8. 计算的步骤中，一共出现4次单位</p>
+
+        </div>
+        
+        <div class="footer">
+            <p style="color: #008C8C; font-size: 24px;"><strong>© 含苞只为待放</strong></p>
+        </div>
+    </div>
+
+    <script>
+        function toggleContent(element) {
+            const content = element.querySelector('.mask-content');
+            const icon = element.querySelector('.toggle-icon');
+            
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                element.classList.remove('active');
+            } else {
+                content.style.display = 'block';
+                element.classList.add('active');
+            }
+        }
+        
+        function toggleAnswer(answerId) {
+            const answerBox = document.getElementById(answerId);
+            if (answerBox.style.display === 'block') {
+                answerBox.style.display = 'none';
+            } else {
+                answerBox.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
