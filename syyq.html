@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化学实验仪器识别记忆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: "Microsoft Yahei", "PingFang SC", sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            color: #1e40af;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+        .toolbar {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus {
+            border-color: #3b82f6;
+        }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+        .category-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .cat-btn {
+            padding: 8px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .cat-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .cat-btn.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: #fff;
+        }
+        .action-group {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .btn-expand {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .btn-expand:hover {
+            background: #bfdbfe;
+        }
+        .btn-quiz {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .btn-quiz:hover {
+            background: #bbf7d0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .instrument-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .item-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.25s;
+            border: 2px solid transparent;
+            position: relative;
+        }
+        .item-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            border-color: #93c5fd;
+        }
+        .item-card.expanded {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+        .cat-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .img-box {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        .img-box:hover {
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+        .img-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .item-name {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .click-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .info-area {
+            display: none;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+        .info-area.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        .info-name {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1e40af;
+            text-align: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #dbeafe;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .info-row {
+            margin-bottom: 8px;
+        }
+        .info-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2563eb;
+            margin-bottom: 2px;
+        }
+        .info-text {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .no-result {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+            font-size: 16px;
+            grid-column: 1 / -1;
+        }
+
+        /* 记忆测试模式 */
+        .quiz-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .quiz-overlay.show {
+            display: flex;
+        }
+        .quiz-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .quiz-box h2 {
+            color: #1e40af;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+        .quiz-progress {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .quiz-img {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .quiz-img img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .quiz-option {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .quiz-option.correct {
+            border-color: #22c55e;
+            background: #f0fdf4;
+            color: #15803d;
+        }
+        .quiz-option.wrong {
+            border-color: #ef4444;
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .quiz-option:disabled {
+            cursor: not-allowed;
+        }
+        .quiz-result {
+            display: none;
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        .quiz-result.show {
+            display: block;
+        }
+        .quiz-result.right {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+        .quiz-result.wrong-ans {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .quiz-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+            background: none;
+            border: none;
+        }
+        .quiz-close:hover {
+            color: #475569;
+        }
+        .quiz-score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #3b82f6;
+            margin: 20px 0;
+        }
+        .quiz-restart {
+            padding: 10px 24px;
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .quiz-restart:hover {
+            background: #2563eb;
+        }
+
+        @media (max-width: 768px) {
+            .instrument-wrap {
+                grid-template-columns: 1fr;
+            }
+            .header h1 {
+                font-size: 22px;
+            }
+            .toolbar {
+                padding: 12px;
+            }
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧪 化学实验仪器识别记忆</h1>
+        <p>点击仪器图片查看名称、用途和注意事项 | 共 36 种常用仪器</p>
+    </div>
+
+    <div class="toolbar">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="搜索仪器名称..." oninput="filterInstruments()">
+        </div>
+        <div class="category-group" id="categoryGroup">
+            <button class="cat-btn active" data-cat="all" onclick="setCategory('all', this)">全部</button>
+            <button class="cat-btn" data-cat="反应容器" onclick="setCategory('反应容器', this)">反应容器</button>
+            <button class="cat-btn" data-cat="计量仪器" onclick="setCategory('计量仪器', this)">计量仪器</button>
+            <button class="cat-btn" data-cat="加热仪器" onclick="setCategory('加热仪器', this)">加热仪器</button>
+            <button class="cat-btn" data-cat="取用仪器" onclick="setCategory('取用仪器', this)">取用仪器</button>
+            <button class="cat-btn" data-cat="夹持固定" onclick="setCategory('夹持固定', this)">夹持固定</button>
+            <button class="cat-btn" data-cat="辅助仪器" onclick="setCategory('辅助仪器', this)">辅助仪器</button>
+        </div>
+        <div class="action-group">
+            <button class="action-btn btn-expand" onclick="toggleAll()">全部展开/收起</button>
+            <button class="action-btn btn-quiz" onclick="startQuiz()">🎯 记忆测试</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="instrument-wrap" id="instrumentWrap"></div>
+    </div>
+
+    <!-- 记忆测试弹窗 -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-box" style="position:relative;">
+            <button class="quiz-close" onclick="closeQuiz()">×</button>
+            <div id="quizContent">
+                <h2>🎯 仪器识别测试</h2>
+                <div class="quiz-progress" id="quizProgress">第 1 / 10 题</div>
+                <div class="quiz-img" id="quizImg"></div>
+                <div class="quiz-options" id="quizOptions"></div>
+                <div class="quiz-result" id="quizResult"></div>
+                <button class="quiz-restart" id="quizNextBtn" style="display:none;" onclick="nextQuestion()">下一题 →</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const instruments = [
+    {
+        name: "试管",
+        category: "反应容器",
+        img: "https://aka.doubaocdn.com/s/xZc0V0ZELd",
+        use: "用作少量试剂的反应容器，可在常温或加热时使用。",
+        note: "加热前擦干外壁水珠；加热液体时不超过容积的1/3，试管口不对着人；加热后不能骤冷，防止炸裂。"
+    },
+    {
+        name: "烧杯",
+        category: "反应容器",
+        img: "https://aka.doubaocdn.com/s/lVKt3tJjA5",
+        use: "配制溶液、较多量试剂的反应容器，可在常温或加热时使用。",
+        note: "加热时必须垫陶土网（石棉网），使受热均匀；不能直接加热；溶解固体时要用玻璃棒搅拌。"
+    },
+    {
+        name: "量筒",
+        category: "计量仪器",
+        img: "https://aka.doubaocdn.com/s/8JPwIMezOs",
+        use: "量取一定体积的液体。",
+        note: "不能加热，不能作反应容器，不能用于配制溶液；读数时视线与液体凹液面的最低处保持水平；应选择合适量程的量筒。"
+    },
+    {
+        name: "酒精灯",
+        category: "加热仪器",
+        img: "https://aka.doubaocdn.com/s/BArPJ6pwgF",
+        use: "实验室常用的加热工具，用于给物质加热。",
+        note: "酒精量不超过容积的2/3，不少于1/4；禁止向燃着的酒精灯里添加酒精；禁止用酒精灯引燃另一只；用完用灯帽盖灭，不可用嘴吹。"
+    },
+    {
+        name: "胶头滴管",
+        category: "取用仪器",
+        img: "https://aka.doubaocdn.com/s/wdGs5YSiBo",
+        use: "吸取和滴加少量液体试剂。",
+        note: "使用时应垂直悬空在容器口上方，不能伸入容器内，不能接触容器壁；吸液后不能平放或倒置；用完后立即清洗（滴瓶上的滴管除外）。"
+    },
+    {
+        name: "集气瓶",
+        category: "反应容器",
+        img: "https://aka.doubaocdn.com/s/LoegipvtQN",
+        use: "收集或储存少量气体，也可用于某些物质与气体的反应容器。",
+        note: "不能加热；收集气体后用毛玻璃片盖住瓶口；做铁丝燃烧等实验时，瓶底要放少量水或细沙，防止炸裂。"
+    },
+    {
+        name: "漏斗",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/UjTUeHau4E",
+        use: "用于过滤操作，也可用于向小口容器中添加液体。",
+        note: "过滤时要注意\"一贴二低三靠\"；漏斗下端管口要紧靠烧杯内壁；不能加热。"
+    },
+    {
+        name: "长颈漏斗",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/pb53DLccgs",
+        use: "用于气体发生装置中添加液体药品。",
+        note: "下端管口必须伸入液面以下（液封），防止生成的气体从长颈漏斗口逸出；不能加热。"
+    },
+    {
+        name: "分液漏斗",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/lAn998u4Z5",
+        use: "用于向反应容器中添加液体并控制滴加速度，也可用于分离互不相溶的液体（分液）。",
+        note: "使用前检查活塞和玻璃塞是否漏液；添加液体时不需要液封；分液时下层液体从下口放出，上层液体从上口倒出。"
+    },
+    {
+        name: "玻璃棒",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/EmqF60Fw9u",
+        use: "用于搅拌、引流、转移固体或蘸取少量液体。",
+        note: "搅拌时不要用力过猛，不要撞击容器壁和底部；引流时玻璃棒下端靠在三层滤纸处；使用后及时清洗。"
+    },
+    {
+        name: "试管夹",
+        category: "夹持固定",
+        img: "https://aka.doubaocdn.com/s/dyVGW4Vv3x",
+        use: "用于夹持试管进行加热。",
+        note: "应从试管底部往上套，夹在试管的中上部（距管口约1/3处）；手握长柄，不要把拇指按在短柄上，防止试管脱落。"
+    },
+    {
+        name: "铁架台",
+        category: "夹持固定",
+        img: "https://aka.doubaocdn.com/s/j17Ld7MZqz",
+        use: "用于固定和夹持各种实验仪器，一般常用于过滤、加热等实验操作。",
+        note: "铁夹夹持玻璃仪器时松紧要适度，过紧容易夹碎仪器；装置要平稳，重心要低；铁圈上可放置陶土网。"
+    },
+    {
+        name: "玻璃片",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/UV8Phs2Qhw",
+        use: "用于盖住集气瓶口，防止气体逸出。",
+        note: "毛玻璃面（磨砂面）朝下，与集气瓶口磨砂面贴合，密封效果更好；使用时保持清洁干燥。"
+    },
+    {
+        name: "锥形瓶",
+        category: "反应容器",
+        img: "https://aka.doubaocdn.com/s/0hecRhLeR0",
+        use: "用作较多量试剂的反应容器，也常用于气体发生装置和滴定实验。",
+        note: "加热时必须垫陶土网，不能直接加热；振荡时用手腕力量，不要上下晃动；瓶塞要塞紧。"
+    },
+    {
+        name: "蒸发皿",
+        category: "加热仪器",
+        img: "https://aka.doubaocdn.com/s/bJbGo85xX1",
+        use: "用于蒸发液体、浓缩溶液或干燥固体。",
+        note: "可直接加热；加热时用玻璃棒不断搅拌，防止局部温度过高造成液滴飞溅；当出现较多固体时停止加热，利用余热蒸干；热的蒸发皿用坩埚钳夹取，放在陶土网上冷却。"
+    },
+    {
+        name: "药匙",
+        category: "取用仪器",
+        img: "https://aka.doubaocdn.com/s/1VNdIPvdDh",
+        use: "用于取用粉末状或小颗粒状的固体药品。",
+        note: "取用药品前要用干净的纸擦拭干净；取用不同药品时要擦拭，防止交叉污染；用过之后要及时清洗擦干。"
+    },
+    {
+        name: "燃烧匙",
+        category: "取用仪器",
+        img: "https://aka.doubaocdn.com/s/DMlmzp1PYW",
+        use: "用于盛放可燃性固体物质，进行燃烧实验。",
+        note: "做某些物质燃烧实验时，可在匙底垫少量细沙或石棉，防止燃烧物损坏匙体；使用后要及时清洗干净。"
+    },
+    {
+        name: "试管刷",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/gky95rQMIG",
+        use: "用于刷洗试管等玻璃仪器。",
+        note: "刷洗时要转动或上下移动刷子，但用力不能过猛，防止戳破试管底部；根据仪器大小选择合适规格的刷子。"
+    },
+    {
+        name: "试管架",
+        category: "夹持固定",
+        img: "https://aka.doubaocdn.com/s/cMyNIAUmqc",
+        use: "用于放置试管，洗净后的试管可倒放在试管架上晾干。",
+        note: "热的试管不能直接放在塑料试管架上，防止烫坏；洗净的试管应倒放在试管架的立柱上晾干。"
+    },
+    {
+        name: "升降台",
+        category: "夹持固定",
+        img: "https://aka.doubaocdn.com/s/cAXDmGu8DP",
+        use: "用于调节酒精灯等仪器的高度，调整加热位置。",
+        note: "调节高度时要平稳，防止仪器倾倒；调好后要锁紧固定旋钮；承载重物时不要超过其承重范围。"
+    },
+    {
+        name: "坩埚钳",
+        category: "夹持固定",
+        img: "https://aka.doubaocdn.com/s/MyrWjNFJb4",
+        use: "用于夹持高温的坩埚、蒸发皿等，也可用于夹持金属进行燃烧实验。",
+        note: "使用时要保持钳头清洁干燥；夹持高温物体后，钳头朝上放在桌面上，防止烫坏桌面；不要用坩埚钳夹持重物。"
+    },
+    {
+        name: "陶土网",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/XE8EbRTQDY",
+        use: "垫在烧杯、锥形瓶等不能直接加热的仪器下面，使受热均匀。",
+        note: "也叫石棉网；不能摔打、弯折；陶土（石棉）脱落的不能继续使用；加热后要等冷却后再移动，防止烫伤。"
+    },
+    {
+        name: "托盘天平",
+        category: "计量仪器",
+        img: "https://aka.doubaocdn.com/s/OlFgy5FRc6",
+        use: "用于粗略称量固体药品的质量，一般精确到0.1克。",
+        note: "使用前要调平（游码归零，调节平衡螺母）；称量时左盘放物体，右盘放砝码（左物右码）；药品不能直接放在托盘上，要放在称量纸或烧杯中；砝码用镊子夹取，先大后小；称量完毕后砝码放回砝码盒，游码归零。"
+    },
+    {
+        name: "水槽",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/oJUtQtcHQP",
+        use: "用于排水法收集气体时盛装水，也可用于盛装实验废液或清洗仪器。",
+        note: "不能加热，不能盛放温度过高的液体；实验结束后及时倒掉废水并清洗干净；塑料水槽避免接触有机溶剂。"
+    },
+    {
+        name: "橡胶塞",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/9Q4BfGiZN3",
+        use: "用于密封试管、烧瓶、集气瓶等容器的瓶口，可打孔后插入玻璃导管。",
+        note: "选择大小与瓶口匹配的橡胶塞；塞子时转动塞入，不要硬塞；打孔时使用打孔器，注意安全；避免接触有机溶剂和高温。"
+    },
+    {
+        name: "玻璃导管",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/4tPSTqzBfC",
+        use: "用于导出或导入气体，连接反应装置与收集装置，有直管、弯管等多种规格。",
+        note: "弯折玻璃管时要先均匀预热，防止断裂；插入橡胶塞时沾水润滑，转动插入，防止折断划伤手；使用前后检查是否有裂纹。"
+    },
+    {
+        name: "乳胶管",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/ixXUz5aLU5",
+        use: "用于连接两段玻璃导管，使气体或液体在装置中流通，也可用于控制液体滴加（止水夹配合）。",
+        note: "套接玻璃管时先将管口沾水润滑，轻轻转动插入，不要用力过猛防止玻璃管折断；老化、开裂的乳胶管要及时更换；避免接触有机溶剂和高温。"
+    },
+    {
+        name: "广口瓶",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/hb56OVaTBK",
+        use: "用于存放固体药品，瓶口较大，方便用药匙取用固体。",
+        note: "不能加热；取用药品后及时盖好瓶塞，防止药品受潮或变质；磨砂瓶口与瓶塞配套，不要混用；见光易分解的药品用棕色广口瓶。"
+    },
+    {
+        name: "细口瓶",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/NPDYashVBa",
+        use: "用于存放液体药品，瓶口较小，可减少液体挥发和倾倒时洒出。",
+        note: "不能加热；倾倒液体时标签朝向手心，防止残留药液腐蚀标签；碱性液体要用橡胶塞，不能用玻璃塞（防止粘连）；见光易分解的液体用棕色细口瓶。"
+    },
+    {
+        name: "滴瓶",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/6BAfzvVqhW",
+        use: "盛放少量液体试剂，配套专用滴管，用于吸取和滴加少量液体。",
+        note: "滴瓶上的滴管专用，不可交叉使用，防止污染试剂；滴管不能平放或倒置，防止液体腐蚀胶头；不能加热，不要盛放强碱溶液；滴加液体时垂直悬空，不要伸入容器内。"
+    },
+    {
+        name: "温度计",
+        category: "计量仪器",
+        img: "https://aka.doubaocdn.com/s/AtW9lKre3g",
+        use: "用于测量物质的温度，实验室常用红液（煤油/酒精）温度计。",
+        note: "不能当作玻璃棒使用，不能用于搅拌；测量时玻璃泡要完全浸入被测物质中，不能触碰容器底部和内壁；读数时不能将温度计取出（体温计除外）；防止打碎，水银温度计打碎后要及时用硫粉处理。"
+    },
+    {
+        name: "坩埚",
+        category: "加热仪器",
+        img: "https://aka.doubaocdn.com/s/FjHgJWldIy",
+        use: "用于高温灼烧固体物质，可直接在酒精灯或泥三角上加热。",
+        note: "可直接高温加热；加热和取用时用坩埚钳夹持；热坩埚放在陶土网上冷却，不能直接放在桌面上；避免骤冷骤热，防止炸裂；瓷坩埚不能用于灼烧碱性物质（会腐蚀）。"
+    },
+    {
+        name: "点滴板",
+        category: "反应容器",
+        img: "https://aka.doubaocdn.com/s/6BF6s3ZvVQ",
+        use: "用于少量试剂的显色反应、对比实验和微型化学反应，节约药品，便于观察。",
+        note: "不能高温加热；实验后及时清洗，保持凹槽洁净；白色点滴板用于观察有色溶液或有色沉淀，黑色点滴板用于观察浅色或白色沉淀；滴加试剂时不要超过凹槽容量。"
+    },
+    {
+        name: "镊子",
+        category: "取用仪器",
+        img: "https://aka.doubaocdn.com/s/juPzjjCxRd",
+        use: "用于取用块状或较大颗粒的固体药品，也可用于夹取砝码、金属片等。",
+        note: "取用块状固体时，先将容器横放，把固体放在容器口，再慢慢竖立容器，防止打破容器底部；使用前后擦拭干净；不要用镊子夹持高温物体，防止损坏。"
+    },
+    {
+        name: "冷凝管",
+        category: "辅助仪器",
+        img: "https://aka.doubaocdn.com/s/4UvIxr3VcE",
+        use: "用于蒸馏或回流操作中冷凝蒸汽，使气态物质冷却液化，常见有直形、球形、蛇形冷凝管。",
+        note: "不能直接加热；通水时应下口进水、上口出水，保证冷凝管内充满冷却水，水流方向与蒸汽方向相反；固定时用铁夹夹持，轻拿轻放，防止玻璃破裂；蒸馏时温度计水银球位置要正确。"
+    },
+    {
+        name: "三脚架",
+        category: "夹持固定",
+        img: "https://aka.doubaocdn.com/s/B4Nk9tHdfc",
+        use: "用于放置陶土网、坩埚等，配合酒精灯进行加热操作，支撑被加热的仪器。",
+        note: "放置要平稳，放在水平桌面上；加热烧杯、烧瓶时，三脚架上要放陶土网；灼烧坩埚时可放置泥三角；避免磕碰变形，影响稳定性。"
+    }
+];
+
+let currentCategory = "all";
+let allExpanded = false;
+
+// 渲染仪器列表
+function renderInstruments() {
+    const wrap = document.getElementById("instrumentWrap");
+    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    
+    const filtered = instruments.filter(item => {
+        const matchCat = currentCategory === "all" || item.category === currentCategory;
+        const matchSearch = !keyword || item.name.toLowerCase().includes(keyword) || 
+                           item.use.toLowerCase().includes(keyword) || 
+                           item.category.toLowerCase().includes(keyword);
+        return matchCat && matchSearch;
+    });
+
+    if (filtered.length === 0) {
+        wrap.innerHTML = '<div class="no-result">😕 没有找到匹配的仪器，请换个关键词试试</div>';
+        return;
+    }
+
+    wrap.innerHTML = filtered.map((item, index) => `
+        <div class="item-card" data-index="${instruments.indexOf(item)}">
+            <span class="cat-tag">${item.category}</span>
+            <div class="img-box" onclick="toggleInfo(this)">
+                <img src="${item.img}" alt="${item.name}" loading="lazy">
+            </div>
+            <div class="click-hint">点击图片查看详情</div>
+            <div class="info-area">
+                <div class="info-name">${item.name}</div>
+                <div class="info-row">
+                    <div class="info-label">📌 用途</div>
+                    <div class="info-text">${item.use}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">⚠️ 注意事项</div>
+                    <div class="info-text">${item.note}</div>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+// 切换单个卡片展开（点击图片触发）
+function toggleInfo(imgBox) {
+    const card = imgBox.parentElement;
+    const info = card.querySelector(".info-area");
+    const hint = card.querySelector(".click-hint");
+    info.classList.toggle("show");
+    card.classList.toggle("expanded");
+    if (info.classList.contains("show")) {
+        hint.textContent = "点击图片收起";
+    } else {
+        hint.textContent = "点击图片查看详情";
+    }
+}
+
+// 全部展开/收起
+function toggleAll() {
+    allExpanded = !allExpanded;
+    const cards = document.querySelectorAll(".item-card");
+    cards.forEach(card => {
+        const info = card.querySelector(".info-area");
+        const hint = card.querySelector(".click-hint");
+        if (allExpanded) {
+            info.classList.add("show");
+            card.classList.add("expanded");
+            hint.textContent = "点击图片收起";
+        } else {
+            info.classList.remove("show");
+            card.classList.remove("expanded");
+            hint.textContent = "点击图片查看详情";
+        }
+    });
+}
+
+// 筛选分类
+function setCategory(cat, btn) {
+    currentCategory = cat;
+    document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    renderInstruments();
+}
+
+// 搜索筛选
+function filterInstruments() {
+    renderInstruments();
+}
+
+// ========== 记忆测试功能 ==========
+let quizQuestions = [];
+let quizCurrent = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+function startQuiz() {
+    // 随机选10道题
+    const shuffled = [...instruments].sort(() => Math.random() - 0.5);
+    quizQuestions = shuffled.slice(0, 10);
+    quizCurrent = 0;
+    quizScore = 0;
+    document.getElementById("quizOverlay").classList.add("show");
+    showQuestion();
+}
+
+function showQuestion() {
+    quizAnswered = false;
+    const q = quizQuestions[quizCurrent];
+    document.getElementById("quizProgress").textContent = `第 ${quizCurrent + 1} / ${quizQuestions.length} 题`;
+    document.getElementById("quizImg").innerHTML = `<img src="${q.img}" alt="测试图片">`;
+    document.getElementById("quizResult").className = "quiz-result";
+    document.getElementById("quizResult").textContent = "";
+    document.getElementById("quizNextBtn").style.display = "none";
+
+    // 生成4个选项（1个正确+3个干扰）
+    const correctName = q.name;
+    const wrongOptions = instruments.filter(i => i.name !== correctName)
+        .sort(() => Math.random() - 0.5).slice(0, 3).map(i => i.name);
+    const options = [...wrongOptions, correctName].sort(() => Math.random() - 0.5);
+
+    document.getElementById("quizOptions").innerHTML = options.map(opt => 
+        `<button class="quiz-option" onclick="selectAnswer('${opt}', '${correctName}', this)">${opt}</button>`
+    ).join("");
+}
+
+function selectAnswer(selected, correct, btn) {
+    if (quizAnswered) return;
+    quizAnswered = true;
+
+    const allBtns = document.querySelectorAll(".quiz-option");
+    allBtns.forEach(b => {
+        b.disabled = true;
+        if (b.textContent === correct) {
+            b.classList.add("correct");
+        }
+    });
+
+    const result = document.getElementById("quizResult");
+    if (selected === correct) {
+        quizScore++;
+        btn.classList.add("correct");
+        result.className = "quiz-result show right";
+        result.innerHTML = `✅ 回答正确！<br><small>${instruments.find(i => i.name === correct).use}</small>`;
+    } else {
+        btn.classList.add("wrong");
+        result.className = "quiz-result show wrong-ans";
+        result.innerHTML = `❌ 回答错误！正确答案是：<strong>${correct}</strong><br><small>${instruments.find(i => i.name === correct).use}</small>`;
+    }
+
+    // 最后一题时，在结果中追加本轮得分
+    if (quizCurrent === quizQuestions.length - 1) {
+        const percent = Math.round(quizScore / quizQuestions.length * 100);
+        result.innerHTML += `<br><br>🏆 本轮得分：<strong>${quizScore} / ${quizQuestions.length}</strong>（正确率 ${percent}%）`;
+    }
+
+    document.getElementById("quizNextBtn").style.display = "inline-block";
+    if (quizCurrent === quizQuestions.length - 1) {
+        document.getElementById("quizNextBtn").textContent = "再来一次 🔄";
+        document.getElementById("quizNextBtn").onclick = function() { startQuiz(); };
+    } else {
+        document.getElementById("quizNextBtn").textContent = "下一题 →";
+        document.getElementById("quizNextBtn").onclick = function() { nextQuestion(); };
+    }
+}
+
+function nextQuestion() {
+    quizCurrent++;
+    showQuestion();
+}
+
+function showFinalScore() {
+    const percent = Math.round(quizScore / quizQuestions.length * 100);
+    let comment = "";
+    if (percent >= 90) comment = "🎉 太棒了！你已经完全掌握了这些仪器！";
+    else if (percent >= 70) comment = "👍 不错！继续加油，再复习一下错题吧。";
+    else if (percent >= 50) comment = "💪 还需要多练习，建议再看看仪器详情。";
+    else comment = "📚 要加油哦！建议先浏览一遍所有仪器再测试。";
+
+    document.getElementById("quizContent").innerHTML = `
+        <h2>🏆 测试完成！</h2>
+        <div class="quiz-score">${quizScore} / ${quizQuestions.length}</div>
+        <p style="color:#64748b; margin-bottom:20px;">正确率 ${percent}%</p>
+        <p style="color:#475569; margin-bottom:24px;">${comment}</p>
+        <button class="quiz-restart" onclick="startQuiz()">🔄 再测一次</button>
+        <button class="quiz-restart" style="background:#64748b; margin-left:10px;" onclick="closeQuiz()">返回浏览</button>
+    `;
+}
+
+function closeQuiz() {
+    document.getElementById("quizOverlay").classList.remove("show");
+}
+
+// 初始化
+renderInstruments();
+</script>
+</body>
+</html>
