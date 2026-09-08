@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>化学仪器连连看（含双人PK）</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --bg-0: #0f172a;
+    --bg-1: #1e293b;
+    --cell-bg: #f8fafc;
+    --cell-border: rgba(148, 163, 184, 0.35);
+    --accent: #f59e0b;
+    --accent-2: #38bdf8;
+    --text-main: #f1f5f9;
+    --text-sub: #94a3b8;
+    --danger: #ef4444;
+    --ok: #22c55e;
+    --text-gap: 2px;
+}
+html, body { height: 100%; }
+body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+    background:
+        radial-gradient(1200px 600px at 15% -10%, rgba(56, 189, 248, 0.12), transparent 60%),
+        radial-gradient(1000px 700px at 110% 10%, rgba(245, 158, 11, 0.10), transparent 55%),
+        linear-gradient(160deg, var(--bg-0) 0%, var(--bg-1) 100%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 10px 24px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    overflow-x: hidden;
+}
+.view { display: none; width: 100%; flex-direction: column; align-items: center; }
+.view.active { display: flex; }
+/* ===== 顶栏（游戏视图） ===== */
+.topbar {
+    width: min(94vw, 720px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .logo {
+    width: 38px; height: 38px; border-radius: 10px;
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+}
+.brand h1 {
+    font-size: 20px; font-weight: 800; letter-spacing: 1px;
+    background: linear-gradient(90deg, #e2e8f0, #bae6fd);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    white-space: nowrap;
+}
+.brand small { display: block; font-size: 10px; font-weight: 500; color: var(--text-sub); letter-spacing: 0; -webkit-text-fill-color: var(--text-sub); }
+.stats { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+.stat-card {
+    background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 12px; padding: 6px 13px; text-align: center; min-width: 78px;
+    backdrop-filter: blur(4px);
+}
+.stat-card .label { font-size: 10px; color: var(--text-sub); letter-spacing: 1px; margin-bottom: 2px; }
+.stat-card .value { font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat-card .value.score { color: var(--accent); }
+.stat-card .value.best { color: var(--accent-2); }
+.stat-card .value.time { color: var(--ok); }
+.stat-card .value.time.urgent { color: var(--danger); animation: blink 0.6s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0.35; } }
+.stat-card .value.target { color: #e2e8f0; font-size: 16px; padding-top: 3px; }
+.controls { display: flex; gap: 6px; }
+.ctrl-btn {
+    width: 42px; height: 42px; border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: rgba(15, 23, 42, 0.65); color: var(--text-main);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease; backdrop-filter: blur(4px);
+}
+.ctrl-btn:hover { background: rgba(51, 65, 85, 0.8); transform: translateY(-2px); }
+.ctrl-btn:active { transform: scale(0.92); }
+.ctrl-btn svg { width: 20px; height: 20px; }
+.ctrl-btn.restart { border-color: rgba(245, 158, 11, 0.5); }
+.ctrl-btn.restart svg { stroke: var(--accent); }
+.ctrl-btn.back { border-color: rgba(56, 189, 248, 0.4); }
+.ctrl-btn.back svg { stroke: var(--accent-2); }
+.ctrl-btn.practice-on{ border-color:#22c55e; background:rgba(34,197,94,0.2); }
+.ctrl-btn.demo-on{ border-color:#8b5cf6; background:rgba(139,92,246,0.2); }
+/* ===== 双人PK 顶栏（并排竞技） ===== */
+.pk-stats { display: none; align-items: center; gap: 10px; }
+.pk-player {
+    background: rgba(15, 23, 42, 0.65); border: 1.5px solid rgba(148, 163, 184, 0.25);
+    border-radius: 12px; padding: 6px 16px; text-align: center; min-width: 104px;
+}
+.pk-player .pk-label { font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 2px; color: var(--text-sub); }
+.pk-player .pk-value { font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.pk-player.red .pk-value { color: #f87171; }
+.pk-player.blue .pk-value { color: #60a5fa; }
+.pk-player .pk-subtime { font-size: 11px; color: var(--text-sub); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.pk-player .pk-subtime.urgent { color: var(--danger); animation: blink 0.6s steps(2) infinite; }
+.pk-vs-badge {
+    width: 34px; height: 34px; border-radius: 50%; flex: none;
+    background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #78350f;
+    font-weight: 900; font-size: 13px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+.dot.red { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+.dot.blue { background: #3b82f6; box-shadow: 0 0 8px rgba(59, 130, 246, 0.8); }
+/* ===== 提示条 ===== */
+.hintbar {
+    width: min(94vw, 720px); display: flex; align-items: center; justify-content: flex-end;
+    gap: 8px; margin-bottom: 10px; font-size: 12px; color: var(--text-sub);
+}
+.toast {
+    background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(245, 158, 11, 0.5);
+    color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 12px;
+    font-weight: 600; opacity: 0; transform: translateY(-4px);
+    transition: opacity 0.25s ease, transform 0.25s ease; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+/* ===== 棋盘（单人） ===== */
+.board-wrap { position: relative; width: min(94vw, 660px); }
+#board {
+    display: grid;
+    gap: 3px;
+    padding: 8px;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 14px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+    backdrop-filter: blur(4px);
+}
+/* ===== 双人PK 并排棋盘 ===== */
+.pk-board-wrap { display: none; width: min(96vw, 920px); gap: 14px; align-items: flex-start; }
+.pk-board-wrap.show { display: grid; grid-template-columns: 1fr 1fr; }
+.pk-col { position: relative; min-width: 0; }
+.pk-col-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    font-size: 14px; font-weight: 800; padding: 8px 14px; border-radius: 12px;
+    background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(148, 163, 184, 0.25);
+}
+.pk-col-head.red { border-color: rgba(239, 68, 68, 0.45); }
+.pk-col-head.blue { border-color: rgba(59, 130, 246, 0.45); }
+.pk-progress { margin-left: auto; font-size: 12px; color: var(--text-sub); font-weight: 600; }
+.pk-progress b { color: #e2e8f0; }
+.pk-board {
+    display: grid;
+    gap: 3px;
+    padding: 8px;
+    background: rgba(15, 23, 42, 0.55);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 14px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+    backdrop-filter: blur(4px);
+}
+/* ===== 格子（单人/PK共用样式） ===== */
+.cell {
+    position: relative; aspect-ratio: 1 / 1;
+    background: linear-gradient(145deg, #ffffff, var(--cell-bg));
+    border-radius: 5px; border: 1px solid var(--cell-border);
+    overflow: hidden; cursor: pointer; touch-action: manipulation;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.18s ease;
+    display: flex; align-items: center; justify-content: center;
+    padding: 8px;
+}
+.cell:hover { transform: scale(1.04); z-index: 2; }
+.cell img {
+    width: 100%; height: 100%; object-fit: contain; pointer-events: none; -webkit-user-drag: none; transition: transform 0.2s ease;
+}
+.cell .cell-name {
+    display: none;
+    font-weight: 800;
+    pointer-events: none;
+    max-width: 94%;
+    max-height:94%;
+    justify-items:center;
+    align-items:center;
+    justify-content:center;
+    align-content:center;
+}
+/* 2字：单行flex */
+.cell .cell-name.single-row{
+    display:flex;
+    flex-wrap:nowrap;
+    flex-direction:row;
+    gap:var(--text-gap);
+    align-items:center;
+    justify-content:center;
+}
+/* 3个字：第1行2字，第2行1字，整体居中 */
+.cell .cell-name.three-row{
+    display:flex;
+    flex-direction:column;
+    gap:var(--text-gap);
+    align-items:center;
+    justify-content:center;
+}
+.cell .cell-name.three-row .line{
+    display:flex;
+    flex-direction:row;
+    gap:var(--text-gap);
+    justify-content:center;
+}
+/* 4字专用：严格2行2列 */
+.cell .cell-name.grid-four{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:auto auto;
+    gap:var(--text-gap) var(--text-gap);
+    justify-items:center;
+    align-items:center;
+}
+.cell.selected {
+    outline: 2.5px solid var(--accent); outline-offset: -2.5px;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3), 0 6px 16px rgba(0,0,0,0.35);
+    transform: scale(1.07); z-index: 3;
+}
+.cell.removed {
+    background: rgba(30,41,59,0.2);
+    border-color: rgba(148,163,184,0.1);
+    pointer-events: none;
+}
+.cell.removed img, .cell.removed .cell-name {
+    opacity:0;
+}
+@keyframes pop {
+    0% { transform: scale(1); opacity: 1; }
+    35% { transform: scale(1.22) rotate(6deg); opacity: 1; }
+    100% { transform: scale(0); opacity: 0; }
+}
+.float-score {
+    position: absolute; z-index: 10; font-weight: 900; font-size: 17px; color: var(--accent);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); pointer-events: none;
+    animation: floatUp 0.9s ease forwards; transform: translate(-50%, -50%);
+}
+.float-score.red { color: #f87171; }
+.float-score.blue { color: #60a5fa; }
+@keyframes floatUp {
+    0% { opacity: 0; scale: 0.6; }
+    20% { opacity: 1; scale: 1.15; }
+    100% { opacity: 0; scale: 1; transform: translate(-50%, -140%); }
+}
+/* ===== 关卡选择视图 ===== */
+.level-head { text-align: center; margin: 6vh 0 4vh; }
+.level-head .logo {
+    width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 18px;
+    background: linear-gradient(135deg, #38bdf8, #6366f1);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 32px rgba(56, 189, 248, 0.4);
+}
+.level-head h1 { font-size: 28px; font-weight: 900; letter-spacing: 2px; margin-bottom: 6px; }
+.level-head p { color: var(--text-sub); font-size: 14px; }
+/* 模式切换 */
+.mode-switch { display: flex; gap: 12px; justify-content: center; margin: -8px 0 22px; }
+.mode-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 14px; cursor: pointer;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: rgba(15, 23, 42, 0.6); color: var(--text-sub);
+    font-size: 15px; font-weight: 700; font-family: inherit;
+    transition: transform 0.18s ease, box-shadow 0.25s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.mode-btn svg { width: 20px; height: 20px; }
+.mode-btn:hover { transform: translateY(-2px); }
+.mode-btn.active.solo {
+    border-color: rgba(245, 158, 11, 0.65); color: #fbbf24;
+    background: rgba(245, 158, 11, 0.14);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.2);
+}
+.mode-btn.active.pk {
+    border-color: rgba(168, 85, 247, 0.65); color: #d8b4fe;
+    background: rgba(168, 85, 247, 0.14);
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.2);
+}
+.level-grid {
+    width: min(94vw, 800px);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+.level-card {
+    background: linear-gradient(160deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 18px;
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+    position: relative;
+}
+.level-card:hover { transform: translateY(-5px); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); border-color: rgba(245, 158, 11, 0.6); }
+.level-card .lv-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 6px 12px; min-width: 40px; height: 34px; border-radius: 12px; margin-bottom: 10px;
+    font-size: 15px; font-weight: 900; white-space: nowrap;
+}
+.level-card.lv1 .lv-num { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
+.level-card.lv2 .lv-num { background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
+.level-card.lv3 .lv-num { background: rgba(245, 158, 11, 0.18); color: #fbbf24; }
+.level-card.lv4 .lv-num { background: rgba(239, 68, 68, 0.18); color: #f87171; }
+.level-card.lv5 .lv-num { background: rgba(139, 92, 246, 0.18); color: #c4b5fd; }
+.level-card .lv-size { font-size: 22px; font-weight: 900; margin-bottom: 4px; }
+.level-card .lv-title {
+    display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 14px; font-weight: 700; margin-bottom: 2px;
+}
+.level-card .lv-meta { font-size: 12px; color: var(--text-sub); line-height: 1.8; margin-bottom: 10px; }
+.level-card .lv-meta b { color: #e2e8f0; }
+.level-card .lv-best {
+    font-size: 12px; padding: 5px 10px; border-radius: 20px;
+    background: rgba(56, 189, 248, 0.12); color: #7dd3fc;
+    display: inline-block;
+}
+.level-card .lv-pk {
+    font-size: 11px; padding: 4px 10px; border-radius: 12px; margin-top: 8px;
+    background: rgba(168, 85, 247, 0.12); color: #c4b5fd; display: inline-block;
+}
+.level-card .lv-cleared {
+    position: absolute; top: 12px; right: 12px;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    display: none; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+}
+.level-card .lv-cleared.show { display: flex; }
+.level-card .lv-cleared svg { width: 14px; height: 14px; stroke: #fff; }
+
+/* =====首页游戏规则说明区块===== */
+.rule-wrap{
+    width: min(94vw,800px);
+    margin-top:36px;
+    background:rgba(30,41,59,0.6);
+    border:1px solid rgba(148,163,184,0.24);
+    border-radius:16px;
+    padding:20px 24px;
+    backdrop-filter: blur(4px);
+}
+.rule-wrap h3{
+    font-size:18px;
+    margin-bottom:12px;
+    color:#bae6fd;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.rule-wrap h3 svg{ width:18px; height:18px; flex:none; }
+.rule-wrap ul{
+    padding-left:20px;
+}
+.rule-wrap li{
+    font-size:14px;
+    color:#cbd5e1;
+    line-height:1.7;
+    margin-bottom:6px;
+}
+.rule-wrap li strong{ color:#f1f5f9; }
+
+/* ===== 结束面板 ===== */
+.overlay {
+    position: fixed; inset: 0; z-index: 50;
+    background: rgba(2, 6, 23, 0.72); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.overlay.show { display: flex; }
+.end-card {
+    background: linear-gradient(160deg, #1e293b, #0f172a);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 20px; padding: 30px 34px; text-align: center;
+    max-width: 440px; width: 100%;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    animation: cardIn 0.4s cubic-bezier(0.2, 1.2, 0.35, 1);
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.end-card .trophy {
+    width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+}
+.end-card .trophy.win { background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 10px 28px rgba(245, 158, 11, 0.4); }
+.end-card .trophy.fail { background: linear-gradient(135deg, #475569, #334155); box-shadow: 0 10px 28px rgba(51, 65, 85, 0.4); }
+.end-card .trophy.pk-red { background: linear-gradient(135deg, #ef4444, #f87171); box-shadow: 0 10px 28px rgba(239, 68, 68, 0.4); }
+.end-card .trophy.pk-blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); box-shadow: 0 10px 28px rgba(59, 130, 246, 0.4); }
+.end-card .trophy svg { width: 34px; height: 34px; }
+.end-card .trophy.win svg { stroke: #78350f; }
+.end-card .trophy.fail svg { stroke: #cbd5e1; }
+.end-card .trophy.pk-red svg { stroke: #7f1d1d; }
+.end-card .trophy.pk-blue svg { stroke: #1e3a8a; }
+.end-card h2 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.end-card .sub { color: var(--text-sub); font-size: 13px; margin-bottom: 16px; }
+.end-card .big-score { font-size: 50px; font-weight: 900; color: var(--accent); font-variant-numeric: tabular-nums; line-height: 1; margin-bottom: 4px; }
+.end-card .target-line { color: var(--text-sub); font-size: 13px; margin-bottom: 6px; }
+.end-card .target-line b { color: #e2e8f0; }
+.end-card .best-line { color: var(--text-sub); font-size: 13px; margin-bottom: 8px; }
+.end-card .best-line b { color: var(--accent-2); }
+/* PK结算：双方得分 */
+.pk-score-row { display: none; align-items: center; justify-content: center; gap: 18px; margin: 8px 0 10px; }
+.pk-side { flex: 1; max-width: 130px; background: rgba(15, 23, 42, 0.55); border-radius: 14px; padding: 12px 10px; border: 1.5px solid; }
+.pk-side.red { border-color: rgba(239, 68, 68, 0.5); }
+.pk-side.blue { border-color: rgba(59, 130, 246, 0.5); }
+.pk-side-label { font-size: 12px; color: var(--text-sub); margin-bottom: 4px; }
+.pk-side-val { font-size: 34px; font-weight: 900; line-height: 1; }
+.pk-side.red .pk-side-val { color: #f87171; }
+.pk-side.blue .pk-side-val { color: #60a5fa; }
+.pk-vs { font-size: 18px; font-weight: 900; color: var(--text-sub); }
+.end-card .verdict {
+    font-size: 14px; padding: 10px 16px; border-radius: 12px; margin: 14px 0 20px;
+    border: 1px solid;
+}
+.end-card .verdict.win { background: rgba(34, 197, 94, 0.12); color: #86efac; border-color: rgba(34, 197, 94, 0.3); }
+.end-card .verdict.fail { background: rgba(245, 158, 11, 0.12); color: #fcd34d; border-color: rgba(245, 158, 11, 0.3); }
+.end-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.end-actions button {
+    padding: 12px 22px; border: none; border-radius: 14px; font-size: 14px; font-weight: 700;
+    font-family: inherit; cursor: pointer; transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.end-actions button:hover { transform: translateY(-2px); }
+.end-actions .again { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1c1917; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35); }
+.end-actions .next { background: linear-gradient(135deg, #22c55e, #16a34a); color: #052e16; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35); }
+.end-actions .level-btn { background: rgba(51, 65, 85, 0.7); color: var(--text-main); border: 1px solid rgba(148, 163, 184, 0.3); }
+/* ===== 响应式 ===== */
+@media (max-width: 900px) {
+    .pk-board-wrap.show { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+    .level-grid { grid-template-columns: repeat(2, 1fr); }
+    .level-head h1 { font-size: 23px; }
+    .brand h1 { font-size: 17px; }
+    .stat-card { min-width: 66px; padding: 5px 9px; }
+    .stat-card .value { font-size: 17px; }
+    #board { gap: 2px; padding: 6px; }
+    .cell { border-radius: 4px; padding:4px; }
+    .rule-wrap{padding:16px 18px;margin-top:28px;}
+    .pk-player { min-width: 80px; padding: 5px 10px; }
+    .pk-player .pk-value { font-size: 17px; }
+    .pk-board { gap: 2px; padding: 6px; }
+}
+</style>
+</head>
+<body>
+<!-- ===== 关卡选择视图 ===== -->
+<div class="view active" id="levelView">
+    <div class="level-head">
+        <div class="logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="32" height="32">
+                <path d="M9 3h6"></path>
+                <path d="M10.5 3v5.2L5.6 17.4a2.1 2.1 0 0 0 1.8 3.2h9.2a2.1 2.1 0 0 0 1.8-3.2L13.5 8.2V3"></path>
+            </svg>
+        </div>
+        <h1>化学仪器连连看</h1>
+        <p>图片与仪器名称配对消除 · 不受路径限制</p>
+    </div>
+    <!-- 模式切换：单人闯关 / 双人PK -->
+    <div class="mode-switch">
+        <button class="mode-btn solo active" id="soloModeBtn" aria-label="单人闯关模式">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"></circle>
+                <path d="M5 20v-1a6 6 0 0 1 14 0v1"></path>
+            </svg>
+            单人闯关
+        </button>
+        <button class="mode-btn pk" id="pkModeBtn" aria-label="双人PK模式">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="8" r="3.5"></circle>
+                <circle cx="17" cy="8" r="3.5"></circle>
+                <path d="M3.5 20v-1a5 5 0 0 1 9-3"></path>
+                <path d="M14.5 20v-1a5 5 0 0 1 6-4"></path>
+            </svg>
+            双人PK
+        </button>
+    </div>
+    <div class="level-grid" id="levelGrid"></div>
+    <!-- 首页游戏规则说明 -->
+    <div class="rule-wrap">
+        <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            游戏规则
+        </h3>
+        <ul>
+            <li>棋盘内分为仪器图片格子、仪器名称格子两种；</li>
+            <li>只要是<strong>同一种仪器：一张图片 + 一个名称</strong>，即可直接配对消除，不受位置、阻挡、拐点限制；</li>
+            <li>图片配图片、名称配名称无法消除；</li>
+         </ul>
+    </div>
+</div>
+<!-- ===== 游戏视图 ===== -->
+<div class="view" id="gameView">
+    <div class="topbar">
+        <div class="brand">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                    <path d="M9 3h6"></path>
+                    <path d="M10.5 3v5.2L5.6 17.4a2.1 2.1 0 0 0 1.8 3.2h9.2a2.1 2.1 0 0 0 1.8-3.2L13.5 8.2V3"></path>
+                </svg>
+            </div>
+            <h1 id="gameTitle">第 1 关<small id="gameSub">4 × 4 · 40 秒</small></h1>
+        </div>
+        <!-- 单机统计 -->
+        <div class="stats" id="soloStats">
+            <div class="stat-card"><div class="label">得分</div><div class="value score" id="scoreVal">0</div></div>
+            <div class="stat-card"><div class="label">目标</div><div class="value target" id="targetVal">120</div></div>
+            <div class="stat-card"><div class="label">最高</div><div class="value best" id="bestVal">0</div></div>
+            <div class="stat-card"><div class="label">剩余</div><div class="value time" id="timeVal">40</div></div>
+        </div>
+        <!-- 双人PK统计：红方得分+倒计时 VS 蓝方得分+倒计时 -->
+        <div class="pk-stats" id="pkStats">
+            <div class="pk-player red" id="pkP1">
+                <div class="pk-label"><span class="dot red"></span>红方</div>
+                <div class="pk-value" id="p1ScoreVal">0</div>
+                <div class="pk-subtime" id="pkATimeVal">40s</div>
+            </div>
+            <div class="pk-vs-badge">VS</div>
+            <div class="pk-player blue" id="pkP2">
+                <div class="pk-label"><span class="dot blue"></span>蓝方</div>
+                <div class="pk-value" id="p2ScoreVal">0</div>
+                <div class="pk-subtime" id="pkBTimeVal">40s</div>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="ctrl-btn back" id="backBtn" title="返回关卡选择" aria-label="返回关卡选择">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <button class="ctrl-btn" id="practiceBtn" title="练习模式（关闭倒计时）" aria-label="练习模式">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 8v4l3 3"></path>
+                </svg>
+            </button>
+            <button class="ctrl-btn" id="demoBtn" title="教学演示切换：混合/只看名称/只看图片" aria-label="教学演示">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </button>
+            <button class="ctrl-btn" id="soundBtn" title="音效开关" aria-label="音效开关">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#e2e8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 5 6 9H2v6h4l5 4V5z"></path>
+                    <path id="wavePath" d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+                </svg>
+            </button>
+            <button class="ctrl-btn restart" id="restartBtn" title="再来一次" aria-label="再来一次">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+                    <path d="M21 3v6h-6"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="hintbar">
+        <div class="toast" id="toast"></div>
+    </div>
+    <!-- 单人棋盘 -->
+    <div class="board-wrap" id="soloBoardWrap">
+        <div id="board" role="grid" aria-label="连连看棋盘"></div>
+    </div>
+    <!-- 双人PK并排棋盘 -->
+    <div class="pk-board-wrap" id="pkBoardWrap">
+        <div class="pk-col" id="pkColA">
+            <div class="pk-col-head red">
+                <span class="dot red"></span>红方棋盘
+                <span class="pk-progress">已消 <b id="pkAProg">0/8</b> 对</span>
+            </div>
+            <div class="pk-board" id="pkBoardA"></div>
+        </div>
+        <div class="pk-col" id="pkColB">
+            <div class="pk-col-head blue">
+                <span class="dot blue"></span>蓝方棋盘
+                <span class="pk-progress">已消 <b id="pkBProg">0/8</b> 对</span>
+            </div>
+            <div class="pk-board" id="pkBoardB"></div>
+        </div>
+    </div>
+</div>
+<!-- ===== 结束面板 ===== -->
+<div class="overlay" id="endOverlay">
+    <div class="end-card">
+        <div class="trophy win" id="endTrophy">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 21h8"></path><path d="M12 17v4"></path>
+                <path d="M7 4h10v6a5 5 0 0 1-10 0V4z"></path>
+                <path d="M7 6H4a2 2 0 0 0 2 4h1"></path>
+                <path d="M17 6h3a2 2 0 0 1-2 4h-1"></path>
+            </svg>
+        </div>
+        <h2 id="endTitle">通关！</h2>
+        <div class="sub" id="endSub">本关得分</div>
+        <!-- 单机结算 -->
+        <div id="soloEnd">
+            <div class="big-score" id="endScore">0</div>
+            <div class="target-line">目标 <b id="endTarget">120</b> · 本关最高 <b id="endBest">0</b></div>
+            <div class="best-line" id="endBestLine"></div>
+        </div>
+        <!-- PK结算 -->
+        <div class="pk-score-row" id="pkScoreRow">
+            <div class="pk-side red">
+                <div class="pk-side-label">红方</div>
+                <div class="pk-side-val" id="pkEndRed">0</div>
+            </div>
+            <div class="pk-vs">VS</div>
+            <div class="pk-side blue">
+                <div class="pk-side-label">蓝方</div>
+                <div class="pk-side-val" id="pkEndBlue">0</div>
+            </div>
+        </div>
+        <div class="verdict win" id="endVerdict">完美通关！</div>
+        <div class="end-actions">
+            <button class="next" id="nextBtn">下一关</button>
+            <button class="again" id="againBtn">再来一次</button>
+            <button class="level-btn" id="closeBtn">返回关卡</button>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    'use strict';
+    /* ===== 仪器素材 ===== */
+    var TYPES = [
+        { name: '试管',     img: 'https://aka.doubaocdn.com/s/xZc0V0ZELd', color: '#3b82f6' },
+        { name: '烧杯',     img: 'https://aka.doubaocdn.com/s/lVKt3tJjA5', color: '#10b981' },
+        { name: '量筒',     img: 'https://aka.doubaocdn.com/s/8JPwIMezOs', color: '#f59e0b' },
+        { name: '酒精灯',   img: 'https://aka.doubaocdn.com/s/BArPJ6pwgF', color: '#ef4444' },
+        { name: '漏斗',     img: 'https://aka.doubaocdn.com/s/UjTUeHau4E', color: '#8b5cf6' },
+        { name: '玻璃棒',   img: 'https://aka.doubaocdn.com/s/EmqF60Fw9u', color: '#06b6d4' },
+        { name: '胶头滴管', img: 'https://aka.doubaocdn.com/s/wdGs5YSiBo', color: '#ec4899' },
+        { name: '集气瓶',   img: 'https://aka.doubaocdn.com/s/LoegipvtQN', color: '#84cc16' }
+    ];
+    /* ===== 五关配置【单人/双人PK共用，时间已减半】 ===== */
+    var LEVELS = [
+        { size: 4,  seconds: 40,  target: 120, pairs:8,  label: '第 1 关 · 初识', cls: 'lv1' },
+        { size: 6,  seconds: 60,  target: 240, pairs:18, label: '第 2 关 · 入门', cls: 'lv2' },
+        { size: 8,  seconds: 80,  target: 480, pairs:32, label: '第 3 关 · 进阶', cls: 'lv3' },
+        { size: 10, seconds: 100, target: 720, pairs:50, label: '第 4 关 · 挑战', cls: 'lv4' },
+        { size: 12, seconds: 120, target: 1000,pairs:72, label: '第 5 关 · 大师', cls: 'lv5' }
+    ];
+    var GAME_SECONDS = LEVELS[0].seconds;
+    var SIZE = LEVELS[0].size;
+    var TARGET = LEVELS[0].target;
+    var TOTAL_PAIRS = LEVELS[0].pairs;
+    var board = [];
+    var boardMode = [];
+    var score = 0;
+    var best = 0;
+    var timeLeft = GAME_SECONDS;
+    var running = false;
+    var busy = false;
+    var selected = null;
+    var comboCount = 0;
+    var rafId = null;
+    var startTs = 0;
+    var lastTick = -1;
+    var currentLevel = 0;
+    var clearedPairs = 0;
+    var practiceMode = false; //练习模式开关
+    var demoMode = 0; //0=正常混合，1=只看名称，2=只看图片
+    var demoText=["正常混合模式","只看仪器名称","只看仪器图片"];
+    /* ===== 双人PK状态（并排双棋盘，各自独立） ===== */
+    var pkMode = false;          //false=单人，true=双人PK
+    var pkRunning = false;
+    var pkBoards = [null, null];   //两位玩家的棋盘数据
+    var pkBoardModes = [null, null];
+    var pkCells = [[], []];        //两位玩家的格子DOM
+    var p1Score = 0, p2Score = 0;  //红/蓝得分
+    var pkCombos = [0, 0];         //红/蓝独立连击
+    var pkCleared = [0, 0];        //红/蓝已消除对数
+    var pkSelected = [null, null]; //红/蓝当前选中
+    var pkBusy = [false, false];   //红/蓝消除动画锁
+    /* ===== DOM 引用 ===== */
+    var levelView = document.getElementById('levelView');
+    var gameView = document.getElementById('gameView');
+    var levelGrid = document.getElementById('levelGrid');
+    var boardEl = document.getElementById('board');
+    var scoreEl = document.getElementById('scoreVal');
+    var targetEl = document.getElementById('targetVal');
+    var bestEl = document.getElementById('bestVal');
+    var timeEl = document.getElementById('timeVal');
+    var gameTitle = document.getElementById('gameTitle');
+    var gameSub = document.getElementById('gameSub');
+    var endOverlay = document.getElementById('endOverlay');
+    var endTrophy = document.getElementById('endTrophy');
+    var endTitle = document.getElementById('endTitle');
+    var endSub = document.getElementById('endSub');
+    var endScoreEl = document.getElementById('endScore');
+    var endTargetEl = document.getElementById('endTarget');
+    var endBestEl = document.getElementById('endBest');
+    var endBestLine = document.getElementById('endBestLine');
+    var endVerdictEl = document.getElementById('endVerdict');
+    var toastEl = document.getElementById('toast');
+    var soundBtn = document.getElementById('soundBtn');
+    var wavePath = document.getElementById('wavePath');
+    var practiceBtn = document.getElementById('practiceBtn');
+    var demoBtn = document.getElementById('demoBtn');
+    var restartBtn = document.getElementById('restartBtn');
+    var backBtn = document.getElementById('backBtn');
+    var againBtn = document.getElementById('againBtn');
+    var nextBtn = document.getElementById('nextBtn');
+    var closeBtn = document.getElementById('closeBtn');
+    /* PK DOM */
+    var soloModeBtn = document.getElementById('soloModeBtn');
+    var pkModeBtn = document.getElementById('pkModeBtn');
+    var soloStats = document.getElementById('soloStats');
+    var pkStats = document.getElementById('pkStats');
+    var p1ScoreEl = document.getElementById('p1ScoreVal');
+    var p2ScoreEl = document.getElementById('p2ScoreVal');
+    var pkATimeVal = document.getElementById('pkATimeVal');
+    var pkBTimeVal = document.getElementById('pkBTimeVal');
+    var soloBoardWrap = document.getElementById('soloBoardWrap');
+    var pkBoardWrap = document.getElementById('pkBoardWrap');
+    var pkBoardA = document.getElementById('pkBoardA');
+    var pkBoardB = document.getElementById('pkBoardB');
+    var pkColA = document.getElementById('pkColA');
+    var pkColB = document.getElementById('pkColB');
+    var pkAProg = document.getElementById('pkAProg');
+    var pkBProg = document.getElementById('pkBProg');
+    var soloEnd = document.getElementById('soloEnd');
+    var pkScoreRow = document.getElementById('pkScoreRow');
+    var pkEndRed = document.getElementById('pkEndRed');
+    var pkEndBlue = document.getElementById('pkEndBlue');
+    /* ===== localStorage存取 ===== */
+    function keyBest(lv) { return 'chemLinkBest_' + lv; }
+    function keyCleared(lv) { return 'chemLinkCleared_' + lv; }
+    function loadBest(lv) {
+        try {
+            var v = parseInt(localStorage.getItem(keyBest(lv)) || '0', 10);
+            return isNaN(v) ? 0 : v;
+        } catch (e) { return 0; }
+    }
+    function saveBest(lv, v) {
+        try { localStorage.setItem(keyBest(lv), String(v)); } catch (e) {}
+    }
+    function isCleared(lv) {
+        try { return localStorage.getItem(keyCleared(lv)) === '1'; } catch (e) { return false; }
+    }
+    function setCleared(lv) {
+        try { localStorage.setItem(keyCleared(lv), '1'); } catch (e) {}
+    }
+    /* PK胜场存取 */
+    function keyPk(lv, who) { return 'chemLinkPk_' + lv + (who === 1 ? '_red' : '_blue'); }
+    function pkRecord(lv) {
+        try {
+            var r = parseInt(localStorage.getItem(keyPk(lv, 1)) || '0', 10);
+            var b = parseInt(localStorage.getItem(keyPk(lv, 2)) || '0', 10);
+            return { red: isNaN(r) ? 0 : r, blue: isNaN(b) ? 0 : b };
+        } catch (e) { return { red: 0, blue: 0 }; }
+    }
+    function addPkWin(lv, who) {
+        try {
+            var v = parseInt(localStorage.getItem(keyPk(lv, who)) || '0', 10) + 1;
+            localStorage.setItem(keyPk(lv, who), String(v));
+        } catch (e) {}
+    }
+    /* ===== 音效 ===== */
+    var AudioFX = (function () {
+        var ctx = null;
+        var muted = false;
+        function ensure() {
+            if (!ctx) {
+                var AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return null;
+                ctx = new AC();
+            }
+            if (ctx.state === 'suspended') ctx.resume();
+            return ctx;
+        }
+        function tone(freq, dur, type, vol, delay, slideTo) {
+            if (muted) return;
+            var c = ensure();
+            if (!c) return;
+            var t0 = c.currentTime + (delay || 0);
+            var osc = c.createOscillator();
+            var gain = c.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.setValueAtTime(freq, t0);
+            if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+            var v = vol || 0.16;
+            gain.gain.setValueAtTime(0.0001, t0);
+            gain.gain.exponentialRampToValueAtTime(v, t0 + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(t0);
+            osc.stop(t0 + dur + 0.05);
+        }
+        return {
+            unlock: function () { ensure(); },
+            setMuted: function (m) { muted = m; },
+            isMuted: function () { return muted; },
+            select: function () { tone(660, 0.06, 'triangle', 0.10); },
+            bad: function () { tone(200, 0.18, 'sawtooth', 0.06, 0, 140); },
+            match: function (combo) {
+                var base = [523.25, 659.25, 783.99, 1046.5];
+                var n = Math.min(combo,3);
+                for(var i=0;i<3;i++){
+                    tone(base[i]*Math.pow(1.12,n),0.13,'triangle',0.14,i*0.055);
+                }
+                if(combo>1) tone(base[3]*Math.pow(1.1,n),0.2,'sine',0.12,0.16);
+            },
+            win: function () {
+                var seq = [523.25,659.25,783.99,1046.5];
+                for(var i=0;i<seq.length;i++) tone(seq[i],0.2,'triangle',0.15,i*0.12);
+            },
+            fail: function () {
+                var seq = [392,329.63,261.63];
+                for(var i=0;i<seq.length;i++) tone(seq[i],0.2,'triangle',0.13,i*0.14);
+            },
+            tick: function () { tone(880, 0.05, 'square', 0.05); }
+        };
+    })();
+    function setMutedUI(m) {
+        if (m) wavePath.setAttribute('d', 'M16 9l5 6M21 9l-5 6');
+        else wavePath.setAttribute('d', 'M15.5 8.5a5 5 0 0 1 0 7');
+    }
+    soundBtn.addEventListener('click', function () {
+        AudioFX.unlock();
+        AudioFX.setMuted(!AudioFX.isMuted());
+        setMutedUI(AudioFX.isMuted());
+    });
+    //模式切换：单人 / 双人PK
+    function setMode(pk) {
+        pkMode = pk;
+        soloModeBtn.classList.toggle('active', !pk);
+        pkModeBtn.classList.toggle('active', pk);
+    }
+    soloModeBtn.addEventListener('click', function () {
+        AudioFX.unlock();
+        setMode(false);
+        showToast('已切换：单人闯关');
+    });
+    pkModeBtn.addEventListener('click', function () {
+        AudioFX.unlock();
+        setMode(true);
+        showToast('已切换：双人PK（并排双棋盘，不限时，先消完者胜）');
+    });
+    //练习模式切换
+    practiceBtn.addEventListener('click',function(){
+        AudioFX.unlock();
+        practiceMode = !practiceMode;
+        practiceBtn.classList.toggle('practice-on',practiceMode);
+        showToast(practiceMode?"已开启练习模式（无倒计时）":"已关闭练习模式");
+        if(running){
+            if(practiceMode){
+                stopTimer();
+                timeEl.textContent="—";
+            }else{
+                timeLeft = GAME_SECONDS;
+                timeEl.textContent=timeLeft;
+                startTs = performance.now();
+                lastTick=-1;
+                rafId = requestAnimationFrame(tick);
+            }
+        }
+        if(pkRunning){
+            // PK模式无倒计时，练习按钮仅对单人有效
+        }
+    });
+    //教学演示模式切换 0→1→2→0
+    demoBtn.addEventListener('click',function(){
+        AudioFX.unlock();
+        demoMode = (demoMode+1)%3;
+        demoBtn.classList.toggle('demo-on',demoMode!==0);
+        showToast(demoText[demoMode]);
+        if(running){
+            renderAll();
+        }
+        if(pkRunning){
+            renderPkAll(0);
+            renderPkAll(1);
+        }
+    });
+    /* ===== 单人棋盘：生成 ===== */
+    function createBoard() {
+        board = [];
+        boardMode = [];
+        for(var r=0;r<SIZE;r++){
+            board[r]=[];
+            boardMode[r]=[];
+            for(var c=0;c<SIZE;c++){
+                board[r][c]=-1;
+                boardMode[r][c]=0;
+            }
+        }
+        var pairsNeeded = TOTAL_PAIRS;
+        var pool = [];
+        for(var i=0;i<pairsNeeded;i++){
+            var tid = i % TYPES.length;
+            pool.push({tid:tid,mode:0});
+            pool.push({tid:tid,mode:1});
+        }
+        for(var i=pool.length-1;i>0;i--){
+            var j = Math.floor(Math.random()*(i+1));
+            var tmp = pool[i]; pool[i]=pool[j]; pool[j]=tmp;
+        }
+        var ptr=0;
+        for(var r=0;r<SIZE && ptr<pool.length;r++){
+            for(var c=0;c<SIZE && ptr<pool.length;c++){
+                var item = pool[ptr++];
+                board[r][c] = item.tid;
+                boardMode[r][c] = item.mode;
+            }
+        }
+    }
+    var cells = [];
+    function buildGrid() {
+        boardEl.style.gridTemplateColumns = 'repeat(' + SIZE + ', 1fr)';
+        boardEl.innerHTML = '';
+        cells = [];
+        for (var r = 0; r < SIZE; r++) {
+            cells[r] = [];
+            for (var c = 0; c < SIZE; c++) {
+                var cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.r = r;
+                cell.dataset.c = c;
+                var img = document.createElement('img');
+                img.alt = '';
+                img.draggable = false;
+                var nameEl = document.createElement('div');
+                nameEl.className = 'cell-name';
+                cell.appendChild(img);
+                cell.appendChild(nameEl);
+                boardEl.appendChild(cell);
+                cells[r][c] = cell;
+                cell.addEventListener('pointerdown', function (e) {
+                    e.preventDefault();
+                    onCellPointerDown(e);
+                });
+            }
+        }
+    }
+    function renderCell(r, c) {
+        var cell = cells[r][c];
+        var t = board[r][c];
+        var mode = boardMode[r][c];
+        cell.className = 'cell';
+        var img = cell.querySelector('img');
+        var nameEl = cell.querySelector('.cell-name');
+        if(t === -1){
+            cell.classList.add('removed');
+            img.style.display='none';
+            nameEl.style.display='none';
+            return;
+        }
+        var typeObj = TYPES[t];
+        img.src = typeObj.img;
+        img.alt = typeObj.name;
+        nameEl.style.color = typeObj.color;
+        var cellPxSize = cell.clientWidth;
+        var fontSize = Math.max(9, Math.min(Math.round(cellPxSize * 0.32),42));
+        nameEl.style.fontSize = fontSize + "px";
+        var nameStr = typeObj.name;
+        nameEl.innerHTML = "";
+        if(nameStr.length === 4){
+            //4字：2行2列 胶头｜滴管
+            nameEl.className = "cell-name grid-four";
+            var s0 = document.createElement("span");s0.textContent=nameStr[0];
+            var s1 = document.createElement("span");s1.textContent=nameStr[1];
+            var s2 = document.createElement("span");s2.textContent=nameStr[2];
+            var s3 = document.createElement("span");s3.textContent=nameStr[3];
+            nameEl.appendChild(s0);nameEl.appendChild(s1);
+            nameEl.appendChild(s2);nameEl.appendChild(s3);
+        }else if(nameStr.length ===3){
+            //3个字：第1行2字，第2行1字，整体居中
+            nameEl.className = "cell-name three-row";
+            var line1 = document.createElement("div");
+            line1.className="line";
+            var l1ch0 = document.createElement("span"); l1ch0.textContent=nameStr[0];
+            var l1ch1 = document.createElement("span"); l1ch1.textContent=nameStr[1];
+            line1.appendChild(l1ch0); line1.appendChild(l1ch1);
+
+            var line2 = document.createElement("div");
+            line2.className="line";
+            var l2ch0 = document.createElement("span"); l2ch0.textContent=nameStr[2];
+            line2.appendChild(l2ch0);
+
+            nameEl.appendChild(line1);
+            nameEl.appendChild(line2);
+        }else{
+            //2个字单行
+            nameEl.className = "cell-name single-row";
+            for(var i=0;i<nameStr.length;i++){
+                var sp = document.createElement("span");
+                sp.textContent = nameStr[i];
+                nameEl.appendChild(sp);
+            }
+        }
+        //演示模式逻辑
+        if(demoMode===0){
+            //正常混合，沿用原始mode
+            if(mode ===0){
+                img.style.display = '';
+                nameEl.style.display = 'none';
+            }else{
+                img.style.display = 'none';
+                nameEl.style.display = '';
+            }
+        }else if(demoMode===1){
+            //只看名称，全部显示文字，隐藏图片
+            img.style.display = 'none';
+            nameEl.style.display = '';
+        }else if(demoMode===2){
+            //只看图片，全部显示图片，隐藏文字
+            img.style.display = '';
+            nameEl.style.display = 'none';
+        }
+    }
+    function renderAll() {
+        for (var r = 0; r < SIZE; r++) {
+            for (var c = 0; c < SIZE; c++) {
+                renderCell(r, c);
+            }
+        }
+        clearSelection();
+    }
+    function clearSelection() {
+        if (selected) {
+            cells[selected.r][selected.c].classList.remove('selected');
+            selected = null;
+        }
+    }
+    function updateScoreUI() {
+        scoreEl.textContent = score;
+    }
+    function showFloatScore(gained, combo) {
+        var el = document.createElement('div');
+        el.className = 'float-score';
+        el.textContent = combo > 1 ? '+' + gained + ' 连击x' + combo : '+' + gained;
+        el.style.left = '50%';
+        el.style.top = '46%';
+        soloBoardWrap.appendChild(el);
+        setTimeout(function () { el.remove(); }, 950);
+    }
+    /* ===== 单人交互 ===== */
+    function onCellPointerDown(e) {
+        AudioFX.unlock();
+        if (!running || busy) return;
+        var cell = e.currentTarget;
+        var r = parseInt(cell.dataset.r, 10);
+        var c = parseInt(cell.dataset.c, 10);
+        if(board[r][c]===-1) return;
+        if (!selected) {
+            selected = { r: r, c: c };
+            cell.classList.add('selected');
+            AudioFX.select();
+            return;
+        }
+        if (selected.r === r && selected.c === c) {
+            clearSelection();
+            AudioFX.select();
+            return;
+        }
+        var pA={r:selected.r,c:selected.c};
+        var pB={r:r,c:c};
+        var tA=board[pA.r][pA.c];
+        var tB=board[pB.r][pB.c];
+        var mA=boardMode[pA.r][pA.c];
+        var mB=boardMode[pB.r][pB.c];
+        // 规则：仪器ID相同，一个图片模式、一个文字模式，直接消除，不需要路径连通
+        if(tA===tB && mA!==mB){
+            busy=true;
+            clearedPairs++;
+            comboCount++;
+            var gain = 20 + (comboCount-1)*15;
+            score += gain;
+            AudioFX.match(comboCount);
+            showFloatScore(gain, comboCount);
+            updateScoreUI();
+            cells[pA.r][pA.c].classList.add('pop');
+            cells[pB.r][pB.c].classList.add('pop');
+            setTimeout(function(){
+                board[pA.r][pA.c]=-1;
+                board[pB.r][pB.c]=-1;
+                renderAll();
+                busy=false;
+                if(clearedPairs >= TOTAL_PAIRS){
+                    endGame();
+                }else if(!hasValidPair()){
+                    showToast('没有可配对，重新打乱棋盘');
+                    shuffleBoard();
+                }
+            },320);
+        }else{
+            AudioFX.bad();
+            showToast('不能配对，请选择【同仪器：图片 + 名称】');
+        }
+        clearSelection();
+    }
+    function hasValidPair(){
+        for(var r1=0;r1<SIZE;r1++){
+            for(var c1=0;c1<SIZE;c1++){
+                var t1=board[r1][c1];
+                if(t1===-1) continue;
+                var m1=boardMode[r1][c1];
+                for(var r2=0;r2<SIZE;r2++){
+                    for(var c2=0;c2<SIZE;c2++){
+                        var t2=board[r2][c2];
+                        if(t2===-1) continue;
+                        if(r1===r2&&c1===c2) continue;
+                        var m2=boardMode[r2][c2];
+                        if(t1===t2 && m1!==m2){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    function shuffleBoard(){
+        clearedPairs=0;
+        createBoard();
+        while(!hasValidPair()){ createBoard(); }
+        renderAll();
+    }
+    /* ===== 双人PK棋盘：生成与渲染 ===== */
+    function createPkBoard(p) {
+        var b = [], bm = [];
+        for(var r=0;r<SIZE;r++){
+            b[r]=[]; bm[r]=[];
+            for(var c=0;c<SIZE;c++){ b[r][c]=-1; bm[r][c]=0; }
+        }
+        var pool = [];
+        for(var i=0;i<TOTAL_PAIRS;i++){
+            var tid = i % TYPES.length;
+            pool.push({tid:tid,mode:0});
+            pool.push({tid:tid,mode:1});
+        }
+        for(var i=pool.length-1;i>0;i--){
+            var j = Math.floor(Math.random()*(i+1));
+            var tmp = pool[i]; pool[i]=pool[j]; pool[j]=tmp;
+        }
+        var ptr=0;
+        for(var r=0;r<SIZE && ptr<pool.length;r++){
+            for(var c=0;c<SIZE && ptr<pool.length;c++){
+                var item = pool[ptr++];
+                b[r][c] = item.tid;
+                bm[r][c] = item.mode;
+            }
+        }
+        pkBoards[p] = b;
+        pkBoardModes[p] = bm;
+    }
+    function buildPkGrids() {
+        pkBoardA.style.gridTemplateColumns = 'repeat(' + SIZE + ', 1fr)';
+        pkBoardB.style.gridTemplateColumns = 'repeat(' + SIZE + ', 1fr)';
+        pkBoardA.innerHTML = '';
+        pkBoardB.innerHTML = '';
+        pkCells = [[], []];
+        var containers = [pkBoardA, pkBoardB];
+        for (var p = 0; p < 2; p++) {
+            var el = containers[p];
+            for (var r = 0; r < SIZE; r++) {
+                pkCells[p][r] = [];
+                for (var c = 0; c < SIZE; c++) {
+                    var cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.r = r;
+                    cell.dataset.c = c;
+                    var img = document.createElement('img');
+                    img.alt = '';
+                    img.draggable = false;
+                    var nameEl = document.createElement('div');
+                    nameEl.className = 'cell-name';
+                    cell.appendChild(img);
+                    cell.appendChild(nameEl);
+                    el.appendChild(cell);
+                    pkCells[p][r][c] = cell;
+                    (function (pidx) {
+                        cell.addEventListener('pointerdown', function (e) {
+                            e.preventDefault();
+                            onPkCellPointerDown(e, pidx);
+                        });
+                    })(p);
+                }
+            }
+        }
+    }
+    function renderPkCell(p, r, c) {
+        var cell = pkCells[p][r][c];
+        var t = pkBoards[p][r][c];
+        var mode = pkBoardModes[p][r][c];
+        cell.className = 'cell';
+        var img = cell.querySelector('img');
+        var nameEl = cell.querySelector('.cell-name');
+        if(t === -1){
+            cell.classList.add('removed');
+            img.style.display='none';
+            nameEl.style.display='none';
+            return;
+        }
+        var typeObj = TYPES[t];
+        img.src = typeObj.img;
+        img.alt = typeObj.name;
+        nameEl.style.color = typeObj.color;
+        var cellPxSize = cell.clientWidth;
+        var fontSize = Math.max(9, Math.min(Math.round(cellPxSize * 0.32),42));
+        nameEl.style.fontSize = fontSize + "px";
+        var nameStr = typeObj.name;
+        nameEl.innerHTML = "";
+        if(nameStr.length === 4){
+            //4字：2行2列 胶头｜滴管
+            nameEl.className = "cell-name grid-four";
+            var s0 = document.createElement("span");s0.textContent=nameStr[0];
+            var s1 = document.createElement("span");s1.textContent=nameStr[1];
+            var s2 = document.createElement("span");s2.textContent=nameStr[2];
+            var s3 = document.createElement("span");s3.textContent=nameStr[3];
+            nameEl.appendChild(s0);nameEl.appendChild(s1);
+            nameEl.appendChild(s2);nameEl.appendChild(s3);
+        }else if(nameStr.length ===3){
+            //3个字：第1行2字，第2行1字，整体居中
+            nameEl.className = "cell-name three-row";
+            var line1 = document.createElement("div");
+            line1.className="line";
+            var l1ch0 = document.createElement("span"); l1ch0.textContent=nameStr[0];
+            var l1ch1 = document.createElement("span"); l1ch1.textContent=nameStr[1];
+            line1.appendChild(l1ch0); line1.appendChild(l1ch1);
+
+            var line2 = document.createElement("div");
+            line2.className="line";
+            var l2ch0 = document.createElement("span"); l2ch0.textContent=nameStr[2];
+            line2.appendChild(l2ch0);
+
+            nameEl.appendChild(line1);
+            nameEl.appendChild(line2);
+        }else{
+            //2个字单行
+            nameEl.className = "cell-name single-row";
+            for(var i=0;i<nameStr.length;i++){
+                var sp = document.createElement("span");
+                sp.textContent = nameStr[i];
+                nameEl.appendChild(sp);
+            }
+        }
+        //演示模式逻辑
+        if(demoMode===0){
+            if(mode ===0){
+                img.style.display = '';
+                nameEl.style.display = 'none';
+            }else{
+                img.style.display = 'none';
+                nameEl.style.display = '';
+            }
+        }else if(demoMode===1){
+            img.style.display = 'none';
+            nameEl.style.display = '';
+        }else if(demoMode===2){
+            img.style.display = '';
+            nameEl.style.display = 'none';
+        }
+    }
+    function renderPkAll(p) {
+        for (var r = 0; r < SIZE; r++) {
+            for (var c = 0; c < SIZE; c++) {
+                renderPkCell(p, r, c);
+            }
+        }
+        if (pkSelected[p]) {
+            var s = pkSelected[p];
+            pkCells[p][s.r][s.c].classList.remove('selected');
+            pkSelected[p] = null;
+        }
+    }
+    function hasValidPairPk(p) {
+        var b = pkBoards[p], bm = pkBoardModes[p];
+        for(var r1=0;r1<SIZE;r1++){
+            for(var c1=0;c1<SIZE;c1++){
+                var t1=b[r1][c1];
+                if(t1===-1) continue;
+                var m1=bm[r1][c1];
+                for(var r2=0;r2<SIZE;r2++){
+                    for(var c2=0;c2<SIZE;c2++){
+                        var t2=b[r2][c2];
+                        if(t2===-1) continue;
+                        if(r1===r2&&c1===c2) continue;
+                        var m2=bm[r2][c2];
+                        if(t1===t2 && m1!==m2){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    function shufflePkBoard(p) {
+        pkCleared[p] = 0;
+        createPkBoard(p);
+        while(!hasValidPairPk(p)){ createPkBoard(p); }
+        renderPkAll(p);
+        updatePkProgress();
+    }
+    /* ===== 双人PK交互：各自独立操作，先消完者胜（无倒计时） ===== */
+    function onPkCellPointerDown(e, p) {
+        AudioFX.unlock();
+        if (!pkRunning || pkBusy[p]) return;
+        var cell = e.currentTarget;
+        var r = parseInt(cell.dataset.r, 10);
+        var c = parseInt(cell.dataset.c, 10);
+        if(pkBoards[p][r][c]===-1) return;
+        if (!pkSelected[p]) {
+            pkSelected[p] = { r: r, c: c };
+            cell.classList.add('selected');
+            AudioFX.select();
+            return;
+        }
+        if (pkSelected[p].r === r && pkSelected[p].c === c) {
+            pkCells[p][r][c].classList.remove('selected');
+            pkSelected[p] = null;
+            AudioFX.select();
+            return;
+        }
+        var pA = pkSelected[p];
+        var pB = { r: r, c: c };
+        var tA = pkBoards[p][pA.r][pA.c];
+        var tB = pkBoards[p][pB.r][pB.c];
+        var mA = pkBoardModes[p][pA.r][pA.c];
+        var mB = pkBoardModes[p][pB.r][pB.c];
+        if(tA===tB && mA!==mB){
+            pkSelected[p] = null;
+            pkCleared[p]++;
+            pkCombos[p]++;
+            var gain = 20 + (pkCombos[p]-1)*15;
+            if(p===0){ p1Score += gain; } else { p2Score += gain; }
+            AudioFX.match(pkCombos[p]);
+            showFloatScorePk(gain, pkCombos[p], p===0 ? 'red' : 'blue', p);
+            updatePkStatsUI();
+            updatePkProgress();
+            pkCells[p][pA.r][pA.c].classList.add('pop');
+            pkCells[p][pB.r][pB.c].classList.add('pop');
+            pkBusy[p] = true;
+            setTimeout(function(){
+                pkBoards[p][pA.r][pA.c] = -1;
+                pkBoards[p][pB.r][pB.c] = -1;
+                renderPkAll(p);
+                pkBusy[p] = false;
+                if(pkCleared[p] >= TOTAL_PAIRS){
+                    endGamePk(p===0 ? 1 : 2);
+                }else if(!hasValidPairPk(p)){
+                    showToast((p===0 ? '红方' : '蓝方') + '棋盘无配对，自动洗牌');
+                    shufflePkBoard(p);
+                }
+            },320);
+        }else{
+            AudioFX.bad();
+            showToast('不能配对，请选择【同仪器：图片 + 名称】');
+            pkCells[p][pA.r][pA.c].classList.remove('selected');
+            pkSelected[p] = null;
+        }
+    }
+    /* ===== 双人PK UI ===== */
+    function updatePkStatsUI() {
+        p1ScoreEl.textContent = p1Score;
+        p2ScoreEl.textContent = p2Score;
+    }
+    function updatePkProgress() {
+        pkAProg.textContent = pkCleared[0] + '/' + TOTAL_PAIRS;
+        pkBProg.textContent = pkCleared[1] + '/' + TOTAL_PAIRS;
+    }
+    function showFloatScorePk(gained, combo, colorCls, p) {
+        var wrap = p===0 ? pkColA : pkColB;
+        var el = document.createElement('div');
+        el.className = 'float-score' + (colorCls ? ' ' + colorCls : '');
+        el.textContent = combo > 1 ? '+' + gained + ' 连击x' + combo : '+' + gained;
+        el.style.left = '50%';
+        el.style.top = '46%';
+        wrap.appendChild(el);
+        setTimeout(function () { el.remove(); }, 950);
+    }
+    /* ===== 单人计时 ===== */
+    function startTimer() {
+        if(practiceMode) return;
+        startTs = performance.now();
+        lastTick = -1;
+        rafId = requestAnimationFrame(tick);
+    }
+    function tick(now) {
+        if(practiceMode) return;
+        var elapsed = (now - startTs) / 1000;
+        timeLeft = Math.max(0, GAME_SECONDS - Math.floor(elapsed));
+        timeEl.textContent = timeLeft;
+        timeEl.classList.toggle('urgent', timeLeft <= 10);
+        if (timeLeft !== lastTick && timeLeft <= 10 && timeLeft > 0) AudioFX.tick();
+        lastTick = timeLeft;
+        if (timeLeft <= 0) {
+            endGame();
+            return;
+        }
+        rafId = requestAnimationFrame(tick);
+    }
+    function stopTimer() {
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = null;
+    }
+    /* ===== 结束：单人 ===== */
+    function endGame() {
+        stopTimer();
+        running = false;
+        busy = false;
+        clearSelection();
+        if (score > best) {
+            best = score;
+            saveBest(currentLevel, best);
+            bestEl.textContent = best;
+        }
+        soloEnd.style.display = '';
+        pkScoreRow.style.display = 'none';
+        var won = score >= TARGET;
+        endScoreEl.textContent = score;
+        endTargetEl.textContent = TARGET;
+        endBestEl.textContent = loadBest(currentLevel);
+        endBestLine.textContent = '本关最高 ' + loadBest(currentLevel) + ' 分';
+        if (won) {
+            setCleared(currentLevel);
+            AudioFX.win();
+            endTrophy.className = 'trophy win';
+            endTitle.textContent = currentLevel === LEVELS.length - 1 ? '全部通关！' : '通关！';
+            endSub.textContent = '达标得分，' + LEVELS[currentLevel].label;
+            var ratio = score / TARGET;
+            if (ratio >= 1.6) endVerdictEl.textContent = '完美表现，仪器大师当之无愧！';
+            else if (ratio >= 1.2) endVerdictEl.textContent = '轻松达标，继续保持！';
+            else endVerdictEl.textContent = '刚好通关，再练一局冲高分！';
+            endVerdictEl.className = 'verdict win';
+            nextBtn.style.display = currentLevel < LEVELS.length - 1 ? '' : 'none';
+        } else {
+            AudioFX.fail();
+            endTrophy.className = 'trophy fail';
+            endTitle.textContent = '还差一点';
+            endSub.textContent = '未达目标分，再来一次';
+            var gap = TARGET - score;
+            endVerdictEl.textContent = '距通关还差 ' + gap + ' 分，继续加油！';
+            endVerdictEl.className = 'verdict fail';
+            nextBtn.style.display = 'none';
+        }
+        renderLevelCards();
+        endOverlay.classList.add('show');
+    }
+    /* ===== 结束：双人PK（无倒计时，先消完者胜） ===== */
+    function endGamePk(winner) {
+        pkRunning = false;
+        for (var p = 0; p < 2; p++) {
+            if (pkSelected[p]) {
+                pkCells[p][pkSelected[p].r][pkSelected[p].c].classList.remove('selected');
+                pkSelected[p] = null;
+            }
+        }
+        if (winner === 1) addPkWin(currentLevel, 1);
+        else if (winner === 2) addPkWin(currentLevel, 2);
+        renderLevelCards();
+        soloEnd.style.display = 'none';
+        pkScoreRow.style.display = 'flex';
+        pkEndRed.textContent = p1Score;
+        pkEndBlue.textContent = p2Score;
+        if (winner === 1) {
+            AudioFX.win();
+            endTrophy.className = 'trophy pk-red';
+            endTitle.textContent = '红方获胜！';
+            endSub.textContent = '率先消完全部配对 · ' + LEVELS[currentLevel].label;
+            endVerdictEl.textContent = '红方 ' + p1Score + ' 分 vs 蓝方 ' + p2Score + ' 分';
+            endVerdictEl.className = 'verdict win';
+        } else if (winner === 2) {
+            AudioFX.win();
+            endTrophy.className = 'trophy pk-blue';
+            endTitle.textContent = '蓝方获胜！';
+            endSub.textContent = '率先消完全部配对 · ' + LEVELS[currentLevel].label;
+            endVerdictEl.textContent = '蓝方 ' + p2Score + ' 分 vs 红方 ' + p1Score + ' 分';
+            endVerdictEl.className = 'verdict win';
+        } else {
+            AudioFX.fail();
+            endTrophy.className = 'trophy fail';
+            endTitle.textContent = '平局！';
+            endSub.textContent = '双方几乎同时消完，平分秋色 · ' + LEVELS[currentLevel].label;
+            endVerdictEl.textContent = '红方 ' + p1Score + ' 分 = 蓝方 ' + p2Score + ' 分';
+            endVerdictEl.className = 'verdict fail';
+        }
+        nextBtn.style.display = currentLevel < LEVELS.length - 1 ? '' : 'none';
+        endOverlay.classList.add('show');
+    }
+    /* ===== 进入关卡 ===== */
+    function enterLevel(lv) {
+        currentLevel = lv;
+        var conf = LEVELS[lv];
+        SIZE = conf.size;
+        GAME_SECONDS = conf.seconds;
+        TARGET = conf.target;
+        TOTAL_PAIRS = conf.pairs;
+        tryFullscreen();
+        gameTitle.textContent = conf.label;
+        gameSub.textContent = (pkMode ? 'PK · ' : '') + SIZE + ' × ' + SIZE + (pkMode ? ' · 不限时' : ' · ' + GAME_SECONDS + ' 秒');
+        targetEl.textContent = TARGET;
+        stopTimer();
+        endOverlay.classList.remove('show');
+        levelView.classList.remove('active');
+        gameView.classList.add('active');
+        if (pkMode) {
+            //双人PK：两个独立棋盘并排，无倒计时
+            soloStats.style.display = 'none';
+            pkStats.style.display = 'flex';
+            soloBoardWrap.style.display = 'none';
+            pkBoardWrap.classList.add('show');
+            p1Score = 0;
+            p2Score = 0;
+            pkCombos = [0, 0];
+            pkCleared = [0, 0];
+            pkSelected = [null, null];
+            pkBusy = [false, false];
+            buildPkGrids();
+            createPkBoard(0);
+            createPkBoard(1);
+            while(!hasValidPairPk(0)){ createPkBoard(0); }
+            while(!hasValidPairPk(1)){ createPkBoard(1); }
+            renderPkAll(0);
+            renderPkAll(1);
+            updatePkStatsUI();
+            updatePkProgress();
+            pkATimeVal.textContent = '不限时';
+            pkBTimeVal.textContent = '不限时';
+            pkATimeVal.classList.remove('urgent');
+            pkBTimeVal.classList.remove('urgent');
+            pkRunning = true;
+        } else {
+            //单人闯关
+            soloStats.style.display = 'flex';
+            pkStats.style.display = 'none';
+            soloBoardWrap.style.display = '';
+            pkBoardWrap.classList.remove('show');
+            score = 0;
+            timeLeft = GAME_SECONDS;
+            comboCount = 0;
+            clearedPairs = 0;
+            selected = null;
+            busy = false;
+            scoreEl.textContent = '0';
+            if(practiceMode){
+                timeEl.textContent="—";
+            }else{
+                timeEl.textContent = GAME_SECONDS;
+            }
+            timeEl.classList.remove('urgent');
+            best = loadBest(lv);
+            bestEl.textContent = best;
+            buildGrid();
+            createBoard();
+            while(!hasValidPair()){ createBoard(); }
+            renderAll();
+            running = true;
+            if(!practiceMode){
+                startTimer();
+            }
+        }
+    }
+    function backToLevels() {
+        stopTimer();
+        running = false;
+        busy = false;
+        pkRunning = false;
+        endOverlay.classList.remove('show');
+        gameView.classList.remove('active');
+        levelView.classList.add('active');
+        renderLevelCards();
+    }
+    function restart() {
+        enterLevel(currentLevel);
+    }
+    function renderLevelCards() {
+        levelGrid.innerHTML = '';
+        LEVELS.forEach(function (conf, i) {
+            var card = document.createElement('div');
+            card.className = 'level-card ' + conf.cls;
+            card.dataset.lv = i;
+            var num = document.createElement('div');
+            num.className = 'lv-num';
+            num.textContent = '第' + (i + 1) + '关';
+            var size = document.createElement('div');
+            size.className = 'lv-size';
+            size.textContent = conf.size + ' × ' + conf.size;
+            var meta = document.createElement('div');
+            meta.className = 'lv-meta';
+            meta.innerHTML = '限时 <b>' + conf.seconds + ' 秒</b> · 目标 <b>' + conf.target + ' 分</b>';
+            var bestLine = document.createElement('div');
+            bestLine.className = 'lv-best';
+            var b = loadBest(i);
+            bestLine.textContent = '最高 ' + b + ' 分';
+            card.appendChild(num);
+            card.appendChild(size);
+            card.appendChild(meta);
+            card.appendChild(bestLine);
+            //PK战绩（有对战记录才显示）
+            var rec = pkRecord(i);
+            if (rec.red > 0 || rec.blue > 0) {
+                var pkLine = document.createElement('div');
+                pkLine.className = 'lv-pk';
+                pkLine.textContent = 'PK 红 ' + rec.red + '胜 · 蓝 ' + rec.blue + '胜';
+                card.appendChild(pkLine);
+            }
+            var cleared = document.createElement('div');
+            cleared.className = 'lv-cleared' + (isCleared(i) ? ' show' : '');
+            cleared.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>';
+            card.appendChild(cleared);
+            levelGrid.appendChild(card);
+            card.addEventListener('click', function () {
+                AudioFX.unlock();
+                enterLevel(i);
+            });
+        });
+    }
+    var toastTimer = null;
+    function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 1800);
+    }
+    restartBtn.addEventListener('click', function () { AudioFX.unlock(); restart(); });
+    againBtn.addEventListener('click', function () { AudioFX.unlock(); restart(); });
+    nextBtn.addEventListener('click', function () {
+        if (currentLevel < LEVELS.length - 1) enterLevel(currentLevel + 1);
+    });
+    closeBtn.addEventListener('click', backToLevels);
+    backBtn.addEventListener('click', backToLevels);
+    renderLevelCards();
+    function tryFullscreen() {
+        var el = document.documentElement;
+        try {
+            if (el.requestFullscreen) {
+                var p = el.requestFullscreen();
+                if (p && p.catch) p.catch(function () {});
+            } else if (el.webkitRequestFullscreen) {
+                el.webkitRequestFullscreen();
+            }
+        } catch (e) {}
+    }
+    document.addEventListener('pointerdown', function firstTap() {
+        tryFullscreen();
+        document.removeEventListener('pointerdown', firstTap);
+    }, { passive: true });
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            if (running) stopTimer();
+        } else {
+            if (running && rafId === null && !practiceMode) {
+                startTs = performance.now() - (GAME_SECONDS - timeLeft) * 1000;
+                lastTick = -1;
+                rafId = requestAnimationFrame(tick);
+            }
+        }
+    });
+})();
+</script>
+</body>
+</html>
