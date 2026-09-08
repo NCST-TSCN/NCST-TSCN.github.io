@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<!-- saved from url=(0259)file:///C:/Users/%E5%90%AB%E8%8B%9E%E5%8F%AA%E4%B8%BA%E5%BE%85%E6%94%BE/Downloads/%E7%89%A9%E8%B4%A8%E7%9A%84%E5%88%86%E7%B1%BB%EF%BC%88%E6%A0%91%E7%8A%B6%E5%9B%BE+%E7%BB%83%E4%B9%A0+PK%E7%89%88%C2%B7%E8%8A%82%E7%82%B9%E5%AD%97%E6%94%BE%E5%A4%A7%EF%BC%89.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>物质的分类</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --bg-0: #0b1220;
+    --bg-1: #16213a;
+    --panel: rgba(22, 33, 58, 0.72);
+    --line: rgba(148, 163, 184, 0.22);
+    --txt: #eef2f7;
+    --sub: #93a5bd;
+    --gold: #fbbf24;
+    --ok: #4ade80;
+    --bad: #f87171;
+    --pure: #38bdf8;
+    --mixture: #f59e0b;
+    --element: #a8b6c8;
+    --compound: #a78bfa;
+    --oxide: #fb923c;
+    --acid: #f87171;
+    --base: #60a5fa;
+    --salt: #4ade80;
+    --organic: #f472b6;
+    --electrolyte: #22d3ee;
+    --nonelectrolyte: #6b7b92;
+    --strong: #2dd4bf;
+    --weak: #c4b5fd;
+}
+html, body { height: 100%; }
+body {
+    font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+    background:
+        radial-gradient(1100px 520px at 12% -8%, rgba(56, 189, 248, 0.14), transparent 60%),
+        radial-gradient(900px 600px at 108% 12%, rgba(167, 139, 250, 0.12), transparent 55%),
+        linear-gradient(160deg, var(--bg-0) 0%, var(--bg-1) 100%);
+    background-attachment: fixed;
+    color: var(--txt);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+.view { display: none; width: 100%; flex-direction: column; align-items: center; padding: 16px 12px 28px; }
+.view.active { display: flex; }
+button { font-family: inherit; cursor: pointer; }
+/* ===== 首页 ===== */
+.home-hero { text-align: center; margin: 5vh 0 2.5vh; }
+.home-hero .logo {
+    width: 68px; height: 68px; margin: 0 auto 16px; border-radius: 20px;
+    background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 14px 34px rgba(99, 102, 241, 0.42);
+}
+.home-hero h1 { font-size: 40px; font-weight: 900; letter-spacing: 6px; margin-bottom: 10px; }
+.home-hero p { color: var(--sub); font-size: 15px; letter-spacing: 1px; }
+.tree-box {
+    width: min(97vw, 1320px);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 24px 24px 20px; backdrop-filter: blur(4px);
+    margin-bottom: 26px;
+}
+.tree-box h3 {
+    font-size: 16px; color: #bae6fd; margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+}
+.tree-box h3 svg { width: 18px; height: 18px; flex: none; }
+.tree-view { display: flex; justify-content: center; overflow-x: auto; padding: 4px 2px 2px; scrollbar-width: thin; }
+.tree-view ul { display: flex; padding-top: 26px; position: relative; }
+.tree-view li {
+    list-style: none; display: flex; flex-direction: column; align-items: center;
+    position: relative; padding: 0 5px;
+}
+.tree-view li::before, .tree-view li::after {
+    content: ''; position: absolute; top: 0; right: 50%;
+    border-top: 2px solid rgba(148, 163, 184, 0.55);
+    width: 50%; height: 26px;
+}
+.tree-view li::after { right: auto; left: 50%; border-left: 2px solid rgba(148, 163, 184, 0.55); }
+.tree-view li:only-child::before, .tree-view li:only-child::after { display: none; }
+.tree-view li:only-child { padding-top: 0; }
+.tree-view li:first-child::before, .tree-view li:last-child::after { border: 0 none; }
+.tree-view li:last-child::before { border-right: 2px solid rgba(148, 163, 184, 0.55); border-radius: 0 7px 0 0; }
+.tree-view li:first-child::after { border-radius: 7px 0 0 0; }
+.tree-view ul ul::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    border-left: 2px solid rgba(148, 163, 184, 0.55);
+    width: 0; height: 26px;
+}
+.tree-node {
+    padding: 3px 12px; border-radius: 10px; font-size: 18px; font-weight: 800;
+    border: 1px solid var(--line); background: rgba(15, 23, 42, 0.6);
+    color: var(--txt); white-space: nowrap; position: relative;
+}
+.tree-node .t-cnt { display: none; }
+.tree-node.root { background: rgba(56, 189, 248, 0.16); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.4); }
+.tree-node.pure { background: rgba(56, 189, 248, 0.13); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.4); }
+.tree-node.mixture { background: rgba(245, 158, 11, 0.13); color: #fcd34d; border-color: rgba(245, 158, 11, 0.4); }
+.tree-node.element { background: rgba(168, 182, 200, 0.13); color: #cbd5e1; border-color: rgba(168, 182, 200, 0.4); }
+.tree-node.compound { background: rgba(167, 139, 250, 0.13); color: #d8b4fe; border-color: rgba(167, 139, 250, 0.4); }
+.tree-node.oxide { background: rgba(251, 146, 60, 0.13); color: #fdba74; border-color: rgba(251, 146, 60, 0.4); }
+.tree-node.acid { background: rgba(248, 113, 113, 0.13); color: #fca5a5; border-color: rgba(248, 113, 113, 0.4); }
+.tree-node.base { background: rgba(96, 165, 250, 0.13); color: #93c5fd; border-color: rgba(96, 165, 250, 0.4); }
+.tree-node.salt { background: rgba(74, 222, 128, 0.13); color: #86efac; border-color: rgba(74, 222, 128, 0.4); }
+.tree-node.organic { background: rgba(244, 114, 182, 0.13); color: #f9a8d4; border-color: rgba(244, 114, 182, 0.4); }
+.tree-node.electrolyte { background: rgba(34, 211, 238, 0.13); color: #67e8f9; border-color: rgba(34, 211, 238, 0.4); }
+.tree-node.nonelectrolyte { background: rgba(107, 123, 146, 0.16); color: #a9b7c9; border-color: rgba(107, 123, 146, 0.4); }
+.tree-node.strong { background: rgba(45, 212, 191, 0.13); color: #5eead4; border-color: rgba(45, 212, 191, 0.4); }
+.tree-node.weak { background: rgba(196, 181, 253, 0.13); color: #ddd6fe; border-color: rgba(196, 181, 253, 0.4); }
+.tree-branch { display: flex; gap: 2px; }
+.tree-method-tag { font-size: 11px; color: var(--sub); text-align: center; margin-top: 8px; letter-spacing: 0.5px; }
+/* 首页模式卡 */
+.mode-cards { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.mode-card {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 18px 30px; border: none; border-radius: 18px;
+    font-size: 18px; font-weight: 800; letter-spacing: 1px;
+    transition: transform 0.16s ease, box-shadow 0.2s ease;
+}
+.mode-card small { font-size: 12px; font-weight: 500; letter-spacing: 0; opacity: 0.9; }
+.mode-card:hover { transform: translateY(-4px); }
+.mode-card .mc-ico { width: 34px; height: 34px; margin-bottom: 2px; }
+.mode-card.mc-level { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1c1917; box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35); }
+.mode-card.mc-level:hover { box-shadow: 0 18px 42px rgba(245, 158, 11, 0.48); }
+.mode-card.mc-practice { background: linear-gradient(135deg, #38bdf8, #0284c7); color: #082f49; box-shadow: 0 12px 30px rgba(56, 189, 248, 0.35); }
+.mode-card.mc-practice:hover { box-shadow: 0 18px 42px rgba(56, 189, 248, 0.48); }
+.mode-card.mc-pk { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #1e1b4b; box-shadow: 0 12px 30px rgba(167, 139, 250, 0.35); }
+.mode-card.mc-pk:hover { box-shadow: 0 18px 42px rgba(167, 139, 250, 0.48); }
+.start-btn {
+    padding: 16px 52px; border: none; border-radius: 16px; font-size: 18px; font-weight: 800;
+    background: linear-gradient(135deg, #f59e0b, #d97706); color: #1c1917;
+    box-shadow: 0 12px 30px rgba(245, 158, 11, 0.35);
+    transition: transform 0.16s ease, box-shadow 0.2s ease; letter-spacing: 2px;
+}
+.start-btn:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(245, 158, 11, 0.45); }
+.home-foot { margin-top: 22px; color: var(--sub); font-size: 13px; text-align: center; line-height: 1.9; }
+/* ===== 顶栏（游戏视图） ===== */
+.topbar {
+    width: min(96vw, 1080px);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.brand { display: flex; align-items: center; gap: 8px; }
+.brand .logo {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+.brand h1 { font-size: 18px; font-weight: 800; white-space: nowrap; }
+.crumb {
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 6px 12px; font-size: 13px;
+}
+.crumb-item { color: var(--sub); cursor: default; }
+.crumb-item.done { color: #7dd3fc; cursor: pointer; font-weight: 600; }
+.crumb-item.done:hover { text-decoration: underline; }
+.crumb-item.cur { color: var(--txt); font-weight: 800; }
+.crumb-sep { color: var(--sub); opacity: 0.5; }
+.top-actions { margin-left: auto; display: flex; gap: 6px; }
+.ctrl-btn {
+    width: 40px; height: 40px; border-radius: 11px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--txt);
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.14s ease, background 0.2s ease;
+}
+.ctrl-btn:hover { background: rgba(51, 65, 85, 0.8); transform: translateY(-2px); }
+.ctrl-btn:active { transform: scale(0.92); }
+.ctrl-btn svg { width: 19px; height: 19px; }
+.ctrl-btn.home { border-color: rgba(56, 189, 248, 0.4); }
+.ctrl-btn.home svg { stroke: #38bdf8; }
+.ctrl-btn.reset { border-color: rgba(245, 158, 11, 0.45); }
+.ctrl-btn.reset svg { stroke: var(--gold); }
+.ctrl-btn.formula { border-color: rgba(34, 211, 238, 0.5); }
+.ctrl-btn.formula svg { stroke: #22d3ee; }
+.ctrl-btn.formula.off { border-color: var(--line); }
+.ctrl-btn.formula.off svg { stroke: #64748b; }
+.ctrl-btn.sound svg { stroke: #e2e8f0; }
+/* ===== 模式按钮行 ===== */
+.modebar {
+    width: min(96vw, 1080px);
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.mode-btn {
+    flex: 1 1 auto; min-width: 150px;
+    display: flex; align-items: center; gap: 7px;
+    padding: 10px 13px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--panel);
+    color: var(--sub); font-size: 13.5px; font-weight: 700; text-align: left;
+    transition: transform 0.15s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.mode-btn .m-step {
+    width: 22px; height: 22px; border-radius: 7px; flex: none;
+    background: rgba(148, 163, 184, 0.16); color: var(--sub);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+}
+.mode-btn .m-name { line-height: 1.25; }
+.mode-btn .m-name small { display: block; font-size: 11px; color: var(--sub); opacity: 0.85; font-weight: 500; }
+.mode-btn.locked { opacity: 0.45; cursor: not-allowed; }
+.mode-btn.unlocked:hover { transform: translateY(-2px); border-color: rgba(56, 189, 248, 0.5); }
+.mode-btn.cur {
+    border-color: rgba(56, 189, 248, 0.75); color: #bae6fd;
+    background: rgba(56, 189, 248, 0.12); box-shadow: 0 4px 18px rgba(56, 189, 248, 0.18);
+}
+.mode-btn.done {
+    border-color: rgba(74, 222, 128, 0.55); color: #86efac; background: rgba(74, 222, 128, 0.08);
+}
+.mode-btn.done .m-step { background: rgba(74, 222, 128, 0.2); color: #86efac; }
+/* ===== 任务舞台 ===== */
+.stage {
+    width: min(96vw, 1080px);
+    display: grid; grid-template-columns: 1fr 1.6fr; gap: 14px;
+    align-items: stretch;
+}
+.panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    padding: 16px; backdrop-filter: blur(4px);
+}
+.panel-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 800; color: #bae6fd; margin-bottom: 12px;
+}
+.panel-title svg { width: 16px; height: 16px; flex: none; }
+.panel-title .cnt { margin-left: auto; font-size: 12.5px; color: var(--sub); font-weight: 600; }
+/* 待分类托盘 */
+.tray-inner {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 320px; position: relative;
+}
+.slot {
+    width: min(78%, 230px); aspect-ratio: 1 / 1.05;
+    background:
+        radial-gradient(120px 60px at 50% 100%, rgba(56, 189, 248, 0.14), transparent 70%),
+        rgba(15, 23, 42, 0.55);
+    border: 1.5px dashed rgba(148, 163, 184, 0.4);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+}
+.tray-empty {
+    color: var(--sub); font-size: 14px; text-align: center; line-height: 2;
+}
+.slot-hint {
+    margin-top: 14px; font-size: 13px; color: var(--sub); text-align: center; line-height: 1.8;
+}
+/* 物质卡（试剂瓶标签风） */
+.matter-card {
+    width: 200px; min-height: 128px;
+    background: linear-gradient(160deg, #f6f8fb, #e7edf5);
+    border-radius: 12px; border: 1px solid rgba(148, 163, 184, 0.5);
+    padding: 14px 12px 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    color: #1e293b;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    position: relative;
+    touch-action: none;
+    cursor: grab;
+}
+.matter-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+    border-radius: 12px 0 0 12px;
+    background: linear-gradient(180deg, #64748b, #334155);
+}
+.matter-card .mc-name { font-size: 24px; font-weight: 900; letter-spacing: 1px; text-align: center; }
+.matter-card .mc-formula { font-size: 15px; font-weight: 700; color: #475569; min-height: 20px; }
+.matter-card .mc-tag {
+    font-size: 10.5px; color: #64748b; background: rgba(100, 116, 139, 0.12);
+    border-radius: 8px; padding: 2px 8px; margin-top: 3px;
+}
+.matter-card.dragging {
+    position: fixed; z-index: 90; margin: 0; pointer-events: none;
+    transform-origin: center center;
+    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.55), 0 0 0 2px rgba(56, 189, 248, 0.55);
+    transition: none;
+}
+.matter-card.returning {
+    transition: transform 0.3s cubic-bezier(0.25, 1.2, 0.4, 1), opacity 0.25s ease;
+}
+.matter-card.wrong {
+    animation: shake 0.4s ease;
+    border-color: var(--bad);
+}
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-7px); }
+    80% { transform: translateX(7px); }
+}
+.matter-card.gone { animation: cardGone 0.28s ease forwards; }
+@keyframes cardGone {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.2); opacity: 0; }
+}
+/* ===== 类别桶 ===== */
+.bucket-grid { display: grid; gap: 10px; height: 100%; }
+.bucket-grid.cols2 { grid-template-columns: 1fr 1fr; }
+.bucket-grid.cols5 { grid-template-columns: repeat(5, 1fr); }
+.bucket {
+    border-radius: 14px; border: 1.5px solid var(--line);
+    background: rgba(15, 23, 42, 0.5);
+    padding: 10px; display: flex; flex-direction: column;
+    min-height: 200px; transition: border-color 0.18s ease, background 0.18s ease, transform 0.15s ease;
+}
+.bucket.hover { border-color: var(--gold); background: rgba(245, 158, 11, 0.08); transform: scale(1.015); }
+.bucket-head {
+    display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 10px;
+    margin-bottom: 8px; flex: none;
+}
+.bucket-head .b-dot { width: 13px; height: 13px; border-radius: 50%; flex: none; box-shadow: 0 0 9px currentColor; }
+.bucket-head .b-name { font-size: 15.5px; font-weight: 800; }
+.bucket-head .b-count {
+    margin-left: auto; font-size: 12px; font-weight: 700; opacity: 0.85;
+    background: rgba(0, 0, 0, 0.25); padding: 2px 8px; border-radius: 10px;
+}
+.bucket-body {
+    flex: 1; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 5px;
+    align-content: flex-start; align-items: flex-start;
+    scrollbar-width: thin;
+}
+.bucket-body::-webkit-scrollbar { width: 4px; }
+.bucket-body::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 4px; }
+.b-item {
+    font-size: 11.5px; font-weight: 600; color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 8px; padding: 3px 8px; white-space: nowrap;
+    animation: itemIn 0.25s ease;
+}
+@keyframes itemIn {
+    from { transform: scale(0.4); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.bucket-next {
+    margin-top: 8px; flex: none;
+    font-size: 12px; font-weight: 700; color: var(--gold);
+    background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 10px; padding: 7px 8px; text-align: center; cursor: pointer;
+    display: none; transition: background 0.18s ease;
+}
+.bucket-next:hover { background: rgba(245, 158, 11, 0.22); }
+.bucket-next.show { display: block; }
+/* ===== 浮层面板 ===== */
+.overlay {
+    position: fixed; inset: 0; z-index: 60;
+    background: rgba(2, 6, 23, 0.72); backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; padding: 18px;
+}
+.overlay.show { display: flex; }
+.modal {
+    background: linear-gradient(165deg, #1c2a48, #101b31);
+    border: 1px solid var(--line); border-radius: 20px;
+    padding: 28px 30px; max-width: 460px; width: 100%; text-align: center;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    animation: modalIn 0.35s cubic-bezier(0.2, 1.2, 0.35, 1);
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: translateY(26px) scale(0.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal .m-icon {
+    width: 60px; height: 60px; margin: 0 auto 12px; border-radius: 17px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+    box-shadow: 0 10px 26px rgba(74, 222, 128, 0.35);
+}
+.modal .m-icon.svg-pk { background: linear-gradient(135deg, #f59e0b, #fbbf24); box-shadow: 0 10px 26px rgba(245, 158, 11, 0.35); }
+.modal .m-icon svg { width: 28px; height: 28px; }
+.modal .m-icon.svg-pk svg { stroke: #78350f; }
+.modal h2 { font-size: 23px; font-weight: 800; margin-bottom: 6px; }
+.modal .m-sub { color: var(--sub); font-size: 13.5px; margin-bottom: 8px; line-height: 1.7; }
+.modal .m-stat {
+    font-size: 14px; color: #e2e8f0; margin-bottom: 20px;
+    background: rgba(15, 23, 42, 0.5); border-radius: 12px; padding: 10px;
+}
+.modal .m-stat b { color: var(--gold); }
+.modal .m-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.modal .m-actions button {
+    padding: 12px 20px; border: none; border-radius: 13px; font-size: 14px; font-weight: 700;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.modal .m-actions button:hover { transform: translateY(-2px); }
+.m-btn-primary { background: linear-gradient(135deg, #f59e0b, #d97706); color: #1c1917; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35); }
+.m-btn-green { background: linear-gradient(135deg, #22c55e, #16a34a); color: #052e16; box-shadow: 0 8px 20px rgba(34, 197, 94, 0.35); }
+.m-btn-ghost { background: rgba(51, 65, 85, 0.7); color: var(--txt); border: 1px solid var(--line); }
+.m-btn-cyan { background: linear-gradient(135deg, #38bdf8, #0284c7); color: #082f49; box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35); }
+.m-btn-purple { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: #1e1b4b; box-shadow: 0 8px 20px rgba(167, 139, 250, 0.35); }
+/* 化合物分类方法选择 */
+.method-options { display: grid; gap: 12px; margin-top: 6px; }
+.method-opt {
+    border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; cursor: pointer;
+    background: rgba(15, 23, 42, 0.5); text-align: left;
+    transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.method-opt:hover { transform: translateY(-2px); }
+.method-opt.m1:hover { border-color: rgba(167, 139, 250, 0.6); background: rgba(167, 139, 250, 0.1); }
+.method-opt.m2:hover { border-color: rgba(34, 211, 238, 0.6); background: rgba(34, 211, 238, 0.1); }
+.method-opt .mo-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.method-opt.m1 .mo-title { color: #d8b4fe; }
+.method-opt.m2 .mo-title { color: #67e8f9; }
+.method-opt .mo-desc { font-size: 12.5px; color: var(--sub); line-height: 1.6; }
+.method-opt .mo-desc b { color: #e2e8f0; }
+/* ===== 总结视图 ===== */
+.summary-wrap { width: min(96vw, 980px); }
+.summary-head { text-align: center; margin: 2vh 0 20px; }
+.summary-head h1 { font-size: 30px; font-weight: 900; letter-spacing: 3px; margin-bottom: 8px; }
+.summary-head p { color: var(--sub); font-size: 14px; }
+.sum-tree { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.s-node-row { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; }
+.s-node {
+    border-radius: 14px; border: 1px solid var(--line); background: rgba(15, 23, 42, 0.55);
+    padding: 12px 14px; min-width: 130px; flex: 1 1 130px; max-width: 250px;
+}
+.s-node .s-head { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+.s-node .s-head .b-dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.s-node .s-head .s-name { font-size: 15px; font-weight: 800; }
+.s-node .s-head .s-cnt { margin-left: auto; font-size: 11.5px; opacity: 0.8; background: rgba(0,0,0,0.25); padding: 1px 7px; border-radius: 9px; }
+.s-node .s-items { display: flex; flex-wrap: wrap; gap: 4px; }
+.s-item {
+    font-size: 11px; color: #dbe4ee; background: rgba(255, 255, 255, 0.06);
+    border-radius: 7px; padding: 2px 7px;
+}
+.sum-arrow { color: var(--sub); font-size: 12px; flex: none; padding: 0 2px; }
+.sum-actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+/* ===== 双人PK舞台 ===== */
+.pk-stage {
+    width: min(96vw, 1080px);
+    display: none; grid-template-columns: 1fr 40px 1fr; gap: 12px; align-items: stretch;
+}
+.pk-stage.show { display: grid; }
+.pk-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pk-head {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px;
+    background: var(--panel); border: 1.5px solid var(--line); font-size: 15px; font-weight: 800;
+}
+.pk-head.red { border-color: rgba(239, 68, 68, 0.55); color: #fca5a5; }
+.pk-head.blue { border-color: rgba(59, 130, 246, 0.55); color: #93c5fd; }
+.pk-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+.pk-dot.red { background: #ef4444; box-shadow: 0 0 9px rgba(239, 68, 68, 0.9); }
+.pk-dot.blue { background: #3b82f6; box-shadow: 0 0 9px rgba(59, 130, 246, 0.9); }
+.pk-time { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--txt); font-size: 14px; }
+.pk-prog { font-size: 12px; color: var(--sub); background: rgba(0, 0, 0, 0.25); padding: 2px 9px; border-radius: 10px; white-space: nowrap; }
+.pk-tray {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    min-height: 210px; display: flex; align-items: center; justify-content: center; padding: 12px;
+    position: relative;
+}
+.pk-slot { display: flex; align-items: center; justify-content: center; width: 100%; }
+.pk-buckets { display: grid; gap: 8px; }
+.pk-buckets.b2 { grid-template-columns: 1fr 1fr; }
+.pk-buckets.b5 { grid-template-columns: repeat(3, 1fr); }
+.pk-bucket {
+    border-radius: 12px; border: 1.5px solid var(--line); background: rgba(15, 23, 42, 0.5);
+    padding: 8px; min-height: 120px; display: flex; flex-direction: column;
+    transition: border-color 0.18s ease, background 0.18s ease;
+}
+.pk-bucket.hover { border-color: var(--gold); background: rgba(245, 158, 11, 0.08); }
+.pk-bucket .pk-b-head { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+.pk-bucket .pk-b-head .b-dot { width: 10px; height: 10px; border-radius: 50%; }
+.pk-bucket .pk-b-head .pk-b-count { margin-left: auto; font-size: 11px; background: rgba(0, 0, 0, 0.25); padding: 1px 7px; border-radius: 9px; opacity: 0.85; }
+.pk-bucket .pk-b-body { flex: 1; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 4px; align-content: flex-start; }
+.pk-bucket .pk-b-item { font-size: 10.5px; color: #e2e8f0; background: rgba(255, 255, 255, 0.07); border-radius: 7px; padding: 2px 6px; white-space: nowrap; animation: itemIn 0.22s ease; }
+.pk-b-next { display: none; margin-top: 6px; font-size: 11.5px; font-weight: 800; color: var(--gold); text-align: center; padding: 5px; border-radius: 8px; background: rgba(245, 158, 11, 0.1); cursor: pointer; }
+.pk-b-next.show { display: block; }
+.pk-vs-mid { display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; color: var(--sub); }
+.pk-stage .matter-card { width: 150px; min-height: 100px; }
+.pk-stage .matter-card .mc-name { font-size: 19px; }
+.pk-stage .matter-card .mc-formula { font-size: 12.5px; }
+/* 模式标识 */
+.mode-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 800; padding: 5px 12px; border-radius: 20px;
+    background: rgba(245, 158, 11, 0.14); border: 1px solid rgba(245, 158, 11, 0.4); color: #fcd34d;
+    white-space: nowrap;
+}
+.mode-tag.practice { background: rgba(56, 189, 248, 0.14); border-color: rgba(56, 189, 248, 0.45); color: #7dd3fc; }
+.mode-tag.pk { background: rgba(167, 139, 250, 0.14); border-color: rgba(167, 139, 250, 0.45); color: #d8b4fe; }
+/* 级别选择 */
+.pick-list { display: grid; gap: 10px; margin: 10px 0 16px; }
+.pick-item {
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid var(--line); border-radius: 13px; padding: 12px 14px; cursor: pointer;
+    background: rgba(15, 23, 42, 0.5); text-align: left;
+    transition: transform 0.14s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.pick-item:hover { transform: translateY(-2px); border-color: rgba(56, 189, 248, 0.55); background: rgba(56, 189, 248, 0.08); }
+.pick-item .pi-dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.pick-item .pi-name { font-size: 15px; font-weight: 800; }
+.pick-item .pi-desc { font-size: 11.5px; color: var(--sub); margin-top: 2px; }
+@media (max-width: 940px) {
+    .pk-stage { grid-template-columns: 1fr; }
+    .pk-vs-mid { display: none; }
+    .pk-tray { min-height: 170px; }
+}
+/* ===== 音效/通用 ===== */
+.toast {
+    position: fixed; top: 16px; left: 50%; transform: translateX(-50%) translateY(-8px);
+    background: rgba(15, 23, 42, 0.92); border: 1px solid rgba(245, 158, 11, 0.5);
+    color: var(--gold); padding: 9px 20px; border-radius: 24px; font-size: 13px; font-weight: 700;
+    opacity: 0; transition: opacity 0.25s ease, transform 0.25s ease; z-index: 80; pointer-events: none;
+    max-width: 88vw; text-align: center;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (max-width: 940px) {
+    .stage { grid-template-columns: 1fr; }
+    .bucket-grid.cols5 { grid-template-columns: repeat(3, 1fr); }
+    .matter-card { width: 160px; min-height: 104px; }
+    .matter-card .mc-name { font-size: 20px; }
+    .mode-btn { min-width: 0; }
+    .mode-btn .m-name small { display: none; }
+    .home-hero h1 { font-size: 28px; }
+}
+@media (max-width: 600px) {
+    .bucket-grid.cols2 { grid-template-columns: 1fr 1fr; }
+    .bucket-grid.cols5 { grid-template-columns: repeat(2, 1fr); }
+    .tray-inner { min-height: 240px; }
+    .topbar { gap: 6px; }
+    .brand h1 { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+<!-- ===== 首页 ===== -->
+<div class="view active" id="homeView">
+    <div class="home-hero">
+        <h1>物质的分类</h1>
+        <p>拖一拖，分一分</p>
+    </div>
+    <div class="tree-box">
+        <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 3v16h16"></path>
+                <path d="M8 9h4"></path>
+                <path d="M8 13h8"></path>
+                <path d="M8 17h5"></path>
+            </svg>
+            本游戏完整的分类框架
+        </h3>
+        <div class="tree-view">
+            <ul>
+                <li>
+                    <div class="tree-node root">物质</div>
+                    <ul>
+                        <li>
+                            <div class="tree-node pure">纯净物</div>
+                            <ul>
+                                <li><div class="tree-node element">单质</div></li>
+                                <li>
+                                    <div class="tree-node compound">化合物</div>
+                                    <div class="tree-branch">
+                                        <ul>
+                                            <li><div class="tree-node oxide">氧化物</div></li>
+                                            <li><div class="tree-node acid">酸</div></li>
+                                            <li><div class="tree-node base">碱</div></li>
+                                            <li><div class="tree-node salt">盐</div></li>
+                                            <li><div class="tree-node organic">有机物</div></li>
+                                        </ul>
+                                        <ul>
+                                            <li>
+                                                <div class="tree-node electrolyte">电解质</div>
+                                                <ul>
+                                                    <li><div class="tree-node strong">强电解质</div></li>
+                                                    <li><div class="tree-node weak">弱电解质</div></li>
+                                                </ul>
+                                            </li>
+                                            <li><div class="tree-node nonelectrolyte">非电解质</div></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <li><div class="tree-node mixture">混合物</div></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="tree-method-tag">左支 · 化合物按组成分（方法一）　　右支 · 化合物按导电性分（方法二）</div>
+    </div>
+    <div class="mode-cards">
+        <button class="mode-card mc-level" id="startBtn">
+            <svg class="mc-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 3 7v10l9 5 9-5V7l-9-5z"></path>
+                <path d="M12 12 3 7"></path>
+                <path d="M12 12v10"></path>
+                <path d="M12 12l9-5"></path>
+            </svg>
+            闯关模式
+            <small>四个级别 · 62 种物质全分类</small>
+        </button>
+        <button class="mode-card mc-practice" id="practiceHomeBtn">
+            <svg class="mc-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 7v5l3 3"></path>
+            </svg>
+            练习模式
+            <small>随机 10 种物质练手</small>
+        </button>
+        <button class="mode-card mc-pk" id="pkHomeBtn">
+            <svg class="mc-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="8.5" cy="9" r="3.5"></circle>
+                <circle cx="17" cy="9" r="3.5"></circle>
+                <path d="M3 19v-1a5 5 0 0 1 8-4"></path>
+                <path d="M14 19v-1a5 5 0 0 1 7-4"></path>
+            </svg>
+            双人 PK
+            <small>同 10 种物质 · 看谁分得快</small>
+        </button>
+    </div>
+    <div class="home-foot">
+        玩法：每次弹出一张物质卡片，把它拖进正确的类别桶；闯关模式可逐级分类，练习与 PK 模式每次随机出 10 种物质。
+    </div>
+</div>
+<!-- ===== 游戏视图 ===== -->
+<div class="view" id="gameView">
+    <div class="topbar">
+        <div class="brand">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <path d="M12 3v3"></path>
+                    <path d="M5 8h14"></path>
+                    <path d="M6 8v2a6 6 0 0 0 12 0V8"></path>
+                </svg>
+            </div>
+            <h1>物质的分类</h1>
+        </div>
+        <span class="mode-tag" id="modeTag" style="display: none;">双人 PK · 并排对战</span>
+        <div class="crumb" id="crumb"></div>
+        <div class="top-actions">
+            <button class="ctrl-btn sound" id="soundBtn" title="音效开关" aria-label="音效开关">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 5 6 9H2v6h4l5 4V5z"></path>
+                    <path id="wavePath" d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+                </svg>
+            </button>
+            <button class="ctrl-btn reset" id="resetBtn" title="重置全部进度" aria-label="重置">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+                    <path d="M21 3v6h-6"></path>
+                </svg>
+            </button>
+            <button class="ctrl-btn formula" id="formulaBtn" title="显示 / 隐藏化学式" aria-label="化学式开关">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="9" cy="8" r="2.2"></circle>
+                    <circle cx="16" cy="6" r="2.2"></circle>
+                    <circle cx="15.5" cy="13.5" r="2.2"></circle>
+                    <path d="M10.8 9.2 14 7.4"></path>
+                    <path d="M10.6 10 13.6 12.4"></path>
+                    <path d="M16 8.2v3.1"></path>
+                    <path d="M4 19h16"></path>
+                </svg>
+            </button>
+            <button class="ctrl-btn home" id="homeBtn" title="返回首页" aria-label="返回首页">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 10.5 12 3l9 7.5"></path>
+                    <path d="M5 9.5V21h14V9.5"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="modebar" id="modebar"></div>
+    <div class="stage" style="">
+        <div class="panel">
+            <div class="panel-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 7h16"></path>
+                    <path d="M6 7v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7"></path>
+                    <path d="M9 7V4h6v3"></path>
+                </svg>
+                待分类物质
+                <span class="cnt" id="trayCnt"></span>
+            </div>
+            <div class="tray-inner" id="trayInner">
+                <div class="slot" id="slot"></div>
+                <div class="slot-hint" id="slotHint">把卡片拖到右侧正确的类别桶中</div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3v16a2 2 0 0 0 2 2h16"></path>
+                    <path d="M7 14l4-4 3 3 5-6"></path>
+                </svg>
+                类别桶
+                <span class="cnt" id="bucketTaskLabel"></span>
+            </div>
+            <div class="bucket-grid" id="bucketGrid"></div>
+        </div>
+    </div>
+    <!-- 双人PK并排舞台 -->
+    <div class="pk-stage" id="pkStage">
+        <div class="pk-col" id="pkColRed">
+            <div class="pk-head red">
+                <span class="pk-dot red"></span>红方
+                <span class="pk-time" id="pkTimeRed">18.7s</span>
+                <span class="pk-prog" id="pkProgRed">0/10</span>
+            </div>
+            <div class="pk-tray"><div class="pk-slot" id="pkSlotRed"><div class="matter-card"><div class="mc-name">硝酸</div><div class="mc-formula">HNO<sub>3</sub></div><div class="mc-tag">拖到正确的类别桶中</div></div></div></div>
+            <div class="pk-buckets b2" id="pkBucketsRed"><div class="pk-bucket" data-bucket="强电解质"><div class="pk-b-head" style="color: var(--strong);"><span class="b-dot" style="background: var(--strong);"></span><span>强电解质</span><span class="pk-b-count" data-count="强电解质">0</span></div><div class="pk-b-body" data-body="强电解质"></div><div class="pk-b-next" data-next="强电解质">继续细分 ▸</div></div><div class="pk-bucket" data-bucket="弱电解质"><div class="pk-b-head" style="color: var(--weak);"><span class="b-dot" style="background: var(--weak);"></span><span>弱电解质</span><span class="pk-b-count" data-count="弱电解质">0</span></div><div class="pk-b-body" data-body="弱电解质"></div><div class="pk-b-next" data-next="弱电解质">继续细分 ▸</div></div></div>
+        </div>
+        <div class="pk-vs-mid">VS</div>
+        <div class="pk-col" id="pkColBlue">
+            <div class="pk-head blue">
+                <span class="pk-dot blue"></span>蓝方
+                <span class="pk-time" id="pkTimeBlue">18.7s</span>
+                <span class="pk-prog" id="pkProgBlue">8/10</span>
+            </div>
+            <div class="pk-tray"><div class="pk-slot" id="pkSlotBlue"><div class="matter-card" style="width: 150px; height: 101.5px;"><div class="mc-name">醋酸铅</div><div class="mc-formula">Pb(CH<sub>3</sub>COO)<sub>2</sub></div><div class="mc-tag">拖到正确的类别桶中</div></div></div></div>
+            <div class="pk-buckets b2" id="pkBucketsBlue"><div class="pk-bucket" data-bucket="强电解质"><div class="pk-b-head" style="color: var(--strong);"><span class="b-dot" style="background: var(--strong);"></span><span>强电解质</span><span class="pk-b-count" data-count="强电解质">5</span></div><div class="pk-b-body" data-body="强电解质"><div class="pk-b-item">硝酸</div><div class="pk-b-item">氯化钠</div><div class="pk-b-item">氧化钙</div><div class="pk-b-item">硫酸铜</div><div class="pk-b-item">盐酸</div></div><div class="pk-b-next" data-next="强电解质">继续细分 ▸</div></div><div class="pk-bucket" data-bucket="弱电解质"><div class="pk-b-head" style="color: var(--weak);"><span class="b-dot" style="background: var(--weak);"></span><span>弱电解质</span><span class="pk-b-count" data-count="弱电解质">3</span></div><div class="pk-b-body" data-body="弱电解质"><div class="pk-b-item">碳酸</div><div class="pk-b-item">氨水</div><div class="pk-b-item">氢氧化铁</div></div><div class="pk-b-next" data-next="弱电解质">继续细分 ▸</div></div></div>
+        </div>
+    </div>
+</div>
+<!-- ===== 总结视图 ===== -->
+<div class="view" id="summaryView">
+    <div class="summary-wrap">
+        <div class="summary-head">
+            <h1>分类总结</h1>
+            <p>看看这些物质都被分到了哪里</p>
+        </div>
+        <div class="summary-wrap-inner" id="summaryTree"></div>
+        <div class="sum-actions">
+            <button class="start-btn" id="summaryAgainBtn" style="padding:14px 38px;font-size:16px;">再玩一次</button>
+            <button class="m-btn-cyan" id="summaryHomeBtn" style="padding:14px 38px;font-size:16px;border-radius:16px;">返回首页</button>
+        </div>
+    </div>
+</div>
+<!-- ===== 任务完成面板 ===== -->
+<div class="overlay" id="doneOverlay">
+    <div class="modal">
+        <div class="m-icon svg-pk">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 21h8"></path>
+                <path d="M12 17v4"></path>
+                <path d="M7 4h10v6a5 5 0 0 1-10 0V4z"></path>
+                <path d="M7 6H4a2 2 0 0 0 2 4h1"></path>
+                <path d="M17 6h3a2 2 0 0 1-2 4h-1"></path>
+            </svg>
+        </div>
+        <h2 id="doneTitle">任务完成</h2>
+        <div class="m-sub" id="doneSub"></div>
+        <div class="m-stat" id="doneStat"></div>
+        <div class="m-actions" id="doneActions"></div>
+    </div>
+</div>
+<!-- ===== 化合物分类方法选择 ===== -->
+<div class="overlay" id="methodOverlay">
+    <div class="modal">
+        <div class="m-icon" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1e1b4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"></path>
+                <path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"></path>
+                <path d="M12 3v18"></path>
+            </svg>
+        </div>
+        <h2>化合物怎么分？</h2>
+        <div class="m-sub">选择一种分类方法，把化合物桶里的物质继续细分</div>
+        <div class="method-options">
+            <div class="method-opt m1" id="methodOptA">
+                <div class="mo-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <path d="M3 6h18"></path><path d="M6 6v12"></path><path d="M18 6v12"></path>
+                    </svg>
+                    方法一 · 按组成分
+                </div>
+                <div class="mo-desc">分成 <b>氧化物 / 酸 / 碱 / 盐 / 有机物</b> 五大类</div>
+            </div>
+            <div class="method-opt m2" id="methodOptB">
+                <div class="mo-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                        <path d="M12 2v3"></path>
+                        <path d="M6 9 4 7"></path>
+                        <path d="M18 9l2-2"></path>
+                        <path d="M8 14h8"></path>
+                        <path d="M8 18h8"></path>
+                        <path d="M5 22a7 7 0 0 1 14 0"></path>
+                    </svg>
+                    方法二 · 按导电性分
+                </div>
+                <div class="mo-desc">分成 <b>电解质 / 非电解质</b>，之后电解质还能再细分</div>
+            </div>
+        </div>
+        <div class="m-actions" style="margin-top:16px;">
+            <button class="m-btn-ghost" id="methodCancelBtn">取消</button>
+        </div>
+    </div>
+</div>
+<!-- ===== 练习 / PK 级别选择 ===== -->
+<div class="overlay" id="taskPickOverlay">
+    <div class="modal">
+        <div class="m-icon" style="background:linear-gradient(135deg,#38bdf8,#6366f1);">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#eef2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 5h16"></path>
+                <path d="M6 5v14h12V5"></path>
+                <path d="M9 5v4"></path>
+            </svg>
+        </div>
+        <h2 id="taskPickTitle">选择 PK 级别</h2>
+        <div class="m-sub" id="taskPickSub">红蓝双方并排操作，同一组 10 种物质，看谁先分完</div>
+        <div class="pick-list" id="taskPickList"><div class="pick-item"><span class="pi-dot" style="background: var(--pure);"></span><div><div class="pi-name">纯净物 / 混合物</div><div class="pi-desc">第一级</div></div></div><div class="pick-item"><span class="pi-dot" style="background: var(--element);"></span><div><div class="pi-name">单质 / 化合物</div><div class="pi-desc">第二级 · 纯净物</div></div></div><div class="pick-item"><span class="pi-dot" style="background: var(--oxide);"></span><div><div class="pi-name">氧化物 / 酸 / 碱 / 盐 / 有机物</div><div class="pi-desc">第三级 · 方法一</div></div></div><div class="pick-item"><span class="pi-dot" style="background: var(--electrolyte);"></span><div><div class="pi-name">电解质 / 非电解质</div><div class="pi-desc">第三级 · 方法二</div></div></div><div class="pick-item"><span class="pi-dot" style="background: var(--strong);"></span><div><div class="pi-name">强电解质 / 弱电解质</div><div class="pi-desc">第四级 · 电解质</div></div></div></div>
+        <div class="m-actions">
+            <button class="m-btn-ghost" id="taskPickCancel">取消</button>
+        </div>
+    </div>
+</div>
+<div class="toast" id="toast">分错了：醋酸铅 不属于「强电解质」，再试试</div>
+<script>
+(function () {
+    'use strict';
+    /* ============================================================
+       数据：45 种常见物质（初中化学 + 高一必修一、必修二）
+       kind: mixture=混合物 pure=纯净物
+       sub:  element=单质 compound=化合物（纯净物才有）
+       c1:   氧化物 oxide / 酸 acid / 碱 base / 盐 salt / 有机物 organic（化合物才有）
+       c2:   electrolyte=电解质 nonelectrolyte=非电解质（化合物才有）
+       st:   strong=强电解质 weak=弱电解质（电解质才有）
+       ============================================================ */
+    var MATTERS = [
+        /* —— 混合物（8）—— */
+        { name: '空气', formula: '', kind: 'mixture' },
+        { name: '海水', formula: '', kind: 'mixture' },
+        { name: '石油', formula: '', kind: 'mixture' },
+        { name: '矿泉水', formula: '', kind: 'mixture' },
+        { name: '食盐水', formula: '', kind: 'mixture' },
+        { name: '钢', formula: '', kind: 'mixture' },
+        { name: '石灰石', formula: '', kind: 'mixture' },
+        { name: '铁锈', formula: '', kind: 'mixture' },
+        { name: '合金', formula: '', kind: 'mixture' },
+        /* —— 金属单质（5）—— */
+        { name: '铁', formula: 'Fe', kind: 'pure', sub: 'element' },
+        { name: '铜', formula: 'Cu', kind: 'pure', sub: 'element' },
+        { name: '铝', formula: 'Al', kind: 'pure', sub: 'element' },
+        { name: '钠', formula: 'Na', kind: 'pure', sub: 'element' },
+        { name: '镁', formula: 'Mg', kind: 'pure', sub: 'element' },
+        /* —— 非金属单质（5）—— */
+        { name: '氧气', formula: 'O<sub>2</sub>', kind: 'pure', sub: 'element' },
+        { name: '氮气', formula: 'N<sub>2</sub>', kind: 'pure', sub: 'element' },
+        { name: '氢气', formula: 'H<sub>2</sub>', kind: 'pure', sub: 'element' },
+        { name: '碳', formula: 'C', kind: 'pure', sub: 'element' },
+        { name: '硫', formula: 'S', kind: 'pure', sub: 'element' },
+        /* —— 稀有气体（2）—— */
+        { name: '氦气', formula: 'He', kind: 'pure', sub: 'element' },
+        { name: '氩气', formula: 'Ar', kind: 'pure', sub: 'element' },
+        /* —— 氧化物（7）—— */
+        { name: '水', formula: 'H<sub>2</sub>O', kind: 'pure', sub: 'compound', c1: 'oxide', c2: 'electrolyte', st: 'weak' },
+        { name: '二氧化碳', formula: 'CO<sub>2</sub>', kind: 'pure', sub: 'compound', c1: 'oxide', c2: 'nonelectrolyte' },
+        { name: '氧化铁', formula: 'Fe<sub>2</sub>O<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'oxide', c2: 'electrolyte', st: 'strong' },
+        { name: '氧化钙', formula: 'CaO', kind: 'pure', sub: 'compound', c1: 'oxide', c2: 'electrolyte', st: 'strong' },
+        { name: '二氧化硫', formula: 'SO<sub>2</sub>', kind: 'pure', sub: 'compound', c1: 'oxide', c2: 'nonelectrolyte' },
+        { name: '氧化铜', formula: 'CuO', kind: 'pure', sub: 'compound', c1: 'oxide', c2: 'electrolyte', st: 'strong' },
+        { name: '氧化铝', formula: 'Al<sub>2</sub>O<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'oxide', c2: 'electrolyte', st: 'weak' },
+        /* —— 酸（7）—— */
+        { name: '盐酸', formula: 'HCl', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'strong' },
+        { name: '硫酸', formula: 'H<sub>2</sub>SO<sub>4</sub>', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'strong' },
+        { name: '硝酸', formula: 'HNO<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'strong' },
+        { name: '氢溴酸', formula: 'HBr', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'strong' },
+        { name: '氢碘酸', formula: 'HI', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'strong' },
+        { name: '高氯酸', formula: 'HClO<sub>4</sub>', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'strong' },
+        { name: '氟化氢', formula: 'HF', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'weak' },
+        { name: '硫化氢', formula: 'H<sub>2</sub>S', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'weak' },
+        { name: '碳酸', formula: 'H<sub>2</sub>CO<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'acid', c2: 'electrolyte', st: 'weak' },
+        /* —— 碱（9）—— */
+        { name: '氢氧化钠', formula: 'NaOH', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'strong' },
+        { name: '氢氧化钙', formula: 'Ca(OH)<sub>2</sub>', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'strong' },
+        { name: '氢氧化钾', formula: 'KOH', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'strong' },
+        { name: '氢氧化钡', formula: 'Ba(OH)<sub>2</sub>', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'strong' },
+        { name: '氨水', formula: 'NH<sub>3</sub>·H<sub>2</sub>O', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'weak' },
+        { name: '氢氧化铜', formula: 'Cu(OH)<sub>2</sub>', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'weak' },
+        { name: '氢氧化铝', formula: 'Al(OH)<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'weak' },
+        { name: '氢氧化镁', formula: 'Mg(OH)<sub>2</sub>', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'weak' },
+        { name: '氢氧化铁', formula: 'Fe(OH)<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'base', c2: 'electrolyte', st: 'weak' },
+        /* —— 盐（11）—— */
+        { name: '氯化钠', formula: 'NaCl', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '碳酸钠', formula: 'Na<sub>2</sub>CO<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '碳酸氢钠', formula: 'NaHCO<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '硫酸铜', formula: 'CuSO<sub>4</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '高锰酸钾', formula: 'KMnO<sub>4</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '硝酸银', formula: 'AgNO<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '硫酸钡', formula: 'BaSO<sub>4</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '氯化银', formula: 'AgCl', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '碳酸钙', formula: 'CaCO<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '碳酸钡', formula: 'BaCO<sub>3</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'strong' },
+        { name: '醋酸铅', formula: 'Pb(CH<sub>3</sub>COO)<sub>2</sub>', kind: 'pure', sub: 'compound', c1: 'salt', c2: 'electrolyte', st: 'weak' },
+        /* —— 有机物（5）—— */
+        { name: '甲烷', formula: 'CH<sub>4</sub>', kind: 'pure', sub: 'compound', c1: 'organic', c2: 'nonelectrolyte' },
+        { name: '乙醇', formula: 'C<sub>2</sub>H<sub>5</sub>OH', kind: 'pure', sub: 'compound', c1: 'organic', c2: 'nonelectrolyte' },
+        { name: '葡萄糖', formula: 'C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>', kind: 'pure', sub: 'compound', c1: 'organic', c2: 'nonelectrolyte' },
+        { name: '乙酸', formula: 'CH<sub>3</sub>COOH', kind: 'pure', sub: 'compound', c1: 'organic', c2: 'electrolyte', st: 'weak' },
+        { name: '蔗糖', formula: 'C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>', kind: 'pure', sub: 'compound', c1: 'organic', c2: 'nonelectrolyte' }
+    ];
+    var C1_LABEL = { oxide: '氧化物', acid: '酸', base: '碱', salt: '盐', organic: '有机物' };
+    var C2_LABEL = { electrolyte: '电解质', nonelectrolyte: '非电解质' };
+    var ST_LABEL = { strong: '强电解质', weak: '弱电解质' };
+    /* 桶配色 */
+    var BUCKET_COLOR = {
+        '纯净物': 'var(--pure)', '混合物': 'var(--mixture)',
+        '单质': 'var(--element)', '化合物': 'var(--compound)',
+        '氧化物': 'var(--oxide)', '酸': 'var(--acid)', '碱': 'var(--base)', '盐': 'var(--salt)', '有机物': 'var(--organic)',
+        '电解质': 'var(--electrolyte)', '非电解质': 'var(--nonelectrolyte)',
+        '强电解质': 'var(--strong)', '弱电解质': 'var(--weak)'
+    };
+    var PURE = MATTERS.filter(function (m) { return m.kind === 'pure'; });
+    var COMP = MATTERS.filter(function (m) { return m.sub === 'compound'; });
+    var ELEC = COMP.filter(function (m) { return m.c2 === 'electrolyte'; });
+    /* ============================================================
+       任务定义
+       ============================================================ */
+    var TASKS = [
+        {
+            id: 'T0', step: 1, name: '纯净物 / 混合物', small: '第一级',
+            buckets: ['纯净物', '混合物'], pool: MATTERS,
+            match: function (m) { return m.kind === 'pure' ? '纯净物' : '混合物'; },
+            hint: '这一张物质是纯净物还是混合物？拖进正确的桶',
+            nextFrom: { '纯净物': 'T1' }
+        },
+        {
+            id: 'T1', step: 2, name: '单质 / 化合物', small: '第二级 · 纯净物',
+            buckets: ['单质', '化合物'], pool: PURE,
+            match: function (m) { return m.sub === 'element' ? '单质' : '化合物'; },
+            hint: '纯净物继续分：由同种元素组成的是单质，由不同种元素组成的是化合物',
+            nextFrom: { '化合物': 'T2' }
+        },
+        {
+            id: 'T2a', step: 3, name: '氧化物 / 酸 / 碱 / 盐 / 有机物', small: '第三级 · 方法一',
+            buckets: ['氧化物', '酸', '碱', '盐', '有机物'], pool: COMP,
+            match: function (m) { return C1_LABEL[m.c1]; },
+            hint: '按组成把化合物分成五类',
+            nextFrom: {}
+        },
+        {
+            id: 'T2b', step: 3, name: '电解质 / 非电解质', small: '第三级 · 方法二',
+            buckets: ['电解质', '非电解质'], pool: COMP,
+            match: function (m) { return C2_LABEL[m.c2]; },
+            hint: '按导电性把化合物分成两类：水溶液中或熔融状态下能导电的是电解质',
+            nextFrom: { '电解质': 'T3' }
+        },
+        {
+            id: 'T3', step: 4, name: '强电解质 / 弱电解质', small: '第四级 · 电解质',
+            buckets: ['强电解质', '弱电解质'], pool: ELEC,
+            match: function (m) { return ST_LABEL[m.st]; },
+            hint: '电解质按电离程度再分：完全电离的是强电解质，部分电离的是弱电解质',
+            nextFrom: {}
+        }
+    ];
+    var TASK_MAP = {};
+    TASKS.forEach(function (t) { TASK_MAP[t.id] = t; });
+    /* ============================================================
+       游戏状态
+       ============================================================ */
+    var doneKey = function (id) { return 'matterClass_done_' + id; };
+    var errKey = function (id) { return 'matterClass_err_' + id; };
+    function isDone(id) {
+        try { return localStorage.getItem(doneKey(id)) === '1'; } catch (e) { return false; }
+    }
+    function setDone(id) {
+        try { localStorage.setItem(doneKey(id), '1'); } catch (e) {}
+    }
+    function getErr(id) {
+        try { return parseInt(localStorage.getItem(errKey(id)) || '0', 10) || 0; } catch (e) { return 0; }
+    }
+    function setErr(id, n) {
+        try { localStorage.setItem(errKey(id), String(n)); } catch (e) {}
+    }
+    var state = {
+        view: 'home',
+        task: 'T0',
+        pool: [],       // 待分类物质（打乱顺序）
+        idx: 0,         // 当前待分类序号
+        bucketMap: {},  // 桶名 -> 已放入物质数组
+        errors: 0,      // 本次任务错误次数
+        dragging: null,
+        showFormula: true
+    };
+    /* ===== 模式：闯关 level / 练习 practice / 双人PK pk ===== */
+    var MODE = { LEVEL: 'level', PRACTICE: 'practice', PK: 'pk' };
+    var mode = MODE.LEVEL;
+    var PRACTICE_N = 10;   // 练习 / PK 每次出 10 种物质
+    var practiceStartTs = 0;
+    var pk = {
+        running: false,
+        matters: [],        // 双方共用的 10 种物质（同一顺序）
+        taskId: 'T0',
+        raf: null,
+        startTs: 0,
+        players: [
+            { idx: 0, pool: [], pos: 0, bucketMap: {}, errors: 0, done: false, finishTs: 0 },
+            { idx: 1, pool: [], pos: 0, bucketMap: {}, errors: 0, done: false, finishTs: 0 }
+        ]
+    };
+    /* ===== DOM ===== */
+    var homeView = document.getElementById('homeView');
+    var gameView = document.getElementById('gameView');
+    var summaryView = document.getElementById('summaryView');
+    var crumb = document.getElementById('crumb');
+    var modebar = document.getElementById('modebar');
+    var modeTag = document.getElementById('modeTag');
+    var trayCnt = document.getElementById('trayCnt');
+    var slot = document.getElementById('slot');
+    var slotHint = document.getElementById('slotHint');
+    var bucketGrid = document.getElementById('bucketGrid');
+    var bucketTaskLabel = document.getElementById('bucketTaskLabel');
+    var doneOverlay = document.getElementById('doneOverlay');
+    var doneTitle = document.getElementById('doneTitle');
+    var doneSub = document.getElementById('doneSub');
+    var doneStat = document.getElementById('doneStat');
+    var doneActions = document.getElementById('doneActions');
+    var methodOverlay = document.getElementById('methodOverlay');
+    var summaryTree = document.getElementById('summaryTree');
+    var toastEl = document.getElementById('toast');
+    var taskPickOverlay = document.getElementById('taskPickOverlay');
+    var taskPickTitle = document.getElementById('taskPickTitle');
+    var taskPickSub = document.getElementById('taskPickSub');
+    var taskPickList = document.getElementById('taskPickList');
+    var pkStage = document.getElementById('pkStage');
+    var pkSlotRed = document.getElementById('pkSlotRed');
+    var pkSlotBlue = document.getElementById('pkSlotBlue');
+    var pkBucketsRed = document.getElementById('pkBucketsRed');
+    var pkBucketsBlue = document.getElementById('pkBucketsBlue');
+    var pkTimeRed = document.getElementById('pkTimeRed');
+    var pkTimeBlue = document.getElementById('pkTimeBlue');
+    var pkProgRed = document.getElementById('pkProgRed');
+    var pkProgBlue = document.getElementById('pkProgBlue');
+    /* ===== 音效 ===== */
+    var AudioFX = (function () {
+        var ctx = null, muted = false;
+        function ensure() {
+            if (!ctx) {
+                var AC = window.AudioContext || window.webkitAudioContext;
+                if (!AC) return null;
+                ctx = new AC();
+            }
+            if (ctx.state === 'suspended') ctx.resume();
+            return ctx;
+        }
+        function tone(freq, dur, type, vol, delay, slideTo) {
+            if (muted) return;
+            var c = ensure();
+            if (!c) return;
+            var t0 = c.currentTime + (delay || 0);
+            var osc = c.createOscillator();
+            var gain = c.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.setValueAtTime(freq, t0);
+            if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+            var v = vol || 0.15;
+            gain.gain.setValueAtTime(0.0001, t0);
+            gain.gain.exponentialRampToValueAtTime(v, t0 + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+            osc.connect(gain);
+            gain.connect(c.destination);
+            osc.start(t0);
+            osc.stop(t0 + dur + 0.05);
+        }
+        return {
+            unlock: function () { ensure(); },
+            setMuted: function (m) { muted = m; },
+            isMuted: function () { return muted; },
+            pick: function () { tone(660, 0.05, 'triangle', 0.09); },
+            correct: function (combo) {
+                var base = [523.25, 659.25, 783.99];
+                for (var i = 0; i < 3; i++) tone(base[i], 0.12, 'triangle', 0.13, i * 0.05);
+            },
+            wrong: function () { tone(190, 0.2, 'sawtooth', 0.06, 0, 130); },
+            finish: function () {
+                var seq = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+                for (var i = 0; i < seq.length; i++) tone(seq[i], 0.18, 'triangle', 0.14, i * 0.1);
+            },
+            click: function () { tone(520, 0.05, 'triangle', 0.08); }
+        };
+    })();
+    var soundBtn = document.getElementById('soundBtn');
+    var wavePath = document.getElementById('wavePath');
+    function setMutedUI(m) {
+        if (m) wavePath.setAttribute('d', 'M16 9l5 6M21 9l-5 6');
+        else wavePath.setAttribute('d', 'M15.5 8.5a5 5 0 0 1 0 7');
+    }
+    soundBtn.addEventListener('click', function () {
+        AudioFX.unlock();
+        AudioFX.setMuted(!AudioFX.isMuted());
+        setMutedUI(AudioFX.isMuted());
+    });
+    /* 化学式显示 / 隐藏 */
+    var formulaBtn = document.getElementById('formulaBtn');
+    function renderFormulaBtn() {
+        formulaBtn.classList.toggle('off', !state.showFormula);
+    }
+    formulaBtn.addEventListener('click', function () {
+        AudioFX.unlock();
+        AudioFX.click();
+        state.showFormula = !state.showFormula;
+        renderFormulaBtn();
+        if (mode === MODE.PK) {
+            pkRenderTray(0);
+            pkRenderTray(1);
+        } else {
+            renderTray();
+        }
+        showToast(state.showFormula ? '已显示化学式' : '已隐藏化学式');
+    });
+    /* ===== 通用 ===== */
+    var toastTimer = null;
+    function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2000);
+    }
+    function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+    }
+    /* ===== 视图切换 ===== */
+    function showView(name) {
+        state.view = name;
+        homeView.classList.toggle('active', name === 'home');
+        gameView.classList.toggle('active', name === 'game');
+        summaryView.classList.toggle('active', name === 'summary');
+    }
+    /* ===== 模式按钮栏 ===== */
+    function renderModebar() {
+        modebar.innerHTML = '';
+        TASKS.forEach(function (t) {
+            var btn = document.createElement('button');
+            btn.className = 'mode-btn';
+            var locked = !taskUnlocked(t.id);
+            if (locked) btn.classList.add('locked');
+            else if (isDone(t.id)) btn.classList.add('done');
+            if (state.task === t.id) btn.classList.add('cur');
+            var step = document.createElement('span');
+            step.className = 'm-step';
+            if (isDone(t.id)) {
+                step.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M20 6 9 17l-5-5"></path></svg>';
+            } else {
+                step.textContent = t.step;
+            }
+            var nameWrap = document.createElement('span');
+            nameWrap.className = 'm-name';
+            nameWrap.textContent = t.name;
+            var small = document.createElement('small');
+            small.textContent = t.small;
+            nameWrap.appendChild(small);
+            btn.appendChild(step);
+            btn.appendChild(nameWrap);
+            if (!locked) {
+                btn.addEventListener('click', function () {
+                    AudioFX.click();
+                    enterTask(t.id);
+                });
+            }
+            modebar.appendChild(btn);
+        });
+    }
+    /* 四个级别的分类均可直接进入，不要求按顺序完成 */
+    function taskUnlocked(id) {
+        return true;
+    }
+    /* ===== 面包屑 ===== */
+    function crumbChain() {
+        var t = state.task;
+        var chain = [];
+        if (t === 'T0') chain = [{ label: '全部物质', task: 'T0' }];
+        else if (t === 'T1') chain = [{ label: '全部物质', task: 'T0' }, { label: '纯净物', task: 'T1' }];
+        else if (t === 'T2a' || t === 'T2b') chain = [{ label: '全部物质', task: 'T0' }, { label: '纯净物', task: 'T1' }, { label: '化合物', task: 'T2' }];
+        else if (t === 'T3') chain = [{ label: '全部物质', task: 'T0' }, { label: '纯净物', task: 'T1' }, { label: '化合物', task: 'T2' }, { label: '电解质', task: 'T3' }];
+        return chain;
+    }
+    function renderCrumb() {
+        crumb.innerHTML = '';
+        var chain = crumbChain();
+        chain.forEach(function (item, i) {
+            if (i > 0) {
+                var sep = document.createElement('span');
+                sep.className = 'crumb-sep';
+                sep.textContent = '/';
+                crumb.appendChild(sep);
+            }
+            var el = document.createElement('span');
+            el.className = 'crumb-item';
+            var isCur = i === chain.length - 1;
+            if (isCur) {
+                el.classList.add('cur');
+                el.textContent = item.label;
+            } else if (item.task === 'T2') {
+                el.classList.add('done');
+                el.textContent = item.label;
+                el.addEventListener('click', function () { openMethodOverlay(); });
+            } else if (isDone(item.task)) {
+                el.classList.add('done');
+                el.textContent = item.label;
+                el.addEventListener('click', function () { taskNext(item.task); });
+            } else {
+                el.textContent = item.label;
+            }
+            crumb.appendChild(el);
+        });
+    }
+    /* ===== 模式管理 ===== */
+    function setMode(m) {
+        mode = m;
+        if (m === MODE.LEVEL) {
+            modeTag.style.display = 'none';
+            modeTag.className = 'mode-tag';
+        } else if (m === MODE.PRACTICE) {
+            modeTag.className = 'mode-tag practice';
+            modeTag.textContent = '练习模式 · 随机 10 种';
+            modeTag.style.display = '';
+        } else {
+            modeTag.className = 'mode-tag pk';
+            modeTag.textContent = '双人 PK · 并排对战';
+            modeTag.style.display = '';
+        }
+    }
+    function stopPk() {
+        if (pk.raf) cancelAnimationFrame(pk.raf);
+        pk.raf = null;
+        pk.running = false;
+    }
+    function showSoloStage() {
+        pkStage.classList.remove('show');
+        var st = document.querySelector('.stage');
+        if (st) st.style.display = '';
+    }
+    /* 跨模式的任务跳转：练习 / PK 中保持模式不变，seed 为上一级分好的物质 */
+    var pendingSeed = null;
+    function mergeBuckets(map) {
+        var out = [];
+        for (var k in map) {
+            if (Object.prototype.hasOwnProperty.call(map, k)) out = out.concat(map[k]);
+        }
+        return out;
+    }
+    function taskNext(nf, seed) {
+        if (nf === 'T2') { openMethodOverlay(); return; }
+        if (mode === MODE.PRACTICE) enterPractice(nf, seed);
+        else if (mode === MODE.PK) enterPk(nf, seed);
+        else enterTask(nf);
+    }
+    /* ===== 任务进入 ===== */
+    function enterTask(id) {
+        var t = TASK_MAP[id];
+        if (!t) return;
+        setMode(MODE.LEVEL);
+        stopPk();
+        showSoloStage();
+        doneOverlay.classList.remove('show');
+        state.task = id;
+        state.pool = shuffle(t.pool);
+        state.idx = 0;
+        state.errors = 0;
+        state.bucketMap = {};
+        t.buckets.forEach(function (b) { state.bucketMap[b] = []; });
+        renderModebar();
+        renderCrumb();
+        renderBuckets();
+        renderTray();
+    }
+    /* ===== 桶区 ===== */
+    function renderBuckets() {
+        var t = TASK_MAP[state.task];
+        bucketTaskLabel.textContent = t.name;
+        bucketGrid.className = 'bucket-grid ' + (t.buckets.length > 2 ? 'cols5' : 'cols2');
+        bucketGrid.innerHTML = '';
+        t.buckets.forEach(function (b) {
+            var bucket = document.createElement('div');
+            bucket.className = 'bucket';
+            bucket.dataset.bucket = b;
+            var head = document.createElement('div');
+            head.className = 'bucket-head';
+            head.style.color = BUCKET_COLOR[b];
+            var dot = document.createElement('span');
+            dot.className = 'b-dot';
+            dot.style.background = BUCKET_COLOR[b];
+            var nm = document.createElement('span');
+            nm.className = 'b-name';
+            nm.textContent = b;
+            var cnt = document.createElement('span');
+            cnt.className = 'b-count';
+            cnt.dataset.count = b;
+            cnt.textContent = '0';
+            head.appendChild(dot);
+            head.appendChild(nm);
+            head.appendChild(cnt);
+            var body = document.createElement('div');
+            body.className = 'bucket-body';
+            body.dataset.body = b;
+            var next = document.createElement('div');
+            next.className = 'bucket-next';
+            next.dataset.next = b;
+            next.textContent = '继续细分 ▸';
+            bucket.appendChild(head);
+            bucket.appendChild(body);
+            bucket.appendChild(next);
+            bucketGrid.appendChild(bucket);
+        });
+    }
+    function renderBucketCounts() {
+        for (var b in state.bucketMap) {
+            if (!Object.prototype.hasOwnProperty.call(state.bucketMap, b)) continue;
+            var cntEl = bucketGrid.querySelector('[data-count="' + b + '"]');
+            var bodyEl = bucketGrid.querySelector('[data-body="' + b + '"]');
+            var arr = state.bucketMap[b];
+            if (cntEl) cntEl.textContent = arr.length;
+            if (bodyEl) {
+                bodyEl.innerHTML = '';
+                arr.forEach(function (m) {
+                    var item = document.createElement('div');
+                    item.className = 'b-item';
+                    item.textContent = m.name;
+                    bodyEl.appendChild(item);
+                });
+                bodyEl.scrollTop = bodyEl.scrollHeight;
+            }
+        }
+        var t = TASK_MAP[state.task];
+        var done = state.idx >= state.pool.length;
+        t.buckets.forEach(function (b) {
+            var nextEl = bucketGrid.querySelector('[data-next="' + b + '"]');
+            var nf = t.nextFrom[b];
+            if (done && nf) {
+                nextEl.classList.add('show');
+                nextEl.onclick = function () {
+                    AudioFX.click();
+                    if (nf === 'T2') {
+                        pendingSeed = state.bucketMap[b];
+                        taskNext('T2');
+                    } else {
+                        taskNext(nf, state.bucketMap[b]);
+                    }
+                };
+            } else if (done && mode !== MODE.LEVEL && t.id === 'T2a') {
+                // 练习 / PK：方法一完成后继续走方法二，保证链可走完
+                nextEl.classList.add('show');
+                nextEl.textContent = '继续：电解质 / 非电解质 ▸';
+                nextEl.onclick = function () {
+                    AudioFX.click();
+                    taskNext('T2b', mergeBuckets(state.bucketMap));
+                };
+            } else {
+                nextEl.classList.remove('show');
+            }
+        });
+    }
+    /* ===== 待分类托盘 ===== */
+    function renderTray() {
+        var t = TASK_MAP[state.task];
+        var total = state.pool.length;
+        var remain = total - state.idx;
+        trayCnt.textContent = remain > 0 ? '剩余 ' + remain + ' / ' + total : '本任务已完成';
+        slotHint.textContent = t.hint;
+        slot.innerHTML = '';
+        if (state.idx >= total) {
+            var empty = document.createElement('div');
+            empty.className = 'tray-empty';
+            empty.innerHTML = '本任务所有物质都分好啦<br>点上方模式按钮或下方「继续细分」进入下一类';
+            slot.appendChild(empty);
+            return;
+        }
+        var m = state.pool[state.idx];
+        var card = makeCard(m);
+        slot.appendChild(card);
+        bindCard(card, m);
+    }
+    function makeCard(m) {
+        var card = document.createElement('div');
+        card.className = 'matter-card';
+        var nm = document.createElement('div');
+        nm.className = 'mc-name';
+        nm.textContent = m.name;
+        var fm = document.createElement('div');
+        fm.className = 'mc-formula';
+        fm.innerHTML = (m.formula && state.showFormula) ? m.formula : '&nbsp;';
+        var tag = document.createElement('div');
+        tag.className = 'mc-tag';
+        tag.textContent = '拖到正确的类别桶中';
+        card.appendChild(nm);
+        card.appendChild(fm);
+        card.appendChild(tag);
+        return card;
+    }
+    /* ============================================================
+       拖拽（Pointer Events，兼容触控）
+       ============================================================ */
+    function bindCard(card, matter) {
+        var grab = false;
+        var startX = 0, startY = 0, originLeft = 0, originTop = 0, moved = false;
+        card.addEventListener('pointerdown', function (e) {
+            if (state.idx >= state.pool.length) return;
+            AudioFX.unlock();
+            AudioFX.pick();
+            grab = true;
+            moved = false;
+            var rect = card.getBoundingClientRect();
+            originLeft = rect.left;
+            originTop = rect.top;
+            startX = e.clientX;
+            startY = e.clientY;
+            try { card.setPointerCapture(e.pointerId); } catch (err) {}
+            card.classList.add('dragging');
+            card.style.left = rect.left + 'px';
+            card.style.top = rect.top + 'px';
+            card.style.width = rect.width + 'px';
+            card.style.height = rect.height + 'px';
+        });
+        card.addEventListener('pointermove', function (e) {
+            if (!grab) return;
+            var dx = e.clientX - startX;
+            var dy = e.clientY - startY;
+            if (Math.abs(dx) + Math.abs(dy) > 6) moved = true;
+            card.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) scale(1.06)';
+            // 桶悬停高亮（直接用指针坐标，避免 fixed+transform 换算偏差）
+            var cx = e.clientX;
+            var cy = e.clientY;
+            var buckets = bucketGrid.querySelectorAll('.bucket');
+            buckets.forEach(function (b) {
+                var r = b.getBoundingClientRect();
+                var hit = cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom;
+                b.classList.toggle('hover', hit);
+            });
+        });
+        card.addEventListener('pointerup', function (e) {
+            if (!grab) return;
+            grab = false;
+            card.classList.remove('dragging');
+            clearHover();
+            if (!moved) {
+                card.classList.remove('dragging');
+                card.style.transform = '';
+                card.style.left = '';
+                card.style.top = '';
+                return;
+            }
+            // drop 命中检测：直接用指针坐标（松手处即目标）
+            var cx = e.clientX;
+            var cy = e.clientY;
+            var target = null;
+            bucketGrid.querySelectorAll('.bucket').forEach(function (b) {
+                var r = b.getBoundingClientRect();
+                if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) target = b;
+            });
+            if (target) {
+                var bucketName = target.dataset.bucket;
+                var t = TASK_MAP[state.task];
+                var correct = t.match(matter) === bucketName;
+                dropResult(card, matter, bucketName, correct);
+            } else {
+                returnCard(card);
+            }
+        });
+        card.addEventListener('pointercancel', function () {
+            grab = false;
+            card.classList.remove('dragging');
+            clearHover();
+            returnCard(card);
+        });
+    }
+    function clearHover() {
+        bucketGrid.querySelectorAll('.bucket.hover').forEach(function (b) { b.classList.remove('hover'); });
+    }
+    function returnCard(card) {
+        card.classList.add('returning');
+        card.style.transform = '';
+        card.style.left = '';
+        card.style.top = '';
+        setTimeout(function () { card.classList.remove('returning'); }, 320);
+    }
+    function dropResult(card, matter, bucketName, correct) {
+        var t = TASK_MAP[state.task];
+        if (correct) {
+            AudioFX.correct();
+            state.bucketMap[bucketName].push(matter);
+            card.classList.add('gone');
+            setTimeout(function () {
+                state.idx++;
+                renderBucketCounts();
+                if (state.idx >= state.pool.length) {
+                    AudioFX.finish();
+                    if (mode === MODE.PRACTICE) {
+                        renderTray();
+                        if (state.task === 'T3') openPracticeDone();
+                        return;
+                    }
+                    setDone(t.id);
+                    setErr(t.id, state.errors);
+                    renderModebar();
+                    renderCrumb();
+                    renderTray();
+                    openDoneModal();
+                } else {
+                    renderTray();
+                }
+            }, 260);
+        } else {
+            state.errors++;
+            AudioFX.wrong();
+            card.classList.add('wrong');
+            setTimeout(function () { card.classList.remove('wrong'); }, 420);
+            returnCard(card);
+            showToast('分错了：' + matter.name + ' 不属于「' + bucketName + '」，再试试');
+        }
+    }
+    /* ===== 练习模式 ===== */
+    function enterPractice(id, seed) {
+        var t = TASK_MAP[id];
+        if (!t) return;
+        setMode(MODE.PRACTICE);
+        stopPk();
+        showSoloStage();
+        doneOverlay.classList.remove('show');
+        state.task = id;
+        state.pool = seed ? shuffle(seed).slice(0, PRACTICE_N) : shuffle(t.pool).slice(0, PRACTICE_N);
+        state.idx = 0;
+        state.errors = 0;
+        state.bucketMap = {};
+        t.buckets.forEach(function (b) { state.bucketMap[b] = []; });
+        practiceStartTs = performance.now();
+        renderModebar();
+        renderCrumb();
+        renderBuckets();
+        renderTray();
+    }
+    function openPracticeDone() {
+        var t = TASK_MAP[state.task];
+        var secs = (performance.now() - practiceStartTs) / 1000;
+        doneTitle.textContent = '练习完成';
+        doneSub.textContent = t.name + ' · 随机 ' + state.pool.length + ' 种物质';
+        doneStat.innerHTML = '用时 <b>' + secs.toFixed(1) + 's</b> · 分错 <b>' + state.errors + '</b> 次' +
+            (state.errors === 0 ? ' · 零失误，太棒了' : '');
+        doneActions.innerHTML = '';
+        var btns = [
+            { cls: 'm-btn-cyan', text: '再练一次（重新随机 10 种）', act: function () { enterPractice(state.task); } },
+            { cls: 'm-btn-purple', text: '换级别练习', act: function () { openTaskPick(MODE.PRACTICE); } },
+            { cls: 'm-btn-primary', text: '去闯关模式', act: function () { enterTask('T0'); } },
+            { cls: 'm-btn-ghost', text: '关闭', act: closeDone }
+        ];
+        btns.forEach(function (b) {
+            var el = document.createElement('button');
+            el.className = b.cls;
+            el.textContent = b.text;
+            el.addEventListener('click', function () {
+                AudioFX.click();
+                b.act();
+            });
+            doneActions.appendChild(el);
+        });
+        doneOverlay.classList.add('show');
+    }
+    /* ===== 双人 PK 模式 ===== */
+    function enterPk(id, seed) {
+        var t = TASK_MAP[id];
+        if (!t) return;
+        setMode(MODE.PK);
+        stopPk();
+        showSoloStage();
+        pkStage.classList.add('show');
+        var st = document.querySelector('.stage');
+        if (st) st.style.display = 'none';
+        doneOverlay.classList.remove('show');
+        pk.taskId = id;
+        pk.matters = seed ? shuffle(seed).slice(0, PRACTICE_N) : shuffle(t.pool).slice(0, PRACTICE_N);
+        for (var i = 0; i < 2; i++) {
+            pk.players[i] = { idx: i, pool: pk.matters.slice(), pos: 0, bucketMap: {}, errors: 0, done: false, finishTs: 0 };
+            t.buckets.forEach(function (b) { pk.players[i].bucketMap[b] = []; });
+        }
+        pk.startTs = performance.now();
+        pk.running = true;
+        pk.raf = requestAnimationFrame(pkTick);
+        pkRenderBuckets(0);
+        pkRenderBuckets(1);
+        pkRenderTray(0);
+        pkRenderTray(1);
+        pkUpdateProg();
+    }
+    function pkSlotEl(i) { return i === 0 ? pkSlotRed : pkSlotBlue; }
+    function pkBucketsEl(i) { return i === 0 ? pkBucketsRed : pkBucketsBlue; }
+    function pkTimeEl(i) { return i === 0 ? pkTimeRed : pkTimeBlue; }
+    function pkProgEl(i) { return i === 0 ? pkProgRed : pkProgBlue; }
+    function pkRenderBuckets(i) {
+        var t = TASK_MAP[pk.taskId];
+        var wrap = pkBucketsEl(i);
+        wrap.className = 'pk-buckets ' + (t.buckets.length > 2 ? 'b5' : 'b2');
+        wrap.innerHTML = '';
+        t.buckets.forEach(function (b) {
+            var bucket = document.createElement('div');
+            bucket.className = 'pk-bucket';
+            bucket.dataset.bucket = b;
+            var head = document.createElement('div');
+            head.className = 'pk-b-head';
+            head.style.color = BUCKET_COLOR[b];
+            var dot = document.createElement('span');
+            dot.className = 'b-dot';
+            dot.style.background = BUCKET_COLOR[b];
+            var nm = document.createElement('span');
+            nm.textContent = b;
+            var cnt = document.createElement('span');
+            cnt.className = 'pk-b-count';
+            cnt.dataset.count = b;
+            cnt.textContent = '0';
+            head.appendChild(dot);
+            head.appendChild(nm);
+            head.appendChild(cnt);
+            var body = document.createElement('div');
+            body.className = 'pk-b-body';
+            body.dataset.body = b;
+            var next = document.createElement('div');
+            next.className = 'pk-b-next';
+            next.dataset.next = b;
+            next.textContent = '继续细分 ▸';
+            bucket.appendChild(head);
+            bucket.appendChild(body);
+            bucket.appendChild(next);
+            wrap.appendChild(bucket);
+        });
+    }
+    function pkRenderBucketCounts(i) {
+        var p = pk.players[i];
+        var t = TASK_MAP[pk.taskId];
+        var wrap = pkBucketsEl(i);
+        for (var b in p.bucketMap) {
+            if (!Object.prototype.hasOwnProperty.call(p.bucketMap, b)) continue;
+            var cntEl = wrap.querySelector('[data-count="' + b + '"]');
+            var bodyEl = wrap.querySelector('[data-body="' + b + '"]');
+            var arr = p.bucketMap[b];
+            if (cntEl) cntEl.textContent = arr.length;
+            if (bodyEl) {
+                bodyEl.innerHTML = '';
+                arr.forEach(function (m) {
+                    var item = document.createElement('div');
+                    item.className = 'pk-b-item';
+                    item.textContent = m.name;
+                    bodyEl.appendChild(item);
+                });
+                bodyEl.scrollTop = bodyEl.scrollHeight;
+            }
+        }
+        var done = p.pos >= p.pool.length;
+        t.buckets.forEach(function (b) {
+            var nextEl = wrap.querySelector('[data-next="' + b + '"]');
+            var nf = t.nextFrom[b];
+            if (done && nf) {
+                nextEl.classList.add('show');
+                nextEl.onclick = function () {
+                    AudioFX.click();
+                    if (nf === 'T2') {
+                        pendingSeed = p.bucketMap[b];
+                        openMethodOverlay();
+                    } else {
+                        taskNext(nf, p.bucketMap[b]);
+                    }
+                };
+            } else if (done && pk.taskId === 'T2a') {
+                nextEl.classList.add('show');
+                nextEl.textContent = '继续：电解质 / 非电解质 ▸';
+                nextEl.onclick = function () {
+                    AudioFX.click();
+                    taskNext('T2b', mergeBuckets(p.bucketMap));
+                };
+            } else {
+                nextEl.classList.remove('show');
+            }
+        });
+    }
+    function pkRenderTray(i) {
+        var p = pk.players[i];
+        var slotEl = pkSlotEl(i);
+        slotEl.innerHTML = '';
+        if (p.done || p.pos >= p.pool.length) {
+            if (p.done) {
+                var win = document.createElement('div');
+                win.className = 'tray-empty';
+                win.textContent = '全部完成！';
+                slotEl.appendChild(win);
+            }
+            return;
+        }
+        var m = p.pool[p.pos];
+        var card = makeCard(m);
+        slotEl.appendChild(card);
+        pkBindCard(card, m, i);
+    }
+    function pkClearHover(i) {
+        pkBucketsEl(i).querySelectorAll('.pk-bucket.hover').forEach(function (b) { b.classList.remove('hover'); });
+    }
+    function pkBindCard(card, matter, i) {
+        var grab = false, startX = 0, startY = 0, originLeft = 0, originTop = 0, moved = false;
+        card.addEventListener('pointerdown', function (e) {
+            var p = pk.players[i];
+            if (p.done || p.pos >= p.pool.length) return;
+            AudioFX.unlock();
+            AudioFX.pick();
+            grab = true;
+            moved = false;
+            var rect = card.getBoundingClientRect();
+            originLeft = rect.left;
+            originTop = rect.top;
+            startX = e.clientX;
+            startY = e.clientY;
+            try { card.setPointerCapture(e.pointerId); } catch (err) {}
+            card.classList.add('dragging');
+            card.style.left = rect.left + 'px';
+            card.style.top = rect.top + 'px';
+            card.style.width = rect.width + 'px';
+            card.style.height = rect.height + 'px';
+        });
+        card.addEventListener('pointermove', function (e) {
+            if (!grab) return;
+            var dx = e.clientX - startX;
+            var dy = e.clientY - startY;
+            if (Math.abs(dx) + Math.abs(dy) > 6) moved = true;
+            card.style.transform = 'translate(' + dx + 'px, ' + dy + 'px) scale(1.06)';
+            // 桶悬停高亮（直接用指针坐标）
+            var cx = e.clientX;
+            var cy = e.clientY;
+            pkBucketsEl(i).querySelectorAll('.pk-bucket').forEach(function (b) {
+                var r = b.getBoundingClientRect();
+                b.classList.toggle('hover', cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom);
+            });
+        });
+        card.addEventListener('pointerup', function (e) {
+            if (!grab) return;
+            grab = false;
+            card.classList.remove('dragging');
+            pkClearHover(i);
+            if (!moved) {
+                card.style.transform = '';
+                card.style.left = '';
+                card.style.top = '';
+                return;
+            }
+            // drop 命中检测：直接用指针坐标（松手处即目标）
+            var cx = e.clientX;
+            var cy = e.clientY;
+            var target = null;
+            pkBucketsEl(i).querySelectorAll('.pk-bucket').forEach(function (b) {
+                var r = b.getBoundingClientRect();
+                if (cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom) target = b;
+            });
+            if (target) {
+                var t = TASK_MAP[pk.taskId];
+                var correct = t.match(matter) === target.dataset.bucket;
+                pkDropResult(card, matter, target.dataset.bucket, correct, i);
+            } else {
+                returnCard(card);
+            }
+        });
+        card.addEventListener('pointercancel', function () {
+            grab = false;
+            card.classList.remove('dragging');
+            pkClearHover(i);
+            returnCard(card);
+        });
+    }
+    function pkDropResult(card, matter, bucketName, correct, i) {
+        var p = pk.players[i];
+        var t = TASK_MAP[pk.taskId];
+        if (correct) {
+            AudioFX.correct();
+            p.bucketMap[bucketName].push(matter);
+            card.classList.add('gone');
+            setTimeout(function () {
+                p.pos++;
+                pkRenderBucketCounts(i);
+                pkUpdateProg();
+                if (p.pos >= p.pool.length) {
+                    p.done = true;
+                    p.finishTs = performance.now();
+                    pkRenderTray(i);
+                    pkUpdateProg();
+                    if (pk.taskId === 'T3') endPk(i);
+                    // 中间级别完成：等待点击「继续细分」进入下一级
+                } else {
+                    pkRenderTray(i);
+                }
+            }, 260);
+        } else {
+            p.errors++;
+            AudioFX.wrong();
+            card.classList.add('wrong');
+            setTimeout(function () { card.classList.remove('wrong'); }, 420);
+            returnCard(card);
+            showToast('分错了：' + matter.name + ' 不属于「' + bucketName + '」，再试试');
+        }
+    }
+    function pkUpdateProg() {
+        pkProgRed.textContent = pk.players[0].pos + '/' + PRACTICE_N;
+        pkProgBlue.textContent = pk.players[1].pos + '/' + PRACTICE_N;
+    }
+    function pkTick() {
+        if (!pk.running) return;
+        var now = performance.now();
+        pk.players.forEach(function (p, i) {
+            var el = pkTimeEl(i);
+            var t = p.done ? p.finishTs - pk.startTs : now - pk.startTs;
+            el.textContent = (t / 1000).toFixed(1) + 's';
+        });
+        pk.raf = requestAnimationFrame(pkTick);
+    }
+    function endPk(winnerIdx) {
+        pk.running = false;
+        if (pk.raf) cancelAnimationFrame(pk.raf);
+        pk.raf = null;
+        var red = pk.players[0], blue = pk.players[1];
+        var wName = winnerIdx === 0 ? '红方' : '蓝方';
+        doneTitle.textContent = wName + '获胜！';
+        doneSub.textContent = '同一组 ' + PRACTICE_N + ' 种物质 · 谁先分完谁赢';
+        var redT = red.done ? ((red.finishTs - pk.startTs) / 1000).toFixed(1) + 's' : '未完成';
+        var blueT = blue.done ? ((blue.finishTs - pk.startTs) / 1000).toFixed(1) + 's' : '未完成';
+        doneStat.innerHTML = '红方用时 <b>' + redT + '</b> · 分错 <b>' + red.errors + '</b> 次<br>蓝方用时 <b>' + blueT + '</b> · 分错 <b>' + blue.errors + '</b> 次';
+        doneActions.innerHTML = '';
+        var btns = [
+            { cls: 'm-btn-cyan', text: '再来一局（重新随机 10 种）', act: function () { enterPk(pk.taskId); } },
+            { cls: 'm-btn-purple', text: '换级别 PK', act: function () { openTaskPick(MODE.PK); } },
+            { cls: 'm-btn-ghost', text: '关闭', act: closeDone }
+        ];
+        btns.forEach(function (b) {
+            var el = document.createElement('button');
+            el.className = b.cls;
+            el.textContent = b.text;
+            el.addEventListener('click', function () {
+                AudioFX.click();
+                b.act();
+            });
+            doneActions.appendChild(el);
+        });
+        doneOverlay.classList.add('show');
+    }
+    /* ===== 练习 / PK 级别选择 ===== */
+    function openTaskPick(kind) {
+        AudioFX.click();
+        var isPk = kind === MODE.PK;
+        taskPickTitle.textContent = isPk ? '选择 PK 级别' : '选择练习级别';
+        taskPickSub.textContent = isPk ? '红蓝双方并排操作，同一组 10 种物质，看谁先分完' : '每次随机抽 10 种物质，从所选级别开始走完整分类流程';
+        taskPickList.innerHTML = '';
+        TASKS.forEach(function (t) {
+            var item = document.createElement('div');
+            item.className = 'pick-item';
+            var dot = document.createElement('span');
+            dot.className = 'pi-dot';
+            dot.style.background = BUCKET_COLOR[t.buckets[0]];
+            var wrap = document.createElement('div');
+            var nm = document.createElement('div');
+            nm.className = 'pi-name';
+            nm.textContent = t.name;
+            var desc = document.createElement('div');
+            desc.className = 'pi-desc';
+            desc.textContent = t.small;
+            wrap.appendChild(nm);
+            wrap.appendChild(desc);
+            item.appendChild(dot);
+            item.appendChild(wrap);
+            item.addEventListener('click', function () {
+                AudioFX.click();
+                taskPickOverlay.classList.remove('show');
+                showView('game');
+                if (isPk) enterPk(t.id);
+                else enterPractice(t.id);
+            });
+            taskPickList.appendChild(item);
+        });
+        taskPickOverlay.classList.add('show');
+    }
+    document.getElementById('taskPickCancel').addEventListener('click', function () {
+        AudioFX.click();
+        taskPickOverlay.classList.remove('show');
+    });
+    /* ===== 任务完成面板 ===== */
+    function openDoneModal() {
+        var t = TASK_MAP[state.task];
+        doneTitle.textContent = t.name + ' · 完成';
+        doneSub.textContent = t.hint;
+        doneStat.innerHTML = '本任务共 <b>' + t.pool.length + '</b> 种物质 · 分错 <b>' + state.errors + '</b> 次' +
+            (state.errors === 0 ? ' · 零失误，非常棒' : '');
+        doneActions.innerHTML = '';
+        var btns = [];
+        if (state.task === 'T0') {
+            btns.push({ cls: 'm-btn-cyan', text: '点击「纯净物」继续：单质 / 化合物', act: function () { enterTask('T1'); } });
+            btns.push({ cls: 'm-btn-ghost', text: '关闭', act: closeDone });
+        } else if (state.task === 'T1') {
+            btns.push({ cls: 'm-btn-purple', text: '方法一：氧化物 / 酸 / 碱 / 盐 / 有机物', act: function () { enterTask('T2a'); } });
+            btns.push({ cls: 'm-btn-cyan', text: '方法二：电解质 / 非电解质', act: function () { enterTask('T2b'); } });
+            btns.push({ cls: 'm-btn-ghost', text: '关闭', act: closeDone });
+        } else if (state.task === 'T2a') {
+            btns.push({ cls: 'm-btn-cyan', text: '去做方法二：电解质 / 非电解质', act: function () { enterTask('T2b'); } });
+            btns.push({ cls: 'm-btn-ghost', text: '关闭', act: closeDone });
+        } else if (state.task === 'T2b') {
+            btns.push({ cls: 'm-btn-green', text: '点击「电解质」继续：强 / 弱电解质', act: function () { enterTask('T3'); } });
+            btns.push({ cls: 'm-btn-ghost', text: '关闭', act: closeDone });
+        } else if (state.task === 'T3') {
+            btns.push({ cls: 'm-btn-primary', text: '查看完整分类总结', act: function () { closeDone(); openSummary(); } });
+            btns.push({ cls: 'm-btn-ghost', text: '关闭', act: closeDone });
+        }
+        btns.forEach(function (b) {
+            var el = document.createElement('button');
+            el.className = b.cls;
+            el.textContent = b.text;
+            el.addEventListener('click', function () {
+                AudioFX.click();
+                b.act();
+            });
+            doneActions.appendChild(el);
+        });
+        doneOverlay.classList.add('show');
+    }
+    function closeDone() {
+        doneOverlay.classList.remove('show');
+    }
+    /* ===== 化合物分类方法选择 ===== */
+    function openMethodOverlay() {
+        AudioFX.click();
+        methodOverlay.classList.add('show');
+    }
+    document.getElementById('methodOptA').addEventListener('click', function () {
+        AudioFX.click();
+        methodOverlay.classList.remove('show');
+        taskNext('T2a', pendingSeed);
+        pendingSeed = null;
+    });
+    document.getElementById('methodOptB').addEventListener('click', function () {
+        AudioFX.click();
+        methodOverlay.classList.remove('show');
+        taskNext('T2b', pendingSeed);
+        pendingSeed = null;
+    });
+    document.getElementById('methodCancelBtn').addEventListener('click', function () {
+        AudioFX.click();
+        methodOverlay.classList.remove('show');
+        pendingSeed = null;
+    });
+    /* ===== 总结视图 ===== */
+    function openSummary() {
+        showView('summary');
+        renderSummary();
+    }
+    function nodeHTML(cls, name, items, countCls) {
+        var itemsHTML = items.map(function (s) {
+            return '<div class="s-item">' + s + '</div>';
+        }).join('');
+        return '<div class="s-node"><div class="s-head"><span class="b-dot" style="background:' + BUCKET_COLOR[name] + ';box-shadow:0 0 8px ' + BUCKET_COLOR[name] + '"></span>' +
+            '<span class="s-name">' + name + '</span>' +
+            (countCls ? '<span class="s-cnt">' + items.length + '种</span>' : '') +
+            '</div><div class="s-items">' + itemsHTML + '</div></div>';
+    }
+    function nodeRow(htmls) {
+        return '<div class="s-node-row">' + htmls.join('<span class="sum-arrow">┃</span>') + '</div>';
+    }
+    function renderSummary() {
+        var pureItems = PURE.map(function (m) { return m.name; });
+        var mixItems = MATTERS.filter(function (m) { return m.kind === 'mixture'; }).map(function (m) { return m.name; });
+        var eleItems = PURE.filter(function (m) { return m.sub === 'element'; }).map(function (m) { return m.name; });
+        var compItems = COMP.map(function (m) { return m.name; });
+        var rows = [];
+        rows.push(nodeHTML('', '物质', MATTERS.map(function (m) { return m.name; }), true));
+        rows.push(nodeRow([
+            nodeHTML('', '纯净物', pureItems, true),
+            nodeHTML('', '混合物', mixItems, true)
+        ]));
+        rows.push(nodeRow([
+            nodeHTML('', '单质', eleItems, true),
+            nodeHTML('', '化合物', compItems, true)
+        ]));
+        // 方法一
+        var c1Rows = ['氧化物', '酸', '碱', '盐', '有机物'].map(function (b) {
+            var arr = COMP.filter(function (m) { return C1_LABEL[m.c1] === b; }).map(function (m) { return m.name; });
+            return nodeHTML('', b, arr, true);
+        });
+        rows.push('<div class="s-node-row">' + c1Rows.join('') + '</div>');
+        // 方法二 + 第四级
+        var elecItems = ELEC.map(function (m) { return m.name; });
+        var nonItems = COMP.filter(function (m) { return m.c2 === 'nonelectrolyte'; }).map(function (m) { return m.name; });
+        var strongItems = ELEC.filter(function (m) { return m.st === 'strong'; }).map(function (m) { return m.name; });
+        var weakItems = ELEC.filter(function (m) { return m.st === 'weak'; }).map(function (m) { return m.name; });
+        rows.push(nodeRow([
+            nodeHTML('', '电解质', elecItems, true),
+            nodeHTML('', '非电解质', nonItems, true)
+        ]));
+        rows.push(nodeRow([
+            nodeHTML('', '强电解质', strongItems, true),
+            nodeHTML('', '弱电解质', weakItems, true)
+        ]));
+        summaryTree.innerHTML = '<div class="sum-tree">' + rows.join('<div class="sum-arrow" style="align-self:center;">▼</div>') + '</div>';
+    }
+    /* ===== 按钮事件 ===== */
+    document.getElementById('startBtn').addEventListener('click', function () {
+        AudioFX.unlock();
+        AudioFX.click();
+        showView('game');
+        enterTask('T0');
+        tryFullscreen();
+    });
+    document.getElementById('practiceHomeBtn').addEventListener('click', function () {
+        AudioFX.unlock();
+        AudioFX.click();
+        showView('game');
+        openTaskPick(MODE.PRACTICE);
+        tryFullscreen();
+    });
+    document.getElementById('pkHomeBtn').addEventListener('click', function () {
+        AudioFX.unlock();
+        AudioFX.click();
+        showView('game');
+        openTaskPick(MODE.PK);
+        tryFullscreen();
+    });
+    function goHome() {
+        AudioFX.click();
+        stopPk();
+        pkStage.classList.remove('show');
+        var st = document.querySelector('.stage');
+        if (st) st.style.display = '';
+        setMode(MODE.LEVEL);
+        showView('home');
+    }
+    document.getElementById('homeBtn').addEventListener('click', goHome);
+    document.getElementById('summaryHomeBtn').addEventListener('click', goHome);
+    document.getElementById('summaryAgainBtn').addEventListener('click', function () {
+        AudioFX.click();
+        showView('game');
+        enterTask('T0');
+    });
+    document.getElementById('resetBtn').addEventListener('click', function () {
+        AudioFX.click();
+        try {
+            ['T0', 'T1', 'T2a', 'T2b', 'T3'].forEach(function (id) {
+                localStorage.removeItem(doneKey(id));
+                localStorage.removeItem(errKey(id));
+            });
+        } catch (e) {}
+        showToast('已重置全部进度');
+        enterTask('T0');
+    });
+    function tryFullscreen() {
+        var el = document.documentElement;
+        try {
+            if (el.requestFullscreen) {
+                var p = el.requestFullscreen();
+                if (p && p.catch) p.catch(function () {});
+            } else if (el.webkitRequestFullscreen) {
+                el.webkitRequestFullscreen();
+            }
+        } catch (e) {}
+    }
+    document.addEventListener('pointerdown', function firstTap() {
+        tryFullscreen();
+        document.removeEventListener('pointerdown', firstTap);
+    }, { passive: true });
+    /* ===== 启动 ===== */
+    renderFormulaBtn();
+    showView('home');
+})();
+/* 禁止鼠标右键：点击右键时页面无任何变化、不弹菜单 */
+document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    return false;
+});
+</script>
+
+
+</body></html>
