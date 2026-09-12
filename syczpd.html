@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>化学实验操作正误判断</title>
+<style>
+  :root{
+    --bg:#f1f5f9; --card:#ffffff; --line:#e2e8f0;
+    --ink:#0f172a; --sub:#64748b;
+    --blue:#2563eb; --green:#16a34a; --red:#dc2626; --amber:#d97706;
+    --ok-bg:#f0fdf4; --err-bg:#fef2f2; --blue-bg:#eff6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;
+    background:var(--bg); color:var(--ink);
+    display:flex; flex-direction:column; min-height:100vh;
+  }
+  header{
+    background:linear-gradient(135deg,#1e3a8a,#2563eb);
+    color:#fff; padding:14px 18px; display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:8px; box-shadow:0 2px 10px rgba(30,58,138,.25);
+    position:relative; z-index:60;
+  }
+  header .title{font-size:20px;font-weight:800;letter-spacing:1px;}
+  header .sub{font-size:12px;opacity:.85;margin-top:2px;}
+  .hd-btns{display:flex;gap:8px;}
+  .btn{
+    border:none;border-radius:10px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;
+    transition:transform .08s, box-shadow .08s; user-select:none;
+  }
+  .btn:active{transform:scale(.96);}
+  .btn.white{background:#fff;color:#1e3a8a;}
+  .btn.ghost{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);}
+  .btn.blue{background:var(--blue);color:#fff;}
+  .btn.green{background:var(--green);color:#fff;}
+  .btn.red{background:var(--red);color:#fff;}
+  .btn.gray{background:#e2e8f0;color:#334155;}
+  .btn.big{font-size:16px;padding:14px 26px;border-radius:14px;}
+  main{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:18px 16px 40px;}
+  .view{display:none;}
+  .view.active{display:block;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 8px rgba(15,23,42,.05);}
+  .seg{display:flex;gap:8px;flex-wrap:wrap;}
+  .seg .btn.on{background:var(--blue);color:#fff;box-shadow:0 3px 10px rgba(37,99,235,.35);}
+  .seg .btn.off{background:#e2e8f0;color:#475569;}
+  .h2{font-size:17px;font-weight:800;margin:14px 0 10px;display:flex;align-items:center;gap:8px;}
+  .h2 .tag{font-size:12px;font-weight:700;color:var(--sub);background:#f1f5f9;border-radius:20px;padding:2px 10px;}
+  /* 首页 */
+  .hero{text-align:center;margin:26px 0 8px;}
+  .hero .big{font-size:26px;font-weight:900;letter-spacing:2px;}
+  .hero .small{color:var(--sub);font-size:14px;margin-top:6px;}
+  .mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:20px;}
+  .mode-card{padding:22px;cursor:pointer;border:2px solid var(--line);transition:all .15s;}
+  .mode-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 18px rgba(37,99,235,.12);}
+  .mode-card .ic{font-size:30px;}
+  .mode-card .nm{font-size:18px;font-weight:800;margin:10px 0 6px;}
+  .mode-card .ds{color:var(--sub);font-size:13px;line-height:1.6;}
+  /* 学习模式 */
+  .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}
+  .topic-card{padding:12px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;}
+  .topic-card:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 18px rgba(37,99,235,.12);}
+  .topic-card .pic{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative;height:130px;display:flex;align-items:center;justify-content:center;}
+  .topic-card .pic svg,.topic-card .pic img{max-width:100%;max-height:128px;width:auto;height:auto;}
+  .topic-card .nm{font-size:14px;font-weight:800;margin-top:8px;line-height:1.4;margin-top:auto;padding-top:8px;}
+  .topic-card .vol{font-size:11px;color:var(--sub);margin-top:2px;}
+  .vol-badge{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;}
+  .vol-up{background:#eff6ff;color:#1d4ed8;}
+  .vol-down{background:#fef3c7;color:#b45309;}
+  .unit-badge{background:#f0fdf4;color:#15803d;margin-left:4px;}
+  /* 弹窗 */
+  .mask{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:16px;overflow-y:auto;}
+  .mask.show{display:flex;}
+  .modal{margin:auto;}
+  .modal{background:#fff;border-radius:18px;max-width:min(880px,100%);width:100%;max-height:calc(100vh - 32px);overflow-y:auto;padding:20px;}
+  .modal h3{font-size:18px;font-weight:900;display:flex;align-items:center;gap:10px;}
+  .modal .x{margin-left:auto;cursor:pointer;background:#f1f5f9;border:none;border-radius:10px;width:34px;height:34px;font-size:18px;color:#475569;}
+  .ok-row{display:flex;gap:16px;align-items:flex-start;margin:16px 0;flex-wrap:wrap;}
+  .ok-row .pic{flex:0 0 300px;height:200px;display:flex;align-items:center;justify-content:center;}
+  .ok-row .pic svg,.ok-row .pic img{max-width:100%;max-height:198px;width:auto;height:auto;border:1px solid var(--line);border-radius:12px;background:#fff;}
+  .ok-row .info{flex:1;min-width:240px;}
+  .ok-row .info .t{color:var(--green);font-weight:900;font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+  .ok-row .info .pt{background:var(--ok-bg);border:1px solid #bbf7d0;border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.7;color:#14532d;}
+  .err-list{display:grid;gap:14px;margin-top:6px;}
+  .err-item{border:1px solid #fecaca;background:var(--err-bg);border-radius:14px;padding:14px;}
+  .err-item .hd{display:flex;align-items:center;gap:8px;font-weight:900;color:var(--red);font-size:15px;margin-bottom:10px;}
+  .err-item .body{display:flex;gap:14px;flex-wrap:wrap;}
+  .err-item .pic{flex:0 0 230px;height:160px;display:flex;align-items:center;justify-content:center;}
+  .err-item .pic svg,.err-item .pic img{max-width:100%;max-height:158px;width:auto;height:auto;border:1px solid #fecaca;border-radius:10px;background:#fff;}
+  .err-item .meta{flex:1;min-width:220px;display:grid;gap:8px;font-size:13px;line-height:1.6;}
+  .err-item .meta b{font-weight:800;}
+  .e-reason{background:#fff;border-radius:10px;padding:9px 11px;}
+  .e-reason .k{color:var(--amber);font-weight:900;}
+  .e-harm{background:#fff;border-radius:10px;padding:9px 11px;}
+  .e-harm .k{color:var(--red);font-weight:900;}
+  .e-fix{background:#fff;border-radius:10px;padding:9px 11px;}
+  body.hide-explain .e-reason,body.hide-explain .e-harm,body.hide-explain .e-fix{display:none;}
+  .e-fix .k{color:var(--green);font-weight:900;}
+  /* 考试 */
+  .exam-stage{text-align:center;padding:30px 18px;}
+  .exam-stage .q-no{font-size:13px;color:var(--sub);font-weight:700;letter-spacing:2px;}
+  .exam-stage .q-pic{display:inline-block;margin:16px 0;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;max-width:420px;width:100%;}
+  .exam-stage .q-pic svg{width:100%;height:auto;}
+  .q-title{font-size:18px;font-weight:900;margin:6px 0 16px;}
+  .judge{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .judge .btn{min-width:130px;font-size:16px;padding:13px 22px;}
+  .feedback{margin-top:16px;padding:14px;border-radius:12px;text-align:left;font-size:13px;line-height:1.7;}
+  .feedback.right{background:var(--ok-bg);border:1px solid #bbf7d0;color:#14532d;}
+  .feedback.wrong{background:var(--err-bg);border:1px solid #fecaca;color:#7f1d1d;}
+  .feedback .fb-t{font-weight:900;font-size:15px;margin-bottom:6px;}
+  .score-board{text-align:center;padding:30px 18px;}
+  .score-board .score{font-size:54px;font-weight:900;color:var(--blue);}
+  .score-board .score-desc{color:var(--sub);margin:6px 0 18px;}
+  .review-list{display:grid;gap:10px;text-align:left;margin-top:18px;max-width:640px;margin-left:auto;margin-right:auto;}
+  .review-item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;background:#fff;}
+  .review-item .r-pic{flex:0 0 90px;}
+  .review-item .r-pic svg{width:100%;height:auto;border-radius:8px;border:1px solid var(--line);}
+  /* 真实图片优先：images/<key>.png 存在则替换 SVG */
+  .img-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+  .img-wrap .scene-img{max-width:100%;max-height:100%;object-fit:contain;opacity:0;transition:opacity .2s;}
+  .img-wrap .scene-svg{width:100%;}
+  .topic-card .pic .img-wrap,.ok-row .pic .img-wrap,.err-item .pic .img-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+  .topic-card .pic .img-wrap .scene-svg svg,
+  .ok-row .pic .img-wrap .scene-svg svg,
+  .err-item .pic .img-wrap .scene-svg svg,
+  .exam-stage .q-pic .img-wrap .scene-svg svg,
+  .review-item .r-pic .img-wrap .scene-svg svg{max-width:100%;max-height:100%;width:auto;height:auto;display:block;}
+  .review-item .r-info{flex:1;font-size:13px;line-height:1.6;}
+  .review-item .r-info .nm{font-weight:800;font-size:14px;}
+  .pill{display:inline-block;font-size:11px;font-weight:900;border-radius:20px;padding:2px 10px;margin-right:6px;}
+  .pill.right{background:var(--ok-bg);color:var(--green);border:1px solid #bbf7d0;}
+  .pill.wrong{background:var(--err-bg);color:var(--red);border:1px solid #fecaca;}
+  .toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:11px 20px;border-radius:12px;font-size:14px;z-index:99;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .toast.show{opacity:1;}
+  .foot-note{text-align:center;color:#94a3b8;font-size:12px;padding:16px 0 24px;}
+  .btn.orange{background:#f97316;color:#fff;}
+  /* PK 布局 */
+  .pk-wrap{display:flex;gap:14px;align-items:stretch;justify-content:center;flex-wrap:nowrap;margin-top:10px;max-width:860px;margin-left:auto;margin-right:auto;}
+  .pk-side{flex:1 1 0;min-width:170px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:14px 12px;text-align:center;}
+  .pk-side.A{border-color:#3b82f6;}
+  .pk-side.B{border-color:#f97316;}
+  .pk-side .who{font-weight:900;font-size:19px;margin-bottom:10px;}
+  .pk-side.A .who{color:#1d4ed8;}
+  .pk-side.B .who{color:#ea580c;}
+  .pk-side .pbtns{display:flex;flex-direction:column;gap:8px;}
+  .pk-side .pbtns button{width:100%;font-size:15px;padding:11px 10px;}
+  .pk-side .pbtns button:disabled{opacity:.45;}
+  .pk-side .picked{margin-top:10px;font-size:16px;font-weight:800;min-height:24px;}
+  .pk-side.done{background:#f0f9ff;}
+  .pk-side.B.done{background:#fff7ed;}
+  .pk-center{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;max-width:360px;}
+  .pk-center .q-pic{margin:6px 0;}
+  .pk-result{margin-top:14px;padding:12px 14px;border-radius:12px;background:#f1f5f9;text-align:left;font-size:13px;line-height:1.7;}
+  .pk-score-row{display:flex;gap:14px;justify-content:center;align-items:stretch;flex-wrap:wrap;margin:14px 0;}
+  .pk-score-card{flex:1;max-width:260px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center;}
+  .pk-score-card.A{border-color:#3b82f6;}
+  .pk-score-card.B{border-color:#f97316;}
+  .pk-score-card .who{font-weight:900;font-size:16px;margin-bottom:6px;}
+  .pk-score-card .big-num{font-size:46px;font-weight:900;}
+  .pk-score-card.A .big-num{color:#1d4ed8;}
+  .pk-score-card.B .big-num{color:#ea580c;}
+  .pk-score-card .tt{font-size:12px;color:var(--sub);margin-top:4px;}
+  .winner-banner{font-size:20px;font-weight:900;text-align:center;padding:12px;border-radius:12px;background:#fef9c3;color:#854d0e;margin-bottom:10px;}
+  .mcq-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:860px;margin:10px auto;}
+  .mcq-card{background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px;cursor:pointer;position:relative;transition:transform .12s,border-color .12s;}
+  .mcq-card:hover{transform:translateY(-2px);border-color:var(--blue);}
+  .mcq-card .letter{position:absolute;top:6px;left:6px;width:24px;height:24px;border-radius:50%;background:#1e3a8a;color:#fff;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;z-index:2;}
+  .mcq-card .pic{height:140px;display:flex;align-items:center;justify-content:center;}
+  .pk-mode .mcq-card .pic{height:185px;}
+  .pk-mode .mcq-card .pic svg,.pk-mode .mcq-card .pic img{max-height:183px;}
+  .mcq-card .pic svg,.mcq-card .pic img{max-width:100%;max-height:140px;width:auto;height:auto;border-radius:8px;display:block;}
+  .mcq-card.picked-right{border-color:var(--green);background:#f0fdf4;box-shadow:0 0 0 3px rgba(22,163,74,.25);}
+  .mcq-card.picked-wrong{border-color:var(--red);background:#fef2f2;box-shadow:0 0 0 3px rgba(220,38,38,.25);}
+  .mcq-card.dim{opacity:.45;}
+  .pk-abtn{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+  .pk-abtn button{min-width:56px;font-size:20px;padding:13px 0;font-weight:900;}
+  @media (max-width:900px){
+    main{padding:12px 10px 30px;}
+    .pk-wrap{flex-direction:column;max-width:560px;}
+    .pk-center{order:-1;max-width:100%;flex-direction:row;gap:14px;flex-wrap:wrap;justify-content:center;}
+    .mcq-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+    .mcq-card .pic svg,.mcq-card .pic img{max-height:150px;}
+    .topic-grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));}
+    .toolbar{gap:8px;}
+    .volSeg,.seg{flex-wrap:wrap;}
+  }
+  @media (max-width:640px){
+    .ok-row .pic{flex-basis:100%;}
+    .err-item{flex-direction:column;}
+    .err-item .pic{flex-basis:100%;}
+    .topic-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+    .topic-card .pic svg,.topic-card .pic img{max-height:108px;}
+    .hero .big{font-size:20px;}
+    .hd-btns{gap:6px;}
+    .hd-btns .btn{padding:6px 10px;font-size:13px;}
+    .modal{padding:14px;margin:0;}
+    .mcq-grid{grid-template-columns:repeat(2,1fr);gap:8px;}
+    .mcq-card .pic svg,.mcq-card .pic img{max-height:120px;}
+    .mcq-card{padding:8px;}
+    .mcq-card .ans-btn{font-size:17px;padding:10px;}
+    .pk-score-card{padding:12px 10px;}
+    header{padding:10px 12px;}
+    .title{font-size:18px !important;}
+  }
+  /* 小知识按钮 */
+  .trivia-btn{display:inline-block;margin:6px 0 0;background:#fef9c3;color:#854d0e;border:1px solid #fde047;border-radius:10px;padding:6px 12px;font-size:13px;cursor:pointer;}
+  .trivia-btn:hover{background:#fef08a;}
+  .trivia-box{margin-top:8px;background:#fffbeb;border:1px dashed #fbbf24;border-radius:10px;padding:10px 12px;font-size:13.5px;color:#78350f;display:none;}
+  .trivia-box.show{display:block;}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="title">🧪 化学实验操作正误判断</div>
+  </div>
+  <div class="hd-btns">
+    <button class="btn ghost" id="expBtn">💡 解析：开</button>
+    <button class="btn ghost" id="fontBtn">🔤 字体</button>
+    <button class="btn ghost" id="homeBtn">首页</button>
+    <button class="btn white" id="fsBtn">全屏</button>
+  </div>
+</header>
+
+<main>
+  <!-- 首页 -->
+  <div class="view active" id="homeView">
+    <div class="hero">
+      <div class="big">实验操作 · 正误我判断</div>
+      <div class="small">先看正确操作，再揪出常见错误：错因、危害后果、改正方法一目了然</div>
+    </div>
+    <div class="card" style="margin-top:20px;padding:18px;">
+      <div class="h2">选择分册 <span class="tag">决定学习和考试的范围</span></div>
+      <div class="seg" id="homeVolSeg"></div>
+    </div>
+    <div class="mode-grid">
+      <div class="card mode-card" id="learnModeCard">
+        <div class="ic">📖</div>
+        <div class="nm">学习模式</div>
+        <div class="ds">按条目浏览正确操作示意图；点开任意操作，查看该操作常见的错误做法、错因、危害后果与改正方法。</div>
+      </div>
+      <div class="card mode-card" id="examModeCard">
+        <div class="ic">✍️</div>
+        <div class="nm">考试模式</div>
+        <div class="ds">从所选分册随机抽 4 道题：1 个正确操作 + 3 个错误操作，逐题判断正误，考后给出得分与完整解析。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学习模式 -->
+  <div class="view" id="learnView">
+    <div class="card" style="padding:16px;">
+      <div class="toolbar">
+        <div class="h2" style="margin:0;">📖 学习模式</div>
+        <div class="seg" id="learnVolSeg"></div>
+        <div class="seg" id="learnUnitSeg" style="display:none"></div>
+        <div class="seg" style="margin-left:auto;" id="learnNav"></div>
+      </div>
+      <div class="topic-grid" id="learnGrid"></div>
+    </div>
+  </div>
+
+  <!-- 考试模式 -->
+  <div class="view" id="examView">
+    <div class="card" style="padding:16px;">
+      <div class="toolbar">
+        <div class="h2" style="margin:0;">✍️ 考试模式</div>
+        <div class="seg" id="examVolSeg"></div>
+        <div class="seg" id="examUnitSeg" style="display:none"></div>
+        <div class="seg" style="margin-left:auto;" id="examNav"></div>
+      </div>
+      <div id="examBody"></div>
+    </div>
+  </div>
+</main>
+
+<div class="mask" id="mask">
+  <div class="modal" id="modal"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+/* ============ 工具 ============ */
+function $(id){ return document.getElementById(id); }
+function toast(msg){
+  var t=$('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove('show'); }, 1800);
+}
+/* 音效 */
+var AC=null;
+function beep(freq,dur,type,vol){
+  try{
+    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    var o=AC.createOscillator(), g=AC.createGain();
+    o.type=type||'sine'; o.frequency.value=freq;
+    g.gain.value=vol||0.12;
+    o.connect(g); g.connect(AC.destination);
+    var t0=AC.currentTime;
+    g.gain.setValueAtTime(vol||0.12,t0);
+    g.gain.exponentialRampToValueAtTime(0.001,t0+(dur||0.2));
+    o.start(t0); o.stop(t0+(dur||0.2));
+  }catch(e){}
+}
+var sndClick=function(){beep(520,0.08,'triangle',0.08);};
+var sndRight=function(){beep(660,0.12,'sine',0.1);setTimeout(function(){beep(880,0.15,'sine',0.1);},90);};
+var sndWrong=function(){beep(220,0.25,'sawtooth',0.08);setTimeout(function(){beep(160,0.3,'sawtooth',0.08);},120); if(navigator.vibrate){ try{ navigator.vibrate([80,40,120]); }catch(e){} } };
+
+/* ============ SVG 图元 ============ */
+/* 简单画风：白底、深灰描边。所有图元函数返回SVG字符串 */
+var INK='#334155', LIGHT='#94a3b8', RED='#dc2626', GREEN='#16a34a', AMBER='#d97706';
+
+/* 桌面 */
+function bench(y){
+  return '<rect x="6" y="'+y+'" width="216" height="11" rx="5" fill="#f6ecdc" stroke="none"/>'+
+         '<rect x="6" y="'+(y+8)+'" width="216" height="4" fill="#e5d3b5"/>'+
+         '<rect x="6" y="'+y+'" width="216" height="3" rx="1.5" fill="#ffffff" opacity="0.55"/>';
+}
+/* 玻璃与液体渐变定义 */
+function defs(){
+  return '<defs>'+
+    '<linearGradient id="gg" x1="0" y1="0" x2="1" y2="0">'+
+      '<stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#eaf3fc"/><stop offset="1" stop-color="#cfE4f7"/>'+
+    '</linearGradient>'+
+    '<linearGradient id="w" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#74b3ef"/>'+
+    '</linearGradient>'+
+    '<linearGradient id="y" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#fef3c7"/><stop offset="1" stop-color="#f59e0b"/>'+
+    '</linearGradient>'+
+    '<linearGradient id="p" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#f0ecfe"/><stop offset="1" stop-color="#a78bfa"/>'+
+    '</linearGradient>'+
+    '<linearGradient id="o" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#ea580c"/>'+
+    '</linearGradient>'+
+    '<radialGradient id="fl" cx="0.5" cy="0.8" r="0.8">'+
+      '<stop offset="0" stop-color="#fef08a"/><stop offset="0.55" stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c" stop-opacity="0.2"/>'+
+    '</radialGradient>'+
+  '</defs>';
+}
+/* 试管：x,y为管口左上角，h为管长，w=管径，ang=旋转角度(绕管口) */
+function tube(x,y,h,ang,opt){
+  opt=opt||{};
+  var w=opt.w||16, col=opt.col||'#64748b';
+  var g='<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">';
+  g+='<path d="M0,0 h'+w+' v'+(h-8)+' q0,8 -'+(w/2)+',8 q-'+(w/2)+',0 -'+(w/2)+',-8 z" fill="url(#gg)" stroke="'+col+'" stroke-width="2.5"/>';
+  g+='<rect x="2.6" y="3" width="2.5" height="'+(h-15)+'" rx="1.25" fill="#ffffff" opacity="0.85"/>';
+  if(opt.liq){
+    g+='<path d="M3,'+(h-opt.liq)+' h'+(w-6)+' v'+(opt.liq-7)+' q0,6 -'+(w/2-3)+',6 q-'+(w/2-3)+',0 -'+(w/2-3)+',-6 z" fill="url(#w)" stroke="none" opacity="0.92"/>';
+  }
+  g+='</g>';
+  return g;
+}
+/* 试管夹 */
+function clamp(x,y,ang){
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')" stroke="#475569" stroke-width="3" fill="none">'+
+    '<rect x="-8" y="0" width="16" height="5" rx="2" fill="#94a3b8" stroke="none"/>'+
+    '<path d="M-3,5 L-3,26 M3,5 L3,26"/>'+
+    '<path d="M-3,26 Q0,34 3,26"/>'+
+    '<path d="M8,13 h22" stroke="#64748b"/>'+
+  '</g>';
+}
+/* 酒精灯：x,y为灯座左上角 */
+function lamp(x,y,opt){
+  opt=opt||{};
+  var s='<g transform="translate('+x+','+y+')">';
+  s+='<rect x="6" y="26" width="58" height="22" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="2.5"/>';
+  s+='<path d="M12,26 q1,-10 17,-10 q16,0 17,10 z" fill="#fffbeb" stroke="#b45309" stroke-width="2.5"/>';
+  s+='<rect x="26" y="8" width="18" height="9" rx="2" fill="#e2e8f0" stroke="#64748b" stroke-width="2"/>';
+  s+='<path d="M33,8 v-5" stroke="#475569" stroke-width="3.5"/>';
+  s+='<path d="M32,26 h6 q-3,7 -6,9 q-3,-2 -6,-9 z" fill="#fcd34d" opacity="0.9"/>';
+  if(opt.lit){
+    s+='<path d="M33,-5 c-4,-6 -1,-13 4,-15 c5,2 8,9 4,15 z" fill="#fde047" stroke="#f59e0b" stroke-width="1"/>';
+    s+='<path d="M28,-6 c-8,-9 -4,-20 6,-24 c10,4 13,15 5,24 z" fill="#fb923c" opacity="0.72"/>';
+    s+='<path d="M24,-7 c-10,-10 -5,-26 9,-30 c14,4 18,20 8,30 z" fill="#f97316" opacity="0.35"/>';
+    s+='<circle cx="30" cy="-30" r="16" fill="url(#fl)" opacity="0.28"/>';
+  }
+  if(opt.cap){ s+='<path d="M22,-6 l0,-8 q0,-3 4,-3 l18,0 q4,0 4,3 l0,8 z" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>'; }
+  if(opt.liq){ s+='<rect x="9" y="38" width="52" height="8" rx="3" fill="#fcd34d" stroke="none" opacity="0.92"/>'; }
+  s+='</g>';
+  return s;
+}
+/* 胶头滴管：x,y为管口(下)中心，ang旋转 */
+function dropper(x,y,ang,opt){
+  opt=opt||{};
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">'+
+    '<path d="M-7,-2 l-1,-26 q0,-5 8,-5 q8,0 8,5 l-1,26 z" fill="url(#gg)" stroke="#64748b" stroke-width="2.2"/>'+
+    '<rect x="-6.3" y="-6" width="2.4" height="22" rx="1.2" fill="#ffffff" opacity="0.8"/>'+
+    '<ellipse cx="0" cy="-36" rx="8" ry="9" fill="#f87171" stroke="#b91c1c" stroke-width="2"/>'+
+    '<path d="M-4.5,-38 q4.5,-3 9,0" stroke="#fecaca" stroke-width="1.6" fill="none"/>'+
+    '<rect x="-3" y="-2" width="6" height="6" rx="2" fill="#93c5fd" stroke="none"/>'+
+  '</g>';
+}
+/* 量筒 */
+function cyl(x,y,w,h,opt){
+  opt=opt||{};
+  var s='<g transform="translate('+x+','+y+')">';
+  s+='<path d="M0,0 h'+w+' v'+(h-6)+' q0,6 -'+(w/2)+',6 q-'+(w/2)+',0 -'+(w/2)+',-6 z" fill="url(#gg)" stroke="#64748b" stroke-width="2.5"/>';
+  s+='<rect x="2.6" y="4" width="2.4" height="'+(h-17)+'" rx="1.2" fill="#ffffff" opacity="0.85"/>';
+  for(var i=1;i<=4;i++){ var yy=(i*h/5);
+    s+='<line x1="3" y1="'+yy+'" x2="'+(w*0.46)+'" y2="'+yy+'" stroke="#94a3b8" stroke-width="1.4"/>';
+  }
+  s+='<path d="M'+(w-2)+',0 q4,0 5,4 q1,4 -3,5" fill="none" stroke="#64748b" stroke-width="2"/>';
+  if(opt.liq){ s+='<path d="M2.5,'+(h-opt.liq)+' h'+(w-5)+' v'+(opt.liq-5)+' q0,4 -'+(w/2-2.5)+',4 q-'+(w/2-2.5)+',0 -'+(w/2-2.5)+',-4 z" fill="url(#w)" stroke="none" opacity="0.92"/>';
+    s+='<path d="M4,'+(h-opt.liq)+' h'+(w-8)+'" stroke="#38bdf8" stroke-width="1.6"/>';
+  }
+  s+='</g>';
+  return s;
+}
+/* 烧杯 */
+function beaker(x,y,w,h,opt){
+  opt=opt||{};
+  var s='<g transform="translate('+x+','+y+')">';
+  s+='<path d="M0,0 h'+w+' v'+(h-6)+' q0,6 -'+(w/2)+',6 q-'+(w/2)+',0 -'+(w/2)+',-6 z" fill="url(#gg)" stroke="#64748b" stroke-width="2.5"/>';
+  s+='<rect x="2.6" y="4" width="2.5" height="'+(h-19)+'" rx="1.25" fill="#ffffff" opacity="0.85"/>';
+  s+='<path d="M2,3 h7 M'+(w-9)+',3 h7" stroke="#64748b" stroke-width="2.2"/>';
+  if(opt.liq){ s+='<path d="M2.5,'+(h-opt.liq)+' h'+(w-5)+' v'+(opt.liq-5)+' q0,4 -'+(w/2-2.5)+',4 q-'+(w/2-2.5)+',0 -'+(w/2-2.5)+',-4 z" fill="url(#w)" stroke="none" opacity="0.92"/>'; }
+  s+='</g>';
+  return s;
+}
+/* 集气瓶(广口瓶)，瓶塞可选 */
+function jar(x,y,w,h,opt){
+  opt=opt||{};
+  var s='<g transform="translate('+x+','+y+')">';
+  s+='<path d="M4,0 h'+(w-8)+' v'+(h-8)+' q0,8 -'+(w/2)+',8 q-'+(w/2)+',0 -'+(w/2)+',-8 z" fill="url(#gg)" stroke="#64748b" stroke-width="2.5"/>';
+  s+='<rect x="7" y="5" width="2.7" height="'+(h-19)+'" rx="1.35" fill="#ffffff" opacity="0.85"/>';
+  if(opt.lid){ s+='<rect x="2" y="-8" width="'+(w-4)+'" height="9" rx="2" fill="#d1d5db" stroke="#475569" stroke-width="2"/>'; }
+  if(opt.water){ s+='<path d="M5,'+(h-opt.water)+' h'+(w-10)+' v'+(opt.water-5)+' q0,4 -'+(w/2-5)+',4 q-'+(w/2-5)+',0 -'+(w/2-5)+',-4 z" fill="url(#w)" stroke="none" opacity="0.88"/>'; }
+  s+='</g>';
+  return s;
+}
+/* 细口瓶/试剂瓶：x,y瓶底中心 */
+function bottle(x,y,opt){
+  opt=opt||{};
+  var w=34,h=46;
+  var s='<g transform="translate('+(x-w/2)+','+y+')">';
+  s+='<path d="M2,0 h'+(w-4)+' v'+(h-8)+' q0,8 -'+(w/2)+',8 q-'+(w/2)+',0 -'+(w/2)+',-8 z" fill="url(#gg)" stroke="#64748b" stroke-width="2.5"/>';
+  s+='<rect x="5" y="4" width="2.6" height="'+(h-17)+'" rx="1.3" fill="#ffffff" opacity="0.8"/>';
+  s+='<path d="M10,0 v-10 h'+(w-20)+' v10" fill="url(#gg)" stroke="#64748b" stroke-width="2.2"/>';
+  s+='<rect x="6" y="-20" width="'+(w-12)+'" height="11" rx="2" fill="#f1f5f9" stroke="#64748b" stroke-width="2.2"/>';
+  if(opt.cap===undefined||opt.cap===true){
+    s+='<rect x="6" y="-31" width="'+(w-12)+'" height="12" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>';
+    s+='<line x1="10" y1="-28" x2="'+(w-10)+'" y2="-28" stroke="#94a3b8" stroke-width="1.5"/>';
+  }
+  if(opt.liq){ s+='<path d="M3,'+(h-opt.liq)+' h'+(w-6)+' v'+(opt.liq-5)+' q0,4 -'+(w/2-3)+',4 q-'+(w/2-3)+',0 -'+(w/2-3)+',-4 z" fill="url(#y)" stroke="none" opacity="0.92"/>'; }
+  if(opt.label){ s+='<rect x="7" y="12" width="20" height="12" rx="1.5" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.2"/>'; }
+  s+='</g>';
+  return s;
+}
+/* 药匙 */
+function spoon(x,y,ang,opt){
+  opt=opt||{};
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">'+
+    '<rect x="0" y="-2" width="34" height="4" rx="2" fill="#fbbf24" stroke="#b45309" stroke-width="1.6"/>'+
+    '<path d="M34,-4 q12,0 12,6 q0,6 -12,6 z" fill="#fbbf24" stroke="#b45309" stroke-width="1.6"/>'+
+    '<path d="M38,-2 q6,0 6,4" stroke="#fff" stroke-width="1.4" fill="none" opacity="0.8"/>'+
+  '</g>';
+}
+/* 镊子 */
+function tweez(x,y,ang,opt){
+  opt=opt||{};
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')" stroke="#475569" stroke-width="3" fill="none" stroke-linecap="round">'+
+    '<path d="M0,0 Q14,-6 26,-2"/>'+
+    '<path d="M0,0 Q14,6 26,2"/>'+
+    '<circle cx="30" cy="-1" r="3.5" fill="#64748b" stroke="none"/>'+
+  '</g>';
+}
+/* 玻璃棒 */
+function rod(x,y,ang,len){
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">'+
+    '<rect x="-3" y="0" width="6" height="'+(len||60)+'" rx="3" fill="#eef4fa" stroke="#94a3b8" stroke-width="1.2"/>'+
+    '<rect x="-1.3" y="2" width="1.8" height="'+(len-4)+'" rx="0.9" fill="#ffffff" opacity="0.9"/>'+
+  '</g>';
+}
+/* 手：简笔手掌，x,y掌心，ang旋转 */
+function hand(x,y,ang,opt){
+  opt=opt||{};
+  var s='<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">';
+  s+='<path d="M-10,0 q-2,-8 4,-11 q10,-4 14,2 q4,10 -4,14 q-8,5 -14,-5 z" fill="#fcd0b5" stroke="#c2703e" stroke-width="2.5"/>';
+  if(opt.fingers){
+    s+='<path d="M0,-9 l-2,-7 M6,-10 l1,-8 M12,-6 l5,-6" stroke="#c2703e" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+  }
+  s+='</g>';
+  return s;
+}
+/* 人：极简单画。x,y头部中心 */
+function person(x,y,opt){
+  opt=opt||{};
+  var s='<g stroke="'+INK+'" fill="none" stroke-width="4" stroke-linecap="round">';
+  s+='<path d="M'+x+','+(y+15)+' L'+x+','+(y+52)+'"/>';
+  var a1=opt.a1, a2=opt.a2;
+  s+='<path d="M'+x+','+(y+22)+' L'+(a1?a1[0]:x-14)+','+(a1?a1[1]:y+34)+'"/>';
+  s+='<path d="M'+x+','+(y+22)+' L'+(a2?a2[0]:x+14)+','+(a2?a2[1]:y+34)+'"/>';
+  s+='</g>';
+  s+='<circle cx="'+x+'" cy="'+y+'" r="14" fill="#fdf3ec" stroke="'+INK+'" stroke-width="3.5"/>';
+  s+='<circle cx="'+(x+opt.eyes||x+4)+'" cy="'+(y+2)+'" r="2.4" fill="'+INK+'"/>';
+  if(opt.nose){
+    s+='<path d="M'+x+' '+(y+5)+' L'+(x+opt.nose[0])+' '+(y+opt.nose[1])+'" stroke="'+INK+'" stroke-width="2.5" fill="none"/>';
+  }
+  return s;
+}
+/* 气泡 */
+function bubble(x,y){
+  return '<circle cx="'+x+'" cy="'+y+'" r="4" fill="#fff" stroke="#60a5fa" stroke-width="2"/>'+
+         '<circle cx="'+(x+1)+'" cy="'+(y-1)+'" r="1.4" fill="#93c5fd"/>';
+}
+/* 水槽 */
+function trough(x,y,w,h){
+  return '<g transform="translate('+x+','+y+')">'+
+    '<rect x="0" y="0" width="'+w+'" height="'+h+'" rx="7" fill="#e0f2fe" stroke="#64748b" stroke-width="2.5"/>'+
+    '<path d="M4,'+(h-6)+' h'+(w-8)+'" stroke="#38bdf8" stroke-width="2"/>'+
+    '<ellipse cx="'+(w/2)+'" cy="10" rx="'+(w/2-6)+'" ry="5" fill="#bae6fd" stroke="#64748b" stroke-width="2"/>'+
+    '<rect x="5" y="12" width="3" height="'+(h-23)+'" rx="1.5" fill="#ffffff" opacity="0.7"/>'+
+  '</g>';
+}
+/* 火柴 */
+function match(x,y,ang){
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">'+
+    '<rect x="-4" y="0" width="8" height="34" rx="3" fill="#fcd34d" stroke="#b45309" stroke-width="1.6"/>'+
+    '<circle cx="0" cy="-5" r="6" fill="#f97316" stroke="#c2410c" stroke-width="2"/>'+
+    '<path d="M0,-11 c-3,-4 -1,-8 2,-9" stroke="#fbbf24" stroke-width="2" fill="none"/>'+
+  '</g>';
+}
+/* 纸张/纸槽 */
+function paper(x,y,ang){
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">'+
+    '<path d="M0,0 L30,0 L34,8 L-4,8 z" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>'+
+    '<path d="M0,0 L-4,8 M30,0 L34,8" stroke="#94a3b8" stroke-width="1.5"/>'+
+    '<path d="M6,2 h16" stroke="#cbd5e1" stroke-width="1.2"/>'+
+  '</g>';
+}
+/* 漏斗 */
+function funnel(x,y){
+  return '<g transform="translate('+x+','+y+')">'+
+    '<path d="M-16,-18 h32 l-10,20 h-12 z" fill="url(#gg)" stroke="#64748b" stroke-width="2.4"/>'+
+    '<rect x="-3.4" y="-16" width="3" height="15" rx="1.5" fill="#ffffff" opacity="0.75"/>'+
+    '<rect x="-4" y="2" width="8" height="16" rx="3" fill="url(#gg)" stroke="#64748b" stroke-width="2.4"/>'+
+  '</g>';
+}
+/* 试管刷 */
+function brush(x,y,ang){
+  return '<g transform="translate('+x+','+y+') rotate('+(ang||0)+')">'+
+    '<rect x="-3" y="0" width="6" height="40" rx="3" fill="#fda4af" stroke="#be123c" stroke-width="1.6"/>'+
+    '<path d="M-6,2 h-8 M-4,8 h-10 M-4,14 h-10" stroke="#fb7185" stroke-width="2.5"/>'+
+  '</g>';
+}
+/* 导线/电源符号 */
+function cell(x,y){
+  return '<g transform="translate('+x+','+y+')">'+
+    '<line x1="-14" y1="0" x2="-5" y2="0" stroke="'+INK+'" stroke-width="3"/>'+
+    '<line x1="-3" y1="-7" x2="-3" y2="7" stroke="'+INK+'" stroke-width="3"/>'+
+    '<line x1="-3" y1="0" x2="5" y2="0" stroke="'+INK+'" stroke-width="3"/>'+
+    '<line x1="7" y1="-7" x2="7" y2="7" stroke="'+INK+'" stroke-width="3"/>'+
+    '<line x1="7" y1="0" x2="16" y2="0" stroke="'+INK+'" stroke-width="3"/>'+
+  '</g>';
+}
+/* 场景容器 */
+function scene(inner,opt){
+  opt=opt||{};
+  return '<svg viewBox="0 0 220 150" xmlns="http://www.w3.org/2000/svg" style="background:#ffffff">'+
+    '<rect x="0" y="0" width="220" height="150" fill="#ffffff"/>'+defs()+inner+'</svg>';
+}
+/* 图片优先渲染：存在 images/<key>.png 则显示真实图片（用户自备组卷网图），否则自动回退自绘SVG */
+function IMG(key){
+  return '<div class="img-wrap">'+
+    '<img class="scene-img" src="images/'+key+'.png" alt="" '+
+    'onload="this.style.opacity=1;var p=this.parentNode;if(p)p.querySelector(\'.scene-svg\').style.display=\'none\'" '+
+    'onerror="this.style.display=\'none\'">'+
+    '<div class="scene-svg">'+SCENES[key]+'</div></div>';
+}
+
+
+/* ============ 场景库（教材插画风） ============ */
+var SCENES={};
+/* 铁架台：x=底座中心,y=底座顶线,h=立杆高 */
+function stand(x,y,h,opt){
+  opt=opt||{};
+  var s='<g transform="translate('+x+','+y+')">';
+  s+='<rect x="-34" y="0" width="68" height="9" rx="3" fill="#93a7bb" stroke="#475569" stroke-width="2"/>';
+  s+='<rect x="-3" y="-'+h+'" width="6" height="'+h+'" fill="#b9c7d6" stroke="#475569" stroke-width="1.6"/>';
+  if(opt.ring!==undefined){var ry=h-opt.ring;
+    s+='<line x1="0" y1="-'+ry+'" x2="-30" y2="-'+ry+'" stroke="#475569" stroke-width="2.5"/>';
+    s+='<circle cx="-38" cy="-'+ry+'" r="4.5" fill="none" stroke="#475569" stroke-width="2"/>';
+    s+='<line x1="-34" y1="-'+ry+'" x2="-45" y2="-'+ry+'" stroke="#475569" stroke-width="2.5"/>';
+  }
+  if(opt.clamp!==undefined){var cy=h-opt.clamp;
+    s+='<line x1="3" y1="-'+cy+'" x2="26" y2="-'+cy+'" stroke="#475569" stroke-width="2.5"/>';
+    s+='<path d="M26,-'+(cy-4)+' q8,0 8,8 q0,12 -8,12" fill="none" stroke="#475569" stroke-width="2.2"/>';
+  }
+  s+='</g>';
+  return s;
+}
+/* 三脚架 */
+function tripod(x,y,w){
+  return '<g transform="translate('+x+','+y+')">'+
+    '<ellipse cx="0" cy="0" rx="'+(w/2)+'" ry="6" fill="none" stroke="#475569" stroke-width="3"/>'+
+    '<line x1="'+(w/2)+'" y1="0" x2="'+(w/2)+'" y2="26" stroke="#475569" stroke-width="2.5"/>'+
+    '<line x1="-'+(w/2)+'" y1="0" x2="-'+(w/2)+'" y2="26" stroke="#475569" stroke-width="2.5"/>'+
+    '<line x1="0" y1="-6" x2="0" y2="26" stroke="#475569" stroke-width="2.5"/>'+
+  '</g>';
+}
+/* 蒸发皿：x=中心,y=顶面,r=半径 */
+function evapor(x,y,r,opt){
+  opt=opt||{};
+  var s='<g transform="translate('+x+','+y+')">';
+  s+='<ellipse cx="0" cy="0" rx="'+r+'" ry="'+(r*0.3)+'" fill="#fff" stroke="#475569" stroke-width="2.5"/>';
+  s+='<path d="M-'+r+',0 q0,'+(r*0.62)+' '+r+','+(r*0.62)+' q'+r+',0 '+r+',-'+(r*0.62)+'" fill="#fff" stroke="#475569" stroke-width="2.5"/>';
+  if(opt.liq){ s+='<path d="M-'+r+',0 q0,'+(r*0.62)+' '+r+','+(r*0.62)+' q'+r+',0 '+r+',-'+(r*0.62)+'" fill="url(#w)" opacity="0.5" transform="translate(0,3)"/>'; }
+  s+='</g>';
+  return s;
+}
+/* 投影 */
+function sh(x,y,r){
+  return '<ellipse cx="'+x+'" cy="'+y+'" rx="'+(r||22)+'" ry="4.5" fill="#94a3b8" opacity="0.22"/>';
+}
+/* 1 闻气味 */
+SCENES.smell_ok=scene(
+  sh(64,128)+sh(158,122,16)+bench(118)+bottle(60,118,{liq:26,label:true})+
+  person(158,58,{a1:[118,80],a2:[116,64]})+
+  '<path d="M116,68 q-22,9 -42,2" stroke="'+GREEN+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<path d="M110,72 q-20,4 -34,-2" stroke="'+GREEN+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="92" y="42" font-size="12" fill="'+GREEN+'" font-weight="700">扇闻</text>'
+);
+SCENES.smell_bad_near=scene(
+  sh(72,128)+sh(134,116,15)+bench(118)+bottle(72,118,{liq:26,label:true})+
+  person(136,52,{a1:[114,80],a2:[158,74],nose:[17,8]})+
+  '<path d="M136,60 q16,8 24,8" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="80" y="36" font-size="12" fill="'+RED+'" font-weight="700">鼻子凑到瓶口</text>'
+);
+/* 2 品尝药品 */
+SCENES.taste_bad=scene(
+  sh(56,128)+sh(154,118,16)+bench(118)+bottle(52,118,{liq:24,label:true})+
+  person(156,52,{a1:[120,74],a2:[156,86]})+
+  '<path d="M156,64 q0,10 -4,15" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<path d="M149,84 q9,2 15,-4" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="88" y="36" font-size="12" fill="'+RED+'" font-weight="700">品尝药品</text>'
+);
+/* 3 触摸药品 */
+SCENES.touch_bad=scene(
+  sh(56,128)+sh(154,116,16)+bench(118)+bottle(52,118,{liq:24,label:true})+
+  person(156,50,{a1:[122,70],a2:[156,88]})+
+  '<path d="M156,62 q-2,12 -8,19" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="82" y="34" font-size="12" fill="'+RED+'" font-weight="700">手直接接触药品</text>'
+);
+/* 废液直接倒入下水道 */
+SCENES.waste_bad_sewer=scene(
+  sh(118,124,60)+
+  /* 水槽/下水道口 */
+  '<rect x="60" y="92" width="116" height="36" rx="6" fill="#e2e8f0" stroke="#64748b" stroke-width="2.5"/>'+
+  '<ellipse cx="118" cy="110" rx="18" ry="6" fill="#94a3b8" stroke="#475569" stroke-width="2"/>'+
+  '<ellipse cx="118" cy="110" rx="8" ry="2.8" fill="#334155"/>'+
+  /* 倾斜烧杯倒废液 */
+  '<g transform="translate(76,58) rotate(32)">'+
+    '<path d="M0,0 h30 v22 q0,4 -15,4 q-15,0 -15,-4 z" fill="url(#gg)" stroke="#64748b" stroke-width="2.2"/>'+
+    '<rect x="3" y="4" width="2.2" height="14" rx="1.1" fill="#ffffff" opacity="0.8"/>'+
+    '<path d="M2,8 h26" stroke="#f97316" stroke-width="3" opacity="0.85"/>'+
+  '</g>'+
+  /* 液流入下水道 */
+  '<path d="M96,78 q12,18 20,28" stroke="#fb923c" stroke-width="4" fill="none" stroke-linecap="round"/>'+
+  '<text x="24" y="28" font-size="11" fill="'+RED+'" font-weight="700">废液直接倒入下水道</text>'
+);
+/* 4 块状固体取用 */
+SCENES.block_ok=scene(
+  sh(72,126)+sh(118,122,20)+bench(118)+tube(56,118,54,160,{w:17})+
+  tweez(110,84,150)+
+  '<rect x="148" y="84" width="24" height="15" rx="3" fill="#fca5a5" stroke="#b91c1c" stroke-width="2"/>'+
+  '<path d="M56,116 q14,-6 22,-6" stroke="#fca5a5" stroke-width="6" fill="none" opacity="0.5"/>'+
+  '<text x="48" y="32" font-size="12" fill="'+GREEN+'" font-weight="700">一横二放三慢竖</text>'
+);
+SCENES.block_bad_hand=scene(
+  sh(58,128)+sh(134,118,18)+bench(118)+bottle(56,118,{liq:24,label:true})+
+  '<rect x="104" y="86" width="24" height="15" rx="3" fill="#fca5a5" stroke="#b91c1c" stroke-width="2"/>'+
+  hand(136,80,-20,{fingers:true})+
+  '<text x="68" y="42" font-size="12" fill="'+RED+'" font-weight="700">手直接抓取</text>'
+);
+SCENES.block_bad_drop=scene(
+  sh(112,124,26)+bench(118)+tube(102,46,54,0,{w:17})+
+  '<rect x="112" y="30" width="22" height="15" rx="3" fill="#fca5a5" stroke="#b91c1c" stroke-width="2"/>'+
+  '<line x1="100" y1="28" x2="100" y2="42" stroke="'+RED+'" stroke-width="2.5" stroke-dasharray="3 3"/>'+
+  '<text x="52" y="26" font-size="12" fill="'+RED+'" font-weight="700">竖管直接投入</text>'+
+  '<text x="48" y="104" font-size="11" fill="'+RED+'">易砸破试管底</text>'
+);
+/* 5 粉末取用 */
+SCENES.powder_ok=scene(
+  sh(68,126)+sh(108,120,20)+bench(118)+tube(52,118,54,26,{w:17})+
+  spoon(118,102,-24)+
+  '<path d="M70,112 q26,-2 34,-8" stroke="#e7c8a0" stroke-width="5" fill="none" opacity="0.8"/>'+
+  '<text x="42" y="30" font-size="12" fill="'+GREEN+'" font-weight="700">一斜二送三直立</text>'
+);
+SCENES.powder_bad_upright=scene(
+  sh(100,120,26)+bench(118)+tube(96,60,54,0,{w:17})+
+  spoon(58,94,40)+
+  '<path d="M108,58 q12,6 10,18" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="40" y="32" font-size="12" fill="'+RED+'" font-weight="700">竖管直接倾倒</text>'+
+  '<text x="36" y="104" font-size="11" fill="'+RED+'">药品粘壁、撒出</text>'
+);
+SCENES.powder_bad_short=scene(
+  sh(68,126)+sh(100,120,20)+bench(118)+tube(50,118,54,18,{w:17})+
+  spoon(104,104,14)+
+  '<path d="M104,100 q22,-10 24,-24" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="34" y="38" font-size="12" fill="'+RED+'" font-weight="700">药匙未伸到底</text>'
+);
+/* 6 液体倾倒 */
+SCENES.pour_ok=scene(
+  sh(52,128)+sh(118,122,20)+bench(118)+
+  bottle(52,118,{liq:32,cap:false,label:true})+
+  '<g transform="translate(40,58) rotate(-20)"><rect x="0" y="0" width="26" height="13" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2.5"/></g>'+
+  tube(116,120,52,152,{w:17,liq:14})+
+  '<path d="M106,62 q12,-12 26,-12" stroke="'+GREEN+'" stroke-width="2.2" fill="none"/>'+
+  '<path d="M84,52 q6,-6 14,-6" stroke="#93c5fd" stroke-width="4" fill="none" opacity="0.8"/>'+
+  '<text x="62" y="36" font-size="11" fill="'+GREEN+'" font-weight="700">塞倒放·标签向手心</text>'
+);
+SCENES.pour_bad_cap=scene(
+  sh(52,128)+sh(118,122,20)+bench(118)+
+  bottle(52,118,{liq:32,label:true})+
+  '<rect x="38" y="58" width="26" height="13" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2.5"/>'+
+  tube(116,120,52,152,{w:17,liq:14})+
+  '<path d="M106,62 q12,-12 26,-12" stroke="'+GREEN+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="58" y="42" font-size="12" fill="'+RED+'" font-weight="700">瓶塞正放桌面</text>'
+);
+SCENES.pour_bad_label=scene(
+  sh(52,128)+sh(118,122,20)+bench(118)+
+  bottle(52,118,{liq:32,cap:false,label:true})+
+  '<g transform="translate(40,58) rotate(-20)"><rect x="0" y="0" width="26" height="13" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2.5"/></g>'+
+  tube(116,120,52,152,{w:17,liq:14})+
+  '<path d="M106,62 q12,-12 26,-12" stroke="'+GREEN+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="50" y="38" font-size="12" fill="'+RED+'" font-weight="700">标签朝外</text>'
+);
+SCENES.pour_bad_apart=scene(
+  sh(46,128)+sh(142,122,20)+bench(118)+
+  bottle(44,118,{liq:32,cap:false,label:true})+
+  '<g transform="translate(32,58) rotate(-20)"><rect x="0" y="0" width="26" height="13" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2.5"/></g>'+
+  tube(140,120,52,152,{w:17,liq:14})+
+  '<path d="M110,72 q16,-10 30,-8" stroke="'+RED+'" stroke-width="2.5" fill="none" stroke-dasharray="4 4"/>'+
+  '<text x="56" y="40" font-size="12" fill="'+RED+'" font-weight="700">瓶口未紧挨试管口</text>'
+);
+SCENES.pour_bad_vertical=scene(
+  sh(70,128)+sh(156,116,22)+bench(118)+bottle(66,118,{liq:26,label:true,cap:false})+
+  '<g transform="translate(150,44)">'+tube(0,0,56,0,{w:19,liq:16})+'</g>'+
+  '<path d="M150,40 q-44,0 -56,10" stroke="#93c5fd" stroke-width="5" fill="none" opacity="0.7" stroke-linecap="round"/>'+
+  '<path d="M150,44 q-28,-8 -42,-4" stroke="'+RED+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="24" font-size="11" fill="'+RED+'" font-weight="700">试管未倾斜（液体易沿外壁流下）</text>'
+);
+/* 7 液体量取 */
+SCENES.measure_ok=scene(
+  sh(116,126,30)+sh(60,116,15)+bench(118)+cyl(90,40,52,78,{liq:38})+
+  '<line x1="78" y1="64" x2="150" y2="64" stroke="'+GREEN+'" stroke-width="2" stroke-dasharray="5 4"/>'+
+  person(58,48,{a1:[86,64],a2:[38,68]})+
+  '<text x="42" y="28" font-size="12" fill="'+GREEN+'" font-weight="700">视线与凹液面最低处相平</text>'
+);
+SCENES.measure_bad_low=scene(
+  sh(116,126,30)+sh(52,114,15)+bench(118)+cyl(90,40,52,78,{liq:38})+
+  '<line x1="80" y1="72" x2="150" y2="58" stroke="'+RED+'" stroke-width="2" stroke-dasharray="5 4"/>'+
+  person(50,40,{a1:[88,60],a2:[32,60]})+
+  '<text x="30" y="28" font-size="12" fill="'+RED+'" font-weight="700">仰视读数（偏小）</text>'
+);
+SCENES.measure_bad_high=scene(
+  sh(116,126,30)+sh(158,114,15)+bench(118)+cyl(90,40,52,78,{liq:38})+
+  '<line x1="80" y1="56" x2="150" y2="72" stroke="'+RED+'" stroke-width="2" stroke-dasharray="5 4"/>'+
+  person(158,42,{a1:[130,58],a2:[182,56]})+
+  '<text x="34" y="28" font-size="12" fill="'+RED+'" font-weight="700">俯视读数（偏大）</text>'
+);
+SCENES.measure_bad_use=scene(
+  sh(128,124,28)+sh(92,120,18)+bench(118)+cyl(124,44,46,74,{liq:34})+
+  '<rect x="138" y="70" width="15" height="12" rx="2" fill="#fca5a5" stroke="#b91c1c" stroke-width="2"/>'+
+  rod(158,84,80,44)+
+  '<text x="10" y="24" font-size="11" fill="'+RED+'" font-weight="700">量筒中溶解固体（不可作反应容器）</text>'
+);
+/* 8 滴加液体 */
+SCENES.drip_ok=scene(
+  sh(112,126,20)+bench(118)+tube(98,120,54,0,{w:17,liq:12})+
+  dropper(106,64,0)+
+  '<line x1="106" y1="46" x2="106" y2="24" stroke="'+GREEN+'" stroke-width="2" stroke-dasharray="3 3"/>'+
+  '<text x="36" y="30" font-size="12" fill="'+GREEN+'" font-weight="700">垂直悬空滴加</text>'
+);
+SCENES.drip_bad_in=scene(
+  sh(112,126,20)+bench(118)+tube(98,120,54,0,{w:17,liq:12})+
+  dropper(106,56,0)+
+  '<line x1="106" y1="44" x2="106" y2="40" stroke="'+RED+'" stroke-width="2"/>'+
+  '<text x="34" y="30" font-size="12" fill="'+RED+'" font-weight="700">滴管伸入试管内</text>'
+);
+SCENES.drip_bad_tilt=scene(
+  sh(112,126,20)+bench(118)+tube(98,120,54,0,{w:17,liq:12})+
+  dropper(106,64,88)+
+  '<text x="30" y="30" font-size="12" fill="'+RED+'" font-weight="700">滴管横拿/倒置</text>'
+);
+/* 9 胶头滴管用后 */
+SCENES.dropper_bad_reuse=scene(
+  sh(56,128)+sh(104,116,18)+bench(118)+bottle(52,118,{liq:26,label:true})+
+  dropper(96,58,0)+
+  '<path d="M120,58 q24,0 28,16" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="32" y="34" font-size="12" fill="'+RED+'" font-weight="700">不洗换试剂反复用</text>'
+);
+/* 10 点燃酒精灯 */
+SCENES.light_ok=scene(
+  sh(96,124,40)+sh(150,118,14)+bench(118)+lamp(66,76,{lit:false,liq:true})+
+  match(152,72,70)+
+  '<text x="52" y="32" font-size="12" fill="'+GREEN+'" font-weight="700">用火柴点燃</text>'
+);
+SCENES.light_bad_cross=scene(
+  sh(60,124,30)+sh(136,124,30)+bench(118)+lamp(48,76,{lit:true,liq:true})+lamp(132,76,{lit:false,liq:true})+
+  '<path d="M154,38 q24,12 32,34" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="22" y="26" font-size="12" fill="'+RED+'" font-weight="700">燃灯对点</text>'
+);
+/* 11 添加酒精 */
+SCENES.add_bad_lit=scene(
+  sh(72,122,34)+bench(118)+lamp(62,76,{lit:true,liq:true})+
+  funnel(144,48)+
+  '<rect x="136" y="40" width="30" height="17" rx="3" fill="#fde68a" stroke="#b45309" stroke-width="2"/>'+
+  '<text x="30" y="24" font-size="12" fill="'+RED+'" font-weight="700">向燃着的灯添加酒精</text>'
+);
+/* 12 熄灭酒精灯 */
+SCENES.putout_bad_blow=scene(
+  sh(72,122,34)+sh(150,116,14)+bench(118)+lamp(62,76,{lit:true,liq:true})+
+  person(158,48,{a1:[128,62],a2:[152,68],nose:[-14,8]})+
+  '<path d="M142,64 q-12,4 -22,2" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="24" y="22" font-size="12" fill="'+RED+'" font-weight="700">用嘴吹灭</text>'
+);
+/* 13 给液体加热 */
+SCENES.heat_ok=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34) rotate(-36)">'+tube(0,0,58,0,{w:16,liq:17})+clamp(32,4,0)+'</g>'+
+  '<text x="14" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">外焰·液≤1/3·口不朝人</text>'
+);
+SCENES.heat_bad_person=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34) rotate(36)">'+tube(0,0,58,0,{w:16,liq:17})+clamp(32,4,0)+'</g>'+
+  person(176,20,{a1:[156,36],a2:[194,30]})+
+  '<text x="22" y="24" font-size="12" fill="'+RED+'" font-weight="700">试管口对着人</text>'
+);
+SCENES.heat_bad_full=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34) rotate(-36)">'+tube(0,0,58,0,{w:16,liq:44})+clamp(32,4,0)+'</g>'+
+  '<text x="22" y="24" font-size="12" fill="'+RED+'" font-weight="700">液体超过1/3</text>'
+);
+SCENES.heat_bad_nopre=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34) rotate(-36)">'+tube(0,0,58,0,{w:16,liq:17})+clamp(32,4,0)+'</g>'+
+  '<path d="M106,60 q-8,-16 -22,-22" stroke="'+RED+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="18" y="24" font-size="12" fill="'+RED+'" font-weight="700">不预热直接加热</text>'
+);
+/* 14 外焰/焰心 */
+SCENES.flame_bad_inner=scene(
+  sh(58,124,30)+sh(126,122,20)+bench(118)+lamp(48,84,{lit:true,liq:true})+
+  '<g transform="translate(116,36) rotate(-28)">'+tube(0,0,54,0,{w:15,liq:15})+clamp(28,4,0)+'</g>'+
+  '<text x="16" y="22" font-size="12" fill="'+RED+'" font-weight="700">内焰加热（温度低）</text>'
+);
+/* 15 连接仪器 */
+SCENES.connect_ok=scene(
+  sh(126,114,26)+sh(66,114,22)+bench(118)+
+  '<g transform="translate(126,48) rotate(12)"><rect x="0" y="-3" width="54" height="7" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="2"/></g>'+
+  '<g transform="translate(58,58) rotate(-20)">'+tube(0,0,46,0,{w:14})+rod(30,6,-80,26)+'</g>'+
+  '<text x="28" y="26" font-size="12" fill="'+GREEN+'" font-weight="700">导管沾水·旋转插入</text>'
+);
+SCENES.connect_bad_dry=scene(
+  sh(126,114,26)+sh(66,114,22)+bench(118)+
+  '<g transform="translate(126,48) rotate(12)"><rect x="0" y="-3" width="54" height="7" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="2"/></g>'+
+  '<g transform="translate(58,58) rotate(-20)">'+tube(0,0,46,0,{w:14})+rod(30,6,-80,26)+'</g>'+
+  '<line x1="126" y1="36" x2="126" y2="48" stroke="'+RED+'" stroke-width="2.5" stroke-dasharray="3 3"/>'+
+  '<text x="20" y="24" font-size="12" fill="'+RED+'" font-weight="700">不润湿硬插（易折断）</text>'
+);
+SCENES.connect_bad_hold=scene(
+  sh(126,114,26)+sh(66,114,22)+bench(118)+
+  '<g transform="translate(126,48) rotate(12)"><rect x="0" y="-3" width="54" height="7" rx="3" fill="#cbd5e1" stroke="#475569" stroke-width="2"/></g>'+
+  '<g transform="translate(58,58) rotate(-20)">'+tube(0,0,46,0,{w:14})+rod(30,6,-80,26)+'</g>'+
+  '<path d="M50,72 q-10,6 -8,18" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="18" y="26" font-size="12" fill="'+RED+'" font-weight="700">手握导管弯曲处发力</text>'
+);
+/* 16 气密性检查 */
+SCENES.leak_ok=scene(
+  sh(60,124,38)+sh(136,114,24)+bench(118)+trough(20,84,80,34)+
+  '<g transform="translate(136,54) rotate(18)">'+tube(0,0,52,0,{w:16})+'</g>'+
+  '<path d="M154,40 q28,-6 32,-32" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  hand(176,18,-30,{fingers:true})+
+  bubble(118,98)+bubble(110,103)+
+  '<text x="16" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">导管入水·手捂试管看气泡</text>'
+);
+SCENES.leak_bad_order=scene(
+  sh(60,124,38)+sh(136,114,24)+bench(118)+trough(20,84,80,34)+
+  '<g transform="translate(136,54) rotate(18)">'+tube(0,0,52,0,{w:16})+'</g>'+
+  '<path d="M154,40 q28,-6 32,-32" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  '<line x1="132" y1="32" x2="132" y2="18" stroke="'+RED+'" stroke-width="2.5" stroke-dasharray="3 3"/>'+
+  '<text x="14" y="24" font-size="11" fill="'+RED+'" font-weight="700">先捂试管后插水（误判）</text>'
+);
+SCENES.leak_bad_plug=scene(
+  sh(60,124,38)+sh(136,114,24)+bench(118)+trough(20,84,80,34)+
+  '<g transform="translate(136,54) rotate(18)">'+tube(0,0,52,0,{w:16})+'</g>'+
+  '<path d="M154,40 q28,-6 32,-32" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  '<path d="M182,14 q12,-4 14,-16" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="14" y="24" font-size="11" fill="'+RED+'" font-weight="700">用手堵管口检查（无效）</text>'
+);
+/* 17 洗涤仪器 */
+SCENES.wash_ok=scene(
+  sh(126,118,24)+sh(154,114,12)+bench(118)+
+  '<g transform="translate(118,50) rotate(-12)">'+tube(0,0,60,0,{w:17})+'</g>'+
+  brush(152,58,-14)+
+  '<path d="M96,104 q20,4 40,0" stroke="#7dd3fc" stroke-width="3" fill="none" opacity="0.7"/>'+
+  '<text x="24" y="26" font-size="12" fill="'+GREEN+'" font-weight="700">试管刷转动刷洗</text>'+
+  '<text x="14" y="106" font-size="10" fill="'+GREEN+'">洗净：水不成滴、不成股流下</text>'
+);
+SCENES.wash_bad_poke=scene(
+  sh(126,118,24)+sh(154,114,12)+bench(118)+
+  '<g transform="translate(118,50) rotate(-12)">'+tube(0,0,60,0,{w:17})+'</g>'+
+  brush(152,58,22)+
+  '<line x1="146" y1="50" x2="130" y2="38" stroke="'+RED+'" stroke-width="2.5"/>'+
+  '<text x="24" y="26" font-size="12" fill="'+RED+'" font-weight="700">用力捅刷（易破管底）</text>'
+);
+SCENES.wash_bad_skip=scene(
+  sh(106,118,24)+bench(118)+
+  '<g transform="translate(98,50) rotate(-12)">'+tube(0,0,60,0,{w:17,liq:28})+'</g>'+
+  '<text x="22" y="30" font-size="12" fill="'+RED+'" font-weight="700">用后不洗直接再用</text>'
+);
+/* 18 收集气体 */
+SCENES.collect_ok=scene(
+  sh(60,124,40)+sh(140,116,26)+bench(118)+trough(16,80,88,40)+
+  '<g transform="translate(142,54) rotate(14)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M152,44 q36,-4 40,-30" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(116,34,46,46,{water:32})+
+  '<text x="12" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">排水法·瓶内装满水倒扣</text>'
+);
+SCENES.collect_bad_air=scene(
+  sh(60,124,40)+sh(140,116,26)+bench(118)+trough(16,80,88,40)+
+  '<g transform="translate(142,54) rotate(14)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M152,44 q36,-4 40,-30" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(116,34,46,46,{water:14})+
+  '<circle cx="138" cy="58" r="7" fill="#fff" stroke="'+RED+'" stroke-width="2.5"/>'+
+  '<text x="12" y="24" font-size="11" fill="'+RED+'" font-weight="700">瓶内留有气泡（不纯）</text>'
+);
+SCENES.collect_bad_short=scene(
+  sh(140,116,26)+sh(84,114,22)+bench(118)+jar(136,34,46,46,{lid:true})+
+  '<g transform="translate(76,54) rotate(-10)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M82,44 q22,-4 26,-26" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  '<text x="10" y="24" font-size="11" fill="'+RED+'" font-weight="700">导管未伸到瓶底（不纯）</text>'
+);
+/* 19 制取氧气 */
+SCENES.o2_ok=scene(
+  sh(70,124,36)+sh(172,118,30)+bench(118)+
+  stand(52,60,58,{clamp:42})+
+  '<g transform="translate(74,52) rotate(-14)">'+tube(0,0,54,0,{w:17})+'<rect x="2" y="-7" width="13" height="9" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/><path d="M4,-2 q4,-5 9,-1" stroke="#e2e8f0" stroke-width="3" fill="none" opacity="0.8"/></g>'+
+  '<path d="M84,40 q34,-8 38,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  trough(156,72,56,42)+jar(164,26,42,46,{water:34})+
+  '<text x="10" y="22" font-size="11" fill="'+GREEN+'" font-weight="700">管口略向下·棉花·气泡均匀再收集</text>'
+);
+SCENES.o2_bad_up=scene(
+  sh(70,124,36)+sh(172,118,30)+bench(118)+
+  stand(52,60,58,{clamp:42})+
+  '<g transform="translate(74,36) rotate(12)">'+tube(0,0,54,0,{w:17})+'</g>'+
+  '<path d="M84,34 q34,4 38,-20" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  trough(156,72,56,42)+jar(164,26,42,46,{water:34})+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">试管口向上（冷凝水倒流炸裂）</text>'
+);
+SCENES.o2_bad_early=scene(
+  sh(70,124,36)+sh(172,118,30)+bench(118)+
+  stand(52,60,58,{clamp:42})+
+  '<g transform="translate(74,52) rotate(-14)">'+tube(0,0,54,0,{w:17})+'<rect x="2" y="-7" width="13" height="9" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/></g>'+
+  '<path d="M84,40 q34,-8 38,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  trough(156,72,56,42)+jar(164,26,42,46,{water:34})+
+  '<circle cx="126" cy="52" r="6" fill="#fff" stroke="'+RED+'" stroke-width="2.5"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">气泡初现立即收集（混空气）</text>'
+);
+SCENES.o2_bad_nocotton=scene(
+  sh(70,124,36)+sh(172,118,30)+bench(118)+
+  stand(52,60,58,{clamp:42})+
+  '<g transform="translate(74,52) rotate(-14)">'+tube(0,0,54,0,{w:17})+'</g>'+
+  '<path d="M84,40 q34,-8 38,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  trough(156,72,56,42)+jar(164,26,42,46,{water:34})+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">管口未放棉花（粉末入导管）</text>'
+);
+/* 20 水的电解 */
+SCENES.ele_ok=scene(
+  sh(110,124,44)+bench(118)+
+  '<g transform="translate(110,50)">'+
+    '<rect x="-30" y="0" width="60" height="52" rx="5" fill="#e0f2fe" stroke="#475569" stroke-width="2.5"/>'+
+    '<path d="M-8,4 q-10,22 8,46 M8,4 q10,22 -8,46" fill="none" stroke="#94a3b8" stroke-width="1.6"/>'+
+    '<rect x="-22" y="2" width="14" height="46" rx="3" fill="none" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="8" y="2" width="14" height="46" rx="3" fill="none" stroke="#475569" stroke-width="2.2"/>'+
+    '<text x="-17" y="24" font-size="10" fill="#1d4ed8" font-weight="700">H₂</text>'+
+    '<text x="13" y="24" font-size="10" fill="#dc2626" font-weight="700">O₂</text>'+
+    '<line x1="-15" y1="16" x2="-15" y2="44" stroke="#475569" stroke-width="2"/>'+
+    '<line x1="15" y1="16" x2="15" y2="44" stroke="#475569" stroke-width="2"/>'+
+  '</g>'+
+  cell(110,30)+
+  '<text x="14" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">直流电·正极O₂负极H₂</text>'
+);
+SCENES.ele_bad_ac=scene(
+  sh(110,124,44)+bench(118)+
+  '<g transform="translate(110,50)">'+
+    '<rect x="-30" y="0" width="60" height="52" rx="5" fill="#e0f2fe" stroke="#475569" stroke-width="2.5"/>'+
+    '<rect x="-22" y="2" width="14" height="46" rx="3" fill="none" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="8" y="2" width="14" height="46" rx="3" fill="none" stroke="#475569" stroke-width="2.2"/>'+
+    '<line x1="-15" y1="16" x2="-15" y2="44" stroke="#475569" stroke-width="2"/>'+
+    '<line x1="15" y1="16" x2="15" y2="44" stroke="#475569" stroke-width="2"/>'+
+  '</g>'+
+  '<path d="M86,36 q8,-8 16,0 q8,8 16,0" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="12" y="24" font-size="11" fill="'+RED+'" font-weight="700">用交流电电解（危险）</text>'
+);
+SCENES.ele_bad_reverse=scene(
+  sh(110,124,44)+bench(118)+
+  '<g transform="translate(110,50)">'+
+    '<rect x="-30" y="0" width="60" height="52" rx="5" fill="#e0f2fe" stroke="#475569" stroke-width="2.5"/>'+
+    '<rect x="-22" y="2" width="14" height="46" rx="3" fill="none" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="8" y="2" width="14" height="46" rx="3" fill="none" stroke="#475569" stroke-width="2.2"/>'+
+    '<text x="-17" y="24" font-size="10" fill="#dc2626">O₂?</text>'+
+    '<text x="13" y="24" font-size="10" fill="#1d4ed8">H₂?</text>'+
+    '<line x1="-15" y1="16" x2="-15" y2="44" stroke="#475569" stroke-width="2"/>'+
+    '<line x1="15" y1="16" x2="15" y2="44" stroke="#475569" stroke-width="2"/>'+
+  '</g>'+
+  cell(110,30)+
+  '<text x="12" y="24" font-size="11" fill="'+RED+'" font-weight="700">正负极接反（结论错误）</text>'
+);
+/* 21 质量守恒 */
+SCENES.mass_ok=scene(
+  sh(110,122,46)+bench(118)+
+  '<g transform="translate(110,62)">'+
+    '<rect x="-36" y="-16" width="72" height="15" rx="3" fill="#eef2f6" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-16" y="-1" width="32" height="38" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-10" y="6" width="20" height="22" rx="2" fill="url(#w)" opacity="0.75"/>'+
+    '<rect x="16" y="-4" width="11" height="9" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.8"/>'+
+  '</g>'+
+  '<path d="M92,20 q-22,-4 -26,-20" stroke="'+GREEN+'" stroke-width="2" stroke-dasharray="3 3"/>'+
+  '<text x="14" y="22" font-size="11" fill="'+GREEN+'" font-weight="700">密闭容器·前后称量相等</text>'
+);
+SCENES.mass_bad_open=scene(
+  sh(110,122,40)+bench(118)+
+  '<g transform="translate(110,62)">'+
+    '<rect x="-16" y="-1" width="32" height="38" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-10" y="6" width="20" height="22" rx="2" fill="url(#w)" opacity="0.75"/>'+
+    '<rect x="-9" y="-9" width="18" height="8" rx="1.5" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>'+
+  '</g>'+
+  '<path d="M110,48 q12,-8 18,-4" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="12" y="22" font-size="11" fill="'+RED+'" font-weight="700">敞口反应·气体逸出（质量变小）</text>'
+);
+SCENES.mass_bad_unseal=scene(
+  sh(110,122,46)+bench(118)+
+  '<g transform="translate(110,62)">'+
+    '<rect x="-36" y="-16" width="72" height="15" rx="3" fill="#eef2f6" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-16" y="-1" width="32" height="38" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-10" y="6" width="20" height="22" rx="2" fill="url(#w)" opacity="0.75"/>'+
+  '</g>'+
+  '<line x1="68" y1="58" x2="152" y2="58" stroke="'+RED+'" stroke-width="2.2" stroke-dasharray="4 4"/>'+
+  '<text x="12" y="22" font-size="11" fill="'+RED+'" font-weight="700">反应后再密封称量（结论错误）</text>'
+);
+/* 22 燃烧条件 */
+SCENES.burn_ok=scene(
+  sh(78,120,48)+bench(118)+
+  '<rect x="36" y="50" width="128" height="8" rx="2" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>'+
+  '<circle cx="62" cy="46" r="7" fill="#fde68a" stroke="#b45309" stroke-width="2"/>'+
+  '<path d="M62,40 c-4,-6 0,-12 5,-14 c4,4 5,9 1,14 z" fill="#fb923c"/>'+
+  '<rect x="116" y="46" width="14" height="9" rx="2" fill="#fecaca" stroke="#b45309" stroke-width="2"/>'+
+  '<circle cx="90" cy="60" r="8" fill="#e0f2fe" stroke="#475569" stroke-width="2"/>'+
+  '<path d="M90,52 c-3,-5 0,-9 4,-10" stroke="#94a3b8" stroke-width="2"/>'+
+  '<rect x="36" y="46" width="128" height="16" rx="2" fill="url(#w)" opacity="0.35"/>'+
+  '<text x="10" y="26" font-size="11" fill="'+GREEN+'" font-weight="700">白磷燃·红磷不燃·水中白磷不燃</text>'
+);
+SCENES.burn_bad_all=scene(
+  sh(78,120,48)+bench(118)+
+  '<rect x="36" y="50" width="128" height="8" rx="2" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>'+
+  '<circle cx="62" cy="46" r="7" fill="#fde68a" stroke="#b45309" stroke-width="2"/>'+
+  '<path d="M62,40 c-4,-6 0,-12 5,-14 c4,4 5,9 1,14 z" fill="#fb923c"/>'+
+  '<rect x="116" y="42" width="14" height="12" rx="2" fill="#fecaca" stroke="'+RED+'" stroke-width="2"/>'+
+  '<path d="M123,42 c-3,-6 0,-10 4,-12 c4,4 4,8 0,12 z" fill="#fb923c"/>'+
+  '<rect x="36" y="46" width="128" height="16" rx="2" fill="url(#w)" opacity="0.35"/>'+
+  '<text x="10" y="26" font-size="11" fill="'+RED+'" font-weight="700">红磷也被引燃（无法对比温度）</text>'
+);
+SCENES.burn_bad_water=scene(
+  sh(78,120,48)+bench(118)+
+  '<rect x="36" y="50" width="128" height="8" rx="2" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>'+
+  '<circle cx="62" cy="46" r="7" fill="#fde68a" stroke="#b45309" stroke-width="2"/>'+
+  '<path d="M62,40 c-4,-6 0,-12 5,-14 c4,4 5,9 1,14 z" fill="#fb923c"/>'+
+  '<rect x="116" y="46" width="14" height="9" rx="2" fill="#fecaca" stroke="#b45309" stroke-width="2"/>'+
+  '<circle cx="94" cy="70" r="8" fill="#fbbf24" stroke="'+RED+'" stroke-width="2"/>'+
+  '<path d="M94,63 c-3,-5 0,-9 4,-10" stroke="#94a3b8" stroke-width="2"/>'+
+  '<path d="M90,62 c-3,-6 0,-10 4,-12" stroke="#fb923c" fill="#fb923c"/>'+
+  '<text x="10" y="26" font-size="11" fill="'+RED+'" font-weight="700">水中白磷取出水面燃（无法证明需O₂）</text>'
+);
+/* 23 配制溶液 */
+SCENES.sol_ok=scene(
+  sh(68,116,32)+sh(160,116,28)+bench(118)+
+  '<g transform="translate(66,50)">'+
+    '<rect x="-28" y="-12" width="56" height="13" rx="3" fill="#eef2f6" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-13" y="1" width="26" height="34" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-9" y="10" width="18" height="16" rx="2" fill="url(#w)" opacity="0.8"/>'+
+    '<rect x="11" y="-3" width="11" height="9" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.8"/>'+
+  '</g>'+
+  cyl(160,44,40,70,{liq:34})+
+  '<text x="12" y="22" font-size="11" fill="'+GREEN+'" font-weight="700">计算→称量→量取→溶解→装瓶</text>'
+);
+SCENES.sol_bad_balance=scene(
+  sh(68,116,32)+bench(118)+
+  '<g transform="translate(66,50)">'+
+    '<rect x="-28" y="-12" width="56" height="13" rx="3" fill="#eef2f6" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-13" y="1" width="26" height="34" rx="3" fill="#fca5a5" stroke="#475569" stroke-width="2.2"/>'+
+    '<text x="-7" y="20" font-size="9" fill="#7f1d1d">药</text>'+
+    '<rect x="11" y="1" width="26" height="34" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<text x="20" y="20" font-size="9" fill="#475569">码</text>'+
+  '</g>'+
+  '<text x="12" y="22" font-size="11" fill="'+RED+'" font-weight="700">砝码药品放反（称量不准）</text>'
+);
+SCENES.sol_bad_view=scene(
+  sh(110,116,30)+bench(118)+cyl(90,44,46,72,{liq:38})+
+  '<line x1="78" y1="60" x2="148" y2="46" stroke="'+RED+'" stroke-width="2" stroke-dasharray="5 4"/>'+
+  '<text x="12" y="22" font-size="11" fill="'+RED+'" font-weight="700">俯视量取水（浓度偏大）</text>'
+);
+SCENES.sol_bad_cylinder=scene(
+  sh(74,116,28)+sh(132,116,26)+bench(118)+cyl(64,40,48,76,{liq:42})+
+  '<rect x="82" y="70" width="11" height="11" rx="2" fill="#fca5a5" stroke="#b91c1c" stroke-width="2"/>'+
+  rod(94,72,-40,26)+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">在量筒中溶解（量筒不可作反应容器）</text>'
+);
+/* 24 稀释浓硫酸 */
+SCENES.dilute_ok=scene(
+  sh(98,122,42)+sh(64,118,18)+bench(118)+beaker(84,64,76,56,{liq:32})+
+  rod(146,92,78,42)+
+  '<path d="M66,52 q-16,-2 -20,-20" stroke="'+GREEN+'" stroke-width="2.2" fill="none"/>'+
+  '<rect x="34" y="24" width="28" height="13" rx="2" fill="#fecaca" stroke="#b91c1c" stroke-width="2"/>'+
+  '<text x="12" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">酸入水·沿壁慢倒·不断搅拌</text>'
+);
+SCENES.dilute_bad_water=scene(
+  sh(98,122,42)+sh(70,118,18)+bench(118)+beaker(84,64,76,56,{liq:32})+
+  '<path d="M104,50 q-8,-4 -14,-16" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<rect x="80" y="24" width="32" height="13" rx="2" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="2"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">水入酸（酸液飞溅伤人）</text>'
+);
+SCENES.dilute_bad_nostir=scene(
+  sh(98,122,42)+sh(64,118,18)+bench(118)+beaker(84,64,76,56,{liq:32})+
+  '<path d="M66,52 q-16,-2 -20,-20" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<rect x="34" y="24" width="28" height="13" rx="2" fill="#fecaca" stroke="#b91c1c" stroke-width="2"/>'+
+  '<line x1="66" y1="88" x2="152" y2="88" stroke="'+RED+'" stroke-width="2.2" stroke-dasharray="4 4"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">倒入后不搅拌（局部过热飞溅）</text>'
+);
+/* 25 测pH */
+SCENES.ph_ok=scene(
+  sh(58,122,30)+sh(120,116,26)+bench(118)+beaker(52,70,58,50,{liq:24})+
+  rod(112,82,72,40)+
+  '<rect x="146" y="60" width="38" height="28" rx="2" fill="#fef9c3" stroke="#a16207" stroke-width="1.8"/>'+
+  '<rect x="148" y="62" width="34" height="7" fill="#fde68a"/>'+
+  '<text x="148" y="82" font-size="8" fill="#a16207">pH试纸</text>'+
+  '<text x="10" y="22" font-size="11" fill="'+GREEN+'" font-weight="700">玻璃棒蘸液滴在试纸上·比色</text>'
+);
+SCENES.ph_bad_dip=scene(
+  sh(58,122,30)+sh(132,116,26)+bench(118)+beaker(52,70,58,50,{liq:24})+
+  '<rect x="136" y="62" width="38" height="28" rx="2" fill="#fef9c3" stroke="#a16207" stroke-width="1.8"/>'+
+  '<path d="M155,62 q0,-14 -8,-18" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">试纸直接浸入溶液（污染试剂）</text>'
+);
+SCENES.ph_bad_wet=scene(
+  sh(58,122,30)+sh(132,116,26)+bench(118)+beaker(52,70,58,50,{liq:24})+
+  '<rect x="136" y="60" width="44" height="28" rx="2" fill="#fef9c3" stroke="#a16207" stroke-width="1.8"/>'+
+  '<path d="M148,56 q0,-10 -6,-14" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">试纸先润湿再测（稀释待测液）</text>'
+);
+SCENES.ph_bad_bottle=scene(
+  sh(68,128)+sh(138,116,26)+bench(118)+bottle(66,118,{liq:26,label:true})+
+  '<rect x="134" y="62" width="38" height="28" rx="2" fill="#fef9c3" stroke="#a16207" stroke-width="1.8"/>'+
+  '<path d="M146,66 q-20,6 -34,0" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">试纸伸入瓶中蘸取（污染整瓶）</text>'
+);
+/* 测pH：直接测浓硫酸等强腐蚀性液体 */
+SCENES.ph_bad_corrosive=scene(
+  sh(58,122,30)+sh(132,116,26)+bench(118)+beaker(52,70,58,50,{liq:24})+
+  '<rect x="136" y="62" width="38" height="28" rx="2" fill="#fef9c3" stroke="#a16207" stroke-width="1.8"/>'+
+  '<path d="M155,90 v-18" stroke="'+RED+'" stroke-width="2.5" fill="none"/>'+
+  '<circle cx="155" cy="56" r="7" fill="none" stroke="'+RED+'" stroke-width="2.2"/>'+
+  '<path d="M151,52 l8,8 M159,52 l-8,8" stroke="'+RED+'" stroke-width="2"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">直接测浓硫酸（强腐蚀·勿用pH试纸）</text>'
+);
+/* 26 过滤 */
+SCENES.filter_ok=scene(
+  sh(128,116,30)+sh(84,122,28)+bench(118)+
+  stand(132,58,60,{ring:50})+
+  beaker(88,86,64,34,{liq:16})+
+  '<g transform="translate(128,44)">'+
+    '<path d="M-18,-20 h36 l-11,24 h-14 z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-4" y="4" width="8" height="20" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<path d="M-12,6 l6,14 M12,6 l-6,14 M-12,6 q3,4 6,0 M12,6 q-3,4 -6,0" fill="none" stroke="#cbd5e1" stroke-width="1.4"/>'+
+  '</g>'+
+  rod(74,94,-36,56)+
+  '<text x="10" y="22" font-size="11" fill="'+GREEN+'" font-weight="700">一贴二低三靠</text>'+
+  '<text x="10" y="106" font-size="9.5" fill="'+GREEN+'">滤纸贴漏斗·液面低于滤纸·玻棒靠滤纸</text>'
+);
+SCENES.filter_bad_tear=scene(
+  sh(128,116,30)+sh(84,122,28)+bench(118)+
+  stand(132,58,60,{ring:50})+
+  beaker(88,86,64,34,{liq:16})+
+  '<g transform="translate(128,44)">'+
+    '<path d="M-18,-20 h36 l-11,24 h-14 z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-4" y="4" width="8" height="20" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<path d="M-12,6 l6,14 M12,6 l-6,14" fill="none" stroke="#cbd5e1" stroke-width="1.4"/>'+
+    '<path d="M0,-4 l5,10 l-10,5 z" fill="#fff" stroke="'+RED+'" stroke-width="1.8"/>'+
+  '</g>'+
+  rod(112,86,80,50)+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">玻棒靠单层滤纸（戳破）</text>'
+);
+SCENES.filter_bad_high=scene(
+  sh(128,116,30)+sh(84,122,28)+bench(118)+
+  stand(132,58,60,{ring:50})+
+  beaker(88,86,64,34,{liq:22})+
+  '<g transform="translate(128,44)">'+
+    '<path d="M-18,-20 h36 l-11,24 h-14 z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-4" y="4" width="8" height="20" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<path d="M-12,6 l6,14 M12,6 l-6,14 M-12,6 q3,4 6,0 M12,6 q-3,4 -6,0" fill="none" stroke="#cbd5e1" stroke-width="1.4"/>'+
+  '</g>'+
+  '<path d="M110,58 q20,8 40,0" stroke="'+RED+'" stroke-width="2.2" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">液面高于滤纸边缘（滤液浑浊）</text>'
+);
+/* 27 蒸发 */
+SCENES.evap_ok=scene(
+  sh(62,122,34)+sh(142,120,30)+bench(118)+lamp(52,82,{lit:true,liq:true})+
+  tripod(140,72,88)+
+  evapor(140,66,44,{liq:true})+
+  rod(158,92,-56,42)+
+  '<text x="10" y="22" font-size="11" fill="'+GREEN+'" font-weight="700">蒸发皿·玻璃棒搅拌·较多固体即停</text>'
+);
+SCENES.evap_bad_nostir=scene(
+  sh(62,122,34)+sh(142,120,30)+bench(118)+lamp(52,82,{lit:true,liq:true})+
+  tripod(140,72,88)+
+  evapor(140,66,44,{liq:true})+
+  '<circle cx="140" cy="58" r="5" fill="#fff" stroke="'+RED+'" stroke-width="2"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">不搅拌（局部过热·液滴飞溅）</text>'
+);
+SCENES.evap_bad_dry=scene(
+  sh(62,122,34)+sh(142,120,30)+bench(118)+lamp(52,82,{lit:true,liq:true})+
+  tripod(140,72,88)+
+  evapor(140,66,44)+
+  '<path d="M140,58 c-4,-6 0,-10 4,-12" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">蒸干才停（固体飞溅）</text>'
+);
+/* 28 托盘天平 */
+SCENES.balance_ok=scene(
+  sh(110,120,60)+bench(118)+
+  '<g transform="translate(110,46)">'+
+    '<rect x="-58" y="36" width="116" height="7" rx="3" fill="#93a7bb" stroke="#475569" stroke-width="1.8"/>'+
+    '<rect x="-4" y="20" width="8" height="16" fill="#b9c7d6" stroke="#475569" stroke-width="1.4"/>'+
+    '<path d="M-54,18 L-4,23 L54,18" stroke="#475569" stroke-width="4" fill="none"/>'+
+    '<line x1="-54" y1="18" x2="-54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<line x1="54" y1="18" x2="54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<rect x="-68" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="38" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-63" y="0" width="20" height="10" rx="2" fill="#fca5a5" stroke="#b91c1c" stroke-width="1.5"/>'+
+    '<rect x="43" y="0" width="11" height="8" rx="1.5" fill="#fcd34d" stroke="#b45309" stroke-width="1.5"/>'+
+    '<circle cx="0" cy="28" r="6" fill="none" stroke="#475569" stroke-width="2"/>'+
+  '</g>'+
+  '<text x="10" y="22" font-size="11" fill="'+GREEN+'" font-weight="700">左物右码·药品垫纸/放烧杯</text>'
+);
+SCENES.balance_bad_direct=scene(
+  sh(110,120,60)+bench(118)+
+  '<g transform="translate(110,46)">'+
+    '<rect x="-58" y="36" width="116" height="7" rx="3" fill="#93a7bb" stroke="#475569" stroke-width="1.8"/>'+
+    '<rect x="-4" y="20" width="8" height="16" fill="#b9c7d6" stroke="#475569" stroke-width="1.4"/>'+
+    '<path d="M-54,18 L-4,23 L54,18" stroke="#475569" stroke-width="4" fill="none"/>'+
+    '<line x1="-54" y1="18" x2="-54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<line x1="54" y1="18" x2="54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<rect x="-68" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="38" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-63" y="0" width="20" height="10" rx="2" fill="#fca5a5" stroke="#b91c1c" stroke-width="1.5"/>'+
+    '<rect x="43" y="0" width="11" height="8" rx="1.5" fill="#fcd34d" stroke="#b45309" stroke-width="1.5"/>'+
+    '<path d="M-58,6 q-8,-4 -4,-12" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '</g>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">药品直接放托盘（腐蚀托盘）</text>'
+);
+SCENES.balance_bad_reverse=scene(
+  sh(110,120,60)+bench(118)+
+  '<g transform="translate(110,46)">'+
+    '<rect x="-58" y="36" width="116" height="7" rx="3" fill="#93a7bb" stroke="#475569" stroke-width="1.8"/>'+
+    '<rect x="-4" y="20" width="8" height="16" fill="#b9c7d6" stroke="#475569" stroke-width="1.4"/>'+
+    '<path d="M-54,18 L-4,23 L54,18" stroke="#475569" stroke-width="4" fill="none"/>'+
+    '<line x1="-54" y1="18" x2="-54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<line x1="54" y1="18" x2="54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<rect x="-68" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="38" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="43" y="0" width="20" height="10" rx="2" fill="#fca5a5" stroke="#b91c1c" stroke-width="1.5"/>'+
+    '<rect x="-63" y="0" width="11" height="8" rx="1.5" fill="#fcd34d" stroke="#b45309" stroke-width="1.5"/>'+
+  '</g>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">砝码药品放反（读数错误）</text>'
+);
+/* 29 氢气验纯 */
+SCENES.h2_ok=scene(
+  sh(148,120,24)+sh(96,112,20)+bench(118)+
+  '<g transform="translate(152,48) rotate(155)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M160,62 q-8,8 -16,10" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<path d="M100,72 c-5,0 -8,-6 -4,-10 c4,-3 8,0 8,3 c0,2 -2,3 -3,3 c-2,0 -3,-2 -2,-4" stroke="'+AMBER+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="10" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">管口朝下·拇指堵口·移近火焰点火</text>'
+);
+SCENES.h2_bad_up=scene(
+  sh(148,120,24)+bench(118)+
+  '<g transform="translate(152,48) rotate(12)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M160,62 q8,4 14,2" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<text x="10" y="24" font-size="11" fill="'+RED+'" font-weight="700">试管口朝上（氢气逸出·检验无效）</text>'
+);
+SCENES.h2_bad_ignite=scene(
+  sh(148,120,24)+bench(118)+
+  '<g transform="translate(152,48) rotate(12)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M160,62 q8,4 14,2" stroke="'+RED+'" stroke-width="2.2" fill="none"/>'+
+  '<path d="M176,58 c-4,0 -7,-5 -3,-9 c4,-3 7,0 7,3 c0,2 -2,3 -3,3" stroke="'+AMBER+'" stroke-width="2.2" fill="none"/>'+
+  '<path d="M188,46 l3,3 l-3,3 M188,50 l3,3 l-3,3 M188,54 l3,3 l-3,3" stroke="'+RED+'" stroke-width="1.8" fill="none"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">直接点燃（可能爆炸）</text>'
+);
+/* 30 气体检验 */
+SCENES.gas_ok=scene(
+  sh(150,124,36)+sh(86,120,18)+bench(118)+jar(120,74,64,48,{})+
+  '<path d="M152,56 l24,-34" stroke="#a16207" stroke-width="3.5" stroke-linecap="round"/>'+
+  '<path d="M178,20 c-3,-6 4,-9 7,-4 c2,4 -2,7 -5,5 z" fill="'+AMBER+'" stroke="'+RED+'" stroke-width="1.2"/>'+
+  '<path d="M148,50 q8,4 14,2" stroke="#94a3b8" stroke-width="2" fill="none"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">带火星木条伸入瓶中复燃（O₂检验）</text>'
+);
+SCENES.gas_bad_lime=scene(
+  sh(150,124,36)+sh(86,120,18)+bench(118)+jar(120,74,64,48,{})+
+  '<path d="M152,58 l26,-32" stroke="#a16207" stroke-width="3.5" stroke-linecap="round"/>'+
+  '<path d="M180,24 c-3,-5 3,-9 6,-5 c2,3 -1,6 -4,5 z" fill="'+AMBER+'" stroke="'+RED+'" stroke-width="1.2"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">用燃着木条检验CO₂（应用澄清石灰水）</text>'
+);
+SCENES.gas_bad_deep=scene(
+  sh(150,124,36)+sh(86,120,18)+bench(118)+jar(120,74,64,48,{})+
+  '<path d="M160,70 l32,-44" stroke="#a16207" stroke-width="3.5" stroke-linecap="round"/>'+
+  '<path d="M194,24 c-3,-6 4,-9 7,-4 c2,4 -2,7 -5,5 z" fill="'+AMBER+'" stroke="'+RED+'" stroke-width="1.2"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">木条伸入瓶内（验满应放在瓶口）</text>'
+);
+SCENES.gas_bad_mouth=scene(
+  sh(150,124,36)+sh(86,120,18)+bench(118)+jar(120,74,64,48,{})+
+  '<path d="M138,60 l-18,-26" stroke="#a16207" stroke-width="3.5" stroke-linecap="round"/>'+
+  '<path d="M118,30 c-3,-5 3,-8 6,-4 c2,3 -1,6 -4,5 z" fill="'+AMBER+'" stroke="'+RED+'" stroke-width="1.2"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">木条放在瓶口上方（检验应伸入瓶中）</text>'
+);
+/* CO2 检验：通入澄清石灰水变浑浊 */
+SCENES.co2test_ok=scene(
+  sh(150,124,36)+sh(90,120,18)+bench(118)+
+  '<g transform="translate(110,56)">'+
+    '<path d="M-14,10 v44 a14,14 0 0 0 28,0 v-44" fill="#e0f2fe" stroke="#475569" stroke-width="2"/>'+
+    '<path d="M-14,40 h28 v14 a14,14 0 0 1 -28,0 z" fill="#e2e8f0" stroke="none"/>'+
+    '<path d="M-14,40 q14,4 28,0" stroke="#94a3b8" stroke-width="1.5" fill="none"/>'+
+    '<circle cx="-2" cy="52" r="1.6" fill="#94a3b8"/>'+
+    '<circle cx="4" cy="58" r="1.4" fill="#94a3b8"/>'+
+    '<circle cx="0" cy="46" r="1.2" fill="#94a3b8"/>'+
+  '</g>'+
+  '<path d="M160,60 L130,96" stroke="#475569" stroke-width="2.5" stroke-dasharray="3,2" fill="none"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">CO₂ 通入澄清石灰水变浑浊</text>'
+);
+/* CO2 检验：用燃着木条（错误） */
+SCENES.co2test_bad=scene(
+  sh(150,124,36)+sh(86,120,18)+bench(118)+jar(120,74,64,48,{})+
+  '<path d="M152,56 l24,-34" stroke="#a16207" stroke-width="3.5" stroke-linecap="round"/>'+
+  '<path d="M178,20 c-3,-6 4,-9 7,-4 c2,4 -2,7 -5,5 z" fill="'+AMBER+'" stroke="'+RED+'" stroke-width="1.2"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">用燃着木条检验CO₂（应通入石灰水）</text>'
+);
+
+/* ===== 本次新增场景 ===== */
+/* 天平：游码读数错误 */
+SCENES.balance_bad_read=scene(
+  sh(110,120,60)+bench(118)+
+  '<g transform="translate(110,46)">'+
+    '<rect x="-58" y="36" width="116" height="7" rx="3" fill="#93a7bb" stroke="#475569" stroke-width="1.8"/>'+
+    '<rect x="-4" y="20" width="8" height="16" fill="#b9c7d6" stroke="#475569" stroke-width="1.4"/>'+
+    '<path d="M-54,18 L-4,23 L54,18" stroke="#475569" stroke-width="4" fill="none"/>'+
+    '<line x1="-54" y1="18" x2="-54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<line x1="54" y1="18" x2="54" y2="36" stroke="#475569" stroke-width="4"/>'+
+    '<rect x="-68" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="38" y="10" width="30" height="9" rx="2" fill="url(#gg)" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-63" y="0" width="20" height="10" rx="2" fill="#fca5a5" stroke="#b91c1c" stroke-width="1.5"/>'+
+    '<rect x="43" y="0" width="11" height="8" rx="1.5" fill="#fcd34d" stroke="#b45309" stroke-width="1.5"/>'+
+    '<rect x="-58" y="45" width="116" height="3" rx="1.5" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>'+
+    '<rect x="26" y="42" width="9" height="9" rx="1" fill="'+RED+'" stroke="#7f1d1d" stroke-width="1.5"/>'+
+  '</g>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">游码读数错误</text>'
+);
+/* 量筒：量程选择不合适 */
+SCENES.measure_bad_range=scene(
+  sh(116,126,34)+bench(118)+cyl(84,28,58,96,{liq:10})+
+  '<text x="92" y="132" font-size="9" fill="#475569">100mL</text>'+
+  '<path d="M112,40 q18,-14 34,-6" stroke="'+RED+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="12" y="24" font-size="11" fill="'+RED+'" font-weight="700">量程选大（量少读数误差大）</text>'
+);
+/* 加热：试管夹夹错位置 */
+SCENES.heat_bad_clamp=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34) rotate(-36)">'+tube(0,0,58,0,{w:16,liq:17})+clamp(10,4,0)+'</g>'+
+  '<text x="14" y="24" font-size="11" fill="'+RED+'" font-weight="700">试管夹未夹在距管口1/3处</text>'
+);
+/* 连接仪器：试管按桌上压塞子 */
+SCENES.connect_bad_press=scene(
+  sh(96,124,30)+bench(118)+
+  tube(90,56,60,0,{w:16})+
+  '<rect x="84" y="46" width="26" height="9" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>'+
+  '<line x1="97" y1="24" x2="97" y2="44" stroke="'+RED+'" stroke-width="2.5" stroke-dasharray="3 3"/>'+
+  '<path d="M93,28 l4,-6 l4,6 z" fill="'+RED+'"/>'+
+  '<text x="18" y="24" font-size="11" fill="'+RED+'" font-weight="700">试管按桌上压塞（易压破试管）</text>'
+);
+/* 气密性：注射器法 */
+SCENES.leak_syringe=scene(
+  sh(120,124,30)+bench(118)+
+  '<g transform="translate(118,56) rotate(8)">'+tube(0,0,56,0,{w:17})+'</g>'+
+  '<rect x="146" y="42" width="22" height="9" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>'+
+  '<rect x="168" y="41" width="28" height="11" rx="2" fill="#e0f2fe" stroke="#475569" stroke-width="2"/>'+
+  '<line x1="196" y1="46.5" x2="208" y2="46.5" stroke="#475569" stroke-width="2"/>'+
+  '<rect x="208" y="42" width="4" height="9" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/>'+
+  '<text x="10" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">注射器法：拉/推活塞看是否回弹</text>'
+);
+/* 气密性：长颈漏斗法 */
+SCENES.leak_funnel=scene(
+  sh(100,124,30)+bench(118)+
+  '<g transform="translate(100,64)">'+
+    '<path d="M-22,0 L-14,30 Q-14,40 0,40 Q14,40 14,30 L22,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-7" y="-2" width="14" height="4" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-3" y="-30" width="6" height="32" fill="#e0f2fe" stroke="#475569" stroke-width="1.8"/>'+
+    '<ellipse cx="0" cy="-30" rx="12" ry="4" fill="#fff" stroke="#475569" stroke-width="2"/>'+
+    '<rect x="-10" y="-30" width="20" height="12" rx="2" fill="url(#w)" opacity="0.6"/>'+
+    '<circle cx="-4" cy="32" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+  '</g>'+
+  '<text x="10" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">长颈漏斗注水·液面不下降即气密</text>'
+);
+/* 气密性：长颈漏斗装置仍用手握法（错误） */
+SCENES.leak_bad_funnel_warm=scene(
+  sh(100,124,30)+sh(180,110,20)+bench(118)+trough(150,90,60,26)+
+  '<g transform="translate(100,64)">'+
+    '<path d="M-22,0 L-14,30 Q-14,40 0,40 Q14,40 14,30 L22,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-7" y="-2" width="14" height="4" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-3" y="-30" width="6" height="32" fill="#e0f2fe" stroke="#475569" stroke-width="1.8"/>'+
+    '<ellipse cx="0" cy="-30" rx="12" ry="4" fill="#fff" stroke="#475569" stroke-width="2"/>'+
+  '</g>'+
+  '<path d="M120,84 q30,-6 38,-30" fill="none" stroke="'+INK+'" stroke-width="2.2"/>'+
+  hand(60,78,-60,{fingers:true})+
+  '<path d="M100,28 q-4,-10 -12,-12" stroke="'+RED+'" stroke-width="2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="24" font-size="11" fill="'+RED+'" font-weight="700">长颈漏斗装置仍用手握法（气从漏斗跑）</text>'
+);
+/* 气密性：分液漏斗装置可用手握法（正确） */
+SCENES.leak_sepfunnel=scene(
+  sh(90,124,34)+sh(180,110,20)+bench(118)+trough(150,90,60,26)+
+  '<g transform="translate(90,64)">'+
+    '<path d="M-22,0 L-14,30 Q-14,40 0,40 Q14,40 14,30 L22,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<path d="M-9,-2 v-18 h18 v18" fill="#e0f2fe" stroke="#475569" stroke-width="1.8"/>'+
+    '<rect x="-11" y="-20" width="22" height="10" rx="2" fill="url(#w)" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-12" y="-30" width="24" height="6" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<circle cx="-4" cy="32" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+  '</g>'+
+  '<path d="M112,84 q36,-6 42,-30" fill="none" stroke="'+INK+'" stroke-width="2.2"/>'+
+  hand(56,78,-60,{fingers:true})+
+  bubble(168,104)+bubble(176,108)+
+  '<text x="10" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">分液漏斗装置·手握法看气泡</text>'
+);
+/* 收集气体：排水法（正确） */
+SCENES.collect_drain_ok=scene(
+  sh(60,124,40)+sh(140,116,26)+bench(118)+trough(16,80,88,40)+
+  '<g transform="translate(142,54) rotate(14)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M152,44 q36,-4 40,-30" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(116,34,46,46,{water:32})+
+  '<text x="12" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">排水法·瓶内装满水倒扣</text>'
+);
+/* 收集气体：排空气法（正确） */
+SCENES.collect_air_ok=scene(
+  sh(140,116,26)+sh(84,114,22)+bench(118)+jar(136,34,46,46,{lid:true})+
+  '<g transform="translate(76,54) rotate(-10)">'+tube(0,0,46,0,{w:15})+'</g>'+
+  '<path d="M82,44 q22,-4 26,-26" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  '<text x="10" y="24" font-size="11" fill="'+GREEN+'" font-weight="700">排空气法·导管伸到集气瓶底</text>'
+);
+/* 制氧：排水集气导管伸入过长 */
+SCENES.o2_bad_duct_long=scene(
+  sh(70,124,36)+sh(172,118,30)+bench(118)+
+  stand(52,60,58,{clamp:42})+
+  '<g transform="translate(74,52) rotate(-14)">'+tube(0,0,54,0,{w:17})+'</g>'+
+  '<path d="M84,40 q42,-6 60,-38 q6,-5 14,-8" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  trough(156,72,56,42)+jar(164,26,42,46,{water:34})+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">导管伸入集气瓶过长（取出困难）</text>'
+);
+/* 制氧：导管伸出橡胶塞过长 */
+SCENES.o2_bad_stopper=scene(
+  sh(70,124,36)+sh(172,118,30)+bench(118)+
+  stand(52,60,58,{clamp:42})+
+  '<g transform="translate(74,52) rotate(-14)">'+
+    tube(0,0,54,0,{w:17})+
+    '<rect x="2" y="-7" width="13" height="9" rx="2" fill="#fff" stroke="#94a3b8" stroke-width="1.5"/>'+
+    '<line x1="15" y1="-2.5" x2="48" y2="-2.5" stroke="'+INK+'" stroke-width="2.5"/>'+
+  '</g>'+
+  '<path d="M48,-2 q26,-4 30,-30" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  trough(156,72,56,42)+jar(164,26,42,46,{water:34})+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">导管伸出橡胶塞过长（气体难排出）</text>'
+);
+/* 制取二氧化碳：正确 */
+SCENES.co2_ok=scene(
+  sh(96,124,34)+sh(176,116,22)+bench(118)+
+  '<g transform="translate(96,66)">'+
+    '<path d="M-20,0 L-12,32 Q-12,42 0,42 Q12,42 12,32 L20,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-14" y="-3" width="28" height="5" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-12" y="20" width="24" height="14" rx="2" fill="url(#w)" opacity="0.6"/>'+
+    '<rect x="-16" y="-8" width="5" height="36" fill="#e0f2fe" stroke="#475569" stroke-width="1.6"/>'+
+    '<ellipse cx="-13.5" cy="-8" rx="7" ry="3" fill="#fff" stroke="#475569" stroke-width="1.6"/>'+
+    '<circle cx="-4" cy="30" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+  '</g>'+
+  '<path d="M116,66 q30,-10 34,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(176,70,44,46,{lid:true})+
+  '<text x="10" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">石灰石+稀盐酸·向上排空气法</text>'
+);
+/* 制CO2：分液漏斗代替长颈漏斗 */
+SCENES.co2_ok_sepfunnel=scene(
+  sh(96,124,34)+sh(176,116,22)+bench(118)+
+  '<g transform="translate(96,66)">'+
+    '<path d="M-20,0 L-12,32 Q-12,42 0,42 Q12,42 12,32 L20,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-14" y="-3" width="28" height="5" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<path d="M-9,-3 v-18 h18 v18" fill="#e0f2fe" stroke="#475569" stroke-width="1.8"/>'+
+    '<rect x="-11" y="-21" width="22" height="10" rx="2" fill="url(#w)" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-12" y="-31" width="24" height="6" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-12" y="20" width="24" height="14" rx="2" fill="url(#w)" opacity="0.6"/>'+
+    '<circle cx="-4" cy="30" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+  '</g>'+
+  '<path d="M116,66 q30,-10 34,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(176,70,44,46,{lid:true})+
+  '<text x="10" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">分液漏斗·控制滴加速率</text>'
+);
+/* 制CO2：注射器代替长颈漏斗 */
+SCENES.co2_ok_syringe=scene(
+  sh(96,124,34)+sh(176,116,22)+bench(118)+
+  '<g transform="translate(96,66)">'+
+    '<path d="M-20,0 L-12,32 Q-12,42 0,42 Q12,42 12,32 L20,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-14" y="-3" width="28" height="5" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-8" y="-26" width="16" height="26" rx="2" fill="#e0f2fe" stroke="#475569" stroke-width="1.8"/>'+
+    '<line x1="-8" y1="-20" x2="8" y2="-20" stroke="#94a3b8" stroke-width="1.2"/>'+
+    '<line x1="-8" y1="-14" x2="8" y2="-14" stroke="#94a3b8" stroke-width="1.2"/>'+
+    '<rect x="-10" y="-34" width="20" height="4" rx="1" fill="#94a3b8" stroke="#475569" stroke-width="1.4"/>'+
+    '<rect x="-12" y="20" width="24" height="14" rx="2" fill="url(#w)" opacity="0.6"/>'+
+    '<circle cx="-4" cy="30" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+  '</g>'+
+  '<path d="M116,66 q30,-10 34,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(176,70,44,46,{lid:true})+
+  '<text x="10" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">注射器·控制液体加入量</text>'
+);
+/* 制CO2：启普发生器（多孔隔板） */
+SCENES.co2_ok_kipp=scene(
+  sh(100,124,30)+sh(180,116,22)+bench(118)+
+  '<g transform="translate(100,60)">'+
+    '<path d="M-18,0 L-14,20 L-22,44 Q-24,54 0,54 Q24,54 22,44 L14,20 L18,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-22" y="34" width="44" height="3" fill="#cbd5e1" stroke="#475569" stroke-width="1.2"/>'+
+    '<circle cx="-6" cy="28" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+    '<circle cx="4" cy="28" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+    '<rect x="-6" y="-14" width="12" height="14" fill="#e0f2fe" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-8" y="-18" width="16" height="4" rx="1" fill="#cbd5e1" stroke="#475569" stroke-width="1.4"/>'+
+    '<path d="M-18,44 q18,6 36,0" stroke="#94a3b8" stroke-width="1.2" fill="none"/>'+
+  '</g>'+
+  '<path d="M120,60 q30,-8 34,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(180,70,42,44,{lid:true})+
+  '<text x="10" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">启普发生器·随开随用随关随停</text>'
+);
+/* 制CO2：用排水法收集（错误） */
+SCENES.co2_bad_water=scene(
+  sh(90,124,30)+sh(176,116,22)+bench(118)+trough(120,80,80,38)+
+  '<g transform="translate(96,60)">'+
+    '<path d="M-18,0 L-12,30 Q-12,40 0,40 Q12,40 12,30 L18,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-12" y="-3" width="24" height="5" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<circle cx="-4" cy="30" r="3" fill="#fde68a" stroke="#b45309" stroke-width="1"/>'+
+  '</g>'+
+  '<path d="M114,78 q20,4 30,6" fill="none" stroke="'+INK+'" stroke-width="2.2"/>'+
+  jar(140,34,44,46,{water:30})+
+  '<path d="M138,52 l10,10 M148,52 l-10,10" stroke="'+RED+'" stroke-width="2.4"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">排水法收集CO₂（CO₂能溶于水·不可用）</text>'
+);
+/* 制二氧化碳：长颈漏斗未液封 */
+SCENES.co2_bad_noseal=scene(
+  sh(96,124,34)+sh(176,116,22)+bench(118)+
+  '<g transform="translate(96,66)">'+
+    '<path d="M-20,0 L-12,32 Q-12,42 0,42 Q12,42 12,32 L20,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-14" y="-3" width="28" height="5" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-12" y="30" width="24" height="6" rx="2" fill="url(#w)" opacity="0.4"/>'+
+    '<rect x="-16" y="-20" width="5" height="30" fill="#e0f2fe" stroke="#475569" stroke-width="1.6"/>'+
+    '<ellipse cx="-13.5" cy="-20" rx="7" ry="3" fill="#fff" stroke="#475569" stroke-width="1.6"/>'+
+  '</g>'+
+  '<path d="M-16,50 q-6,8 2,14" stroke="'+RED+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">长颈漏斗未液封（气体从漏斗逸出）</text>'
+);
+/* 制二氧化碳：用向下排空气法收集 */
+SCENES.co2_bad_down=scene(
+  sh(96,124,34)+sh(168,116,22)+bench(118)+
+  '<g transform="translate(96,66)">'+
+    '<path d="M-20,0 L-12,32 Q-12,42 0,42 Q12,42 12,32 L20,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-14" y="-3" width="28" height="5" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+  '</g>'+
+  '<path d="M116,66 q28,-8 30,-34" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  '<g transform="translate(168,30) rotate(180)">'+jar(0,0,42,46,{})+'</g>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">向下排空气（CO₂比空气大，应向上排）</text>'
+);
+/* 二氧化碳检验验满：澄清石灰水 */
+SCENES.gas_co2_ok=scene(
+  sh(150,124,36)+sh(80,120,18)+bench(118)+jar(118,66,46,44,{})+
+  '<g transform="translate(118,108)">'+
+    '<rect x="-20" y="-16" width="40" height="18" rx="3" fill="#e0f2fe" stroke="#475569" stroke-width="2"/>'+
+    '<path d="M-20,-10 q10,4 20,0 q10,-4 20,0 l0,0 q0,8 0,8 l-40,0 q0,-8 0,-8 z" fill="#f1f5f9" opacity="0.9"/>'+
+  '</g>'+
+  '<text x="10" y="20" font-size="11" fill="'+GREEN+'" font-weight="700">CO₂：石灰水变浑浊；瓶口木条熄灭即满</text>'
+);
+/* 过滤：未用玻璃棒引流 */
+SCENES.filter_bad_norod=scene(
+  sh(128,116,30)+sh(84,122,28)+bench(118)+
+  stand(132,58,60,{ring:50})+
+  beaker(88,86,64,34,{liq:16})+
+  '<g transform="translate(128,44)">'+
+    '<path d="M-18,-20 h36 l-11,24 h-14 z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-4" y="4" width="8" height="20" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+  '</g>'+
+  '<path d="M96,90 q10,-28 14,-44" stroke="#93c5fd" stroke-width="4" fill="none" opacity="0.8"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">未用玻璃棒引流（易冲破滤纸）</text>'
+);
+/* 过滤：漏斗下端未靠烧杯内壁 */
+SCENES.filter_bad_notouch=scene(
+  sh(128,116,30)+sh(84,122,28)+bench(118)+
+  stand(132,58,60,{ring:50})+
+  beaker(96,86,64,34,{liq:16})+
+  '<g transform="translate(128,44)">'+
+    '<path d="M-18,-20 h36 l-11,24 h-14 z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-4" y="4" width="8" height="20" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<path d="M-12,6 l6,14 M12,6 l-6,14" fill="none" stroke="#cbd5e1" stroke-width="1.4"/>'+
+  '</g>'+
+  rod(74,94,-36,56)+
+  '<line x1="124" y1="64" x2="124" y2="82" stroke="'+RED+'" stroke-width="2" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">漏斗下端未靠烧杯内壁（液滴飞溅）</text>'
+);
+/* 过滤：烧杯未靠玻璃棒 */
+SCENES.filter_bad_beaker=scene(
+  sh(128,116,30)+sh(84,122,28)+bench(118)+
+  stand(132,58,60,{ring:50})+
+  beaker(76,86,64,34,{liq:16})+
+  '<g transform="translate(128,44)">'+
+    '<path d="M-18,-20 h36 l-11,24 h-14 z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-4" y="4" width="8" height="20" rx="3" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<path d="M-12,6 l6,14 M12,6 l-6,14" fill="none" stroke="#cbd5e1" stroke-width="1.4"/>'+
+  '</g>'+
+  rod(110,94,-10,56)+
+  '<path d="M108,92 q8,-20 12,-30" stroke="'+RED+'" stroke-width="2" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">烧杯未靠玻璃棒（液体易洒）</text>'
+);
+
+/* ============ 本轮新增场景 ============ */
+/* 量筒：拿在手上读数（未放在平稳桌面） */
+SCENES.measure_bad_hold=scene(
+  sh(140,124,28)+
+  '<g transform="translate(110,30) rotate(-8)">'+cyl(0,0,46,80,{liq:40})+'</g>'+
+  hand(158,72,-20,{fingers:true})+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">量筒拿在手上读数（应放平稳桌面）</text>'
+);
+/* 量筒：视线对凹液面最高处 */
+SCENES.measure_bad_top=scene(
+  sh(116,126,30)+sh(60,116,15)+bench(118)+cyl(90,40,52,78,{liq:38})+
+  /* 红色虚线对准凹液面的上缘（最高处），正确应对下缘 */
+  '<line x1="78" y1="56" x2="148" y2="56" stroke="'+RED+'" stroke-width="2" stroke-dasharray="5 4"/>'+
+  '<line x1="78" y1="68" x2="148" y2="68" stroke="'+GREEN+'" stroke-width="1.6" stroke-dasharray="2 3" opacity="0.7"/>'+
+  person(60,44,{a1:[88,56],a2:[34,60]})+
+  '<text x="80" y="28" font-size="11" fill="'+RED+'" font-weight="700">视线对凹液面最高处（应对最低处）</text>'
+);
+/* 量筒：从无刻度一侧读数 */
+SCENES.measure_bad_noscale=scene(
+  sh(116,126,30)+sh(168,116,15)+bench(118)+cyl(90,40,52,78,{liq:38})+
+  '<line x1="80" y1="64" x2="150" y2="64" stroke="'+RED+'" stroke-width="2" stroke-dasharray="5 4"/>'+
+  person(168,44,{a1:[130,64],a2:[190,60]})+
+  '<text x="14" y="28" font-size="11" fill="'+RED+'" font-weight="700">从无刻度一侧读数（应看刻度一侧）</text>'
+);
+/* 滴加：吸液时把空气挤入试剂瓶·瓶内冒泡 */
+SCENES.drip_bad_bubble=scene(
+  sh(56,126,26)+bench(118)+bottle(52,118,{liq:26,label:true,cap:false})+
+  dropper(52,84,0)+
+  bubble(48,100)+bubble(56,96)+bubble(50,108)+
+  '<path d="M48,70 q-6,8 -2,14" stroke="'+RED+'" stroke-width="2" stroke-dasharray="3 3" fill="none"/>'+
+  '<text x="92" y="40" font-size="11" fill="'+RED+'" font-weight="700">挤空气入瓶·液体冒泡</text>'
+);
+/* 滴瓶滴管用完后用自来水洗 */
+SCENES.drip_bad_wash=scene(
+  sh(110,126,34)+sh(150,122,18)+bench(118)+
+  /* 水龙头 */
+  '<rect x="120" y="18" width="46" height="8" rx="3" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>'+
+  '<rect x="156" y="14" width="6" height="16" rx="2" fill="#94a3b8" stroke="#64748b" stroke-width="2"/>'+
+  /* 水流 */
+  '<path d="M128,26 v22" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>'+
+  /* 被冲洗的滴管（倾斜） */
+  '<g transform="translate(108,56) rotate(-18)">'+dropper(0,0,0)+'</g>'+
+  /* 水花 */
+  '<circle cx="124" cy="84" r="3" fill="#38bdf8"/><circle cx="132" cy="88" r="2.4" fill="#38bdf8"/><circle cx="118" cy="90" r="2" fill="#38bdf8"/>'+
+  /* 滴瓶（空着，滴管不在瓶里） */
+  bottle(54,118,{liq:22,label:true,cap:false})+
+  '<text x="16" y="36" font-size="11" fill="'+RED+'" font-weight="700">滴瓶上的滴管用完后用水冲洗</text>'
+);
+/* 加热：试管没有倾斜约45°（竖直） */
+SCENES.heat_bad_no45=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34)">'+tube(0,0,58,0,{w:16,liq:17})+clamp(32,4,0)+'</g>'+
+  '<text x="14" y="24" font-size="11" fill="'+RED+'" font-weight="700">试管竖直未倾斜（应斜约45°）</text>'
+);
+/* 加热：试管夹从试管口往下套（方向错） */
+SCENES.heat_bad_clamp_dir=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34) rotate(-36)">'+tube(0,0,58,0,{w:16,liq:17})+clamp(6,4,0)+'</g>'+
+  '<path d="M170,60 q14,-4 16,-18" stroke="'+RED+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<path d="M184,44 l-6,-4 l1,7 z" fill="'+RED+'"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">试管夹从管口往下套（应从底部往上）</text>'
+);
+/* 给液体加热：手持试管、未用试管夹 */
+SCENES.heat_bad_hand=scene(
+  sh(66,124,30)+sh(150,122,22)+bench(118)+lamp(58,84,{lit:true,liq:true})+
+  '<g transform="translate(152,34) rotate(-36)">'+tube(0,0,58,0,{w:16,liq:17})+'</g>'+
+  hand(196,52,140,{fingers:true})+
+  '<path d="M188,44 q8,-8 16,-4" stroke="'+RED+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">手持试管加热（应用试管夹·防烫伤）</text>'
+);
+/* 制CO2：导管未伸到集气瓶瓶底 */
+SCENES.co2_bad_high=scene(
+  sh(96,124,34)+sh(176,116,22)+bench(118)+
+  '<g transform="translate(96,66)">'+
+    '<path d="M-20,0 L-12,32 Q-12,42 0,42 Q12,42 12,32 L20,0 Z" fill="url(#gg)" stroke="#475569" stroke-width="2.2"/>'+
+    '<rect x="-14" y="-3" width="28" height="5" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="1.6"/>'+
+    '<rect x="-12" y="20" width="24" height="14" rx="2" fill="url(#w)" opacity="0.6"/>'+
+    '<rect x="-16" y="-8" width="5" height="36" fill="#e0f2fe" stroke="#475569" stroke-width="1.6"/>'+
+    '<ellipse cx="-13.5" cy="-8" rx="7" ry="3" fill="#fff" stroke="#475569" stroke-width="1.6"/>'+
+  '</g>'+
+  '<path d="M116,66 q30,-10 34,-34 q4,-4 10,-6" fill="none" stroke="'+INK+'" stroke-width="2.5"/>'+
+  jar(176,70,44,46,{lid:true})+
+  '<line x1="160" y1="86" x2="190" y2="86" stroke="'+RED+'" stroke-width="2" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="20" font-size="11" fill="'+RED+'" font-weight="700">导管未伸到集气瓶底部</text>'
+);
+/* 配溶液：用胶头滴管搅拌 */
+SCENES.sol_bad_dropper_stir=scene(
+  sh(110,118,40)+bench(118)+beaker(84,64,76,54,{liq:30})+
+  dropper(122,66,30)+
+  '<path d="M108,92 q14,8 28,0" stroke="'+RED+'" stroke-width="2.2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">用胶头滴管搅拌（应用玻璃棒）</text>'
+);
+/* 配溶液：瓶塞没有倒放 */
+SCENES.sol_bad_cap=scene(
+  sh(150,124,36)+sh(60,120,18)+bench(118)+bottle(60,110,{liq:24,label:true,cap:false})+
+  spoon(108,96,-20)+
+  '<rect x="150" y="108" width="28" height="8" rx="2" fill="#cbd5e1" stroke="#475569" stroke-width="2"/>'+
+  '<line x1="153" y1="111" x2="175" y2="111" stroke="#94a3b8" stroke-width="1.5"/>'+
+  '<path d="M148,122 q8,-6 18,-2" stroke="'+RED+'" stroke-width="2" fill="none" stroke-dasharray="3 3"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">瓶塞正放在桌上（应倒放·防污染）</text>'
+);
+/* 蒸发：用手拿热的蒸发皿 */
+SCENES.evap_bad_hand=scene(
+  sh(62,122,34)+sh(142,120,30)+bench(118)+lamp(52,82,{lit:true,liq:true})+
+  tripod(140,72,88)+
+  evapor(140,66,44,{liq:true})+
+  hand(178,60,-30,{fingers:true})+
+  '<path d="M170,56 q6,-6 12,-2" stroke="'+RED+'" stroke-width="2" stroke-dasharray="3 3" fill="none"/>'+
+  '<text x="10" y="22" font-size="11" fill="'+RED+'" font-weight="700">用手拿热蒸发皿（应用坩埚钳·防烫伤）</text>'
+);
+
+
+/* ============ 教学数据 ============ */
+var UP='up', DOWN='down';
+var TOPICS=[
+ {id:'principle', name:'药品取用的原则（不摸、不尝、不直接闻）', vol:UP, unit:1,
+  correct:{scene:'smell_ok', point:'不摸：不直接用手接触药品；不尝：任何药品严禁用嘴品尝；不闻：不把鼻孔凑到瓶口，采用扇闻法——手在瓶口轻轻扇动，让极少量气体飘入鼻孔。'},
+  trivia:'实验室药品柜里贴的"三不"原则（不摸、不尝、不直接闻）是 19 世纪中期化学事故血的教训换来的。扇闻法能把吸入量控制在安全范围内。',
+  errors:[
+   {scene:'touch_bad', reason:'直接用手抓取、触摸药品。', harm:'腐蚀性药品灼伤皮肤，有毒药品经皮肤渗入体内，还会污染药品。', fix:'取用药品必须用镊子、药匙等工具，严禁手摸。'},
+   {scene:'taste_bad', reason:'用嘴品尝药品的味道。', harm:'药品可能有毒或有腐蚀性，品尝会导致中毒、口腔和消化道灼伤。', fix:'任何情况下都禁止品尝药品；辨别药品只能看、闻（扇闻法）。'},
+   {scene:'smell_bad_near', reason:'把鼻子凑到瓶口直接闻，吸入大量气体。', harm:'刺激性、有毒气体直接冲入呼吸道，造成呛咳、黏膜灼伤，严重时中毒。', fix:'采用扇闻法：手在瓶口轻轻扇动，仅让极少量气体飘入鼻孔。'},
+   {scene:'waste_bad_sewer', reason:'实验后的废液（尤其含酸、碱、有毒或重金属的废液）直接倒入下水道。', harm:'腐蚀下水管道、污染水体，有毒废液还会危害环境和人体健康。', fix:'废液应倒入指定的废液缸/废液桶，按规定分类处理，不能直接倒入下水道。'}
+  ]},
+ {id:'block', name:'块状药品的取用', vol:UP, unit:1,
+  correct:{scene:'block_ok', point:'一横二放三慢竖：试管横放，用镊子夹取块状药品放在试管口，再把试管慢慢竖起来，让药品缓缓滑到管底；严禁试管竖着直接往里加。'},
+  trivia:'块状固体一定要"一横二放三慢竖"——玻璃试管底厚度只有约 1 mm，竖直投入一颗锌粒就能把它砸穿。',
+  errors:[
+   {scene:'block_bad_hand', reason:'用手直接抓取块状药品。', harm:'药品污染、腐蚀皮肤；手上的汗液等也会污染药品。', fix:'用镊子夹取，不可徒手接触药品。'},
+   {scene:'block_bad_drop', reason:'试管竖立，将块状固体直接投入试管底部。', harm:'固体砸落冲击管底，极易把试管底部砸破，割伤手。', fix:'先把试管放平（横放），固体放管口后缓慢竖起，让固体轻轻滑到管底。'}
+  ]},
+ {id:'powder', name:'粉末状药品的取用', vol:UP, unit:1,
+  correct:{scene:'powder_ok', point:'一斜二送三直立：试管倾斜，用药匙或纸槽把粉末送到试管底部，再直立试管。'},
+  trivia:'纸槽（V 形纸条）比药匙更适合把粉末送到试管底部，尤其在管径细、药匙伸不进去的时候。',
+  errors:[
+   {scene:'powder_bad_upright', reason:'试管直立，直接用药匙向管口倾倒粉末。', harm:'粉末粘在管壁上、撒到桌面，取量不准且浪费药品。', fix:'试管先倾斜，药匙/纸槽伸至管底后再直立。'}
+  ]},
+ {id:'balance', name:'托盘天平称量固体药品', vol:UP, unit:1,
+  correct:{scene:'balance_ok', point:'左物右码；先调零，砝码由大到小添加；读数=砝码+游码；有腐蚀性、易潮解的药品必须放在小烧杯（或玻璃器皿）中称量。'},
+  trivia:'托盘天平的游码标尺零刻度在左侧，"左物右码"是因为游码从左往右加，读数=砝码+游码。',
+  errors:[
+   {scene:'balance_bad_direct', reason:'腐蚀性（潮解）药品直接放在托盘上称量。', harm:'腐蚀、污染天平托盘，导致称量不准、天平损坏。', fix:'药品放在称量纸或小烧杯中称量。'},
+   {scene:'balance_bad_reverse', reason:'砝码与药品位置放反（左砝右物且用游码）。', harm:'读数 = 砝码 − 游码，称量结果错误。', fix:'遵循“左物右码”，读数时正确加减游码。'},
+   {scene:'balance_bad_read', reason:'游码没有对准零刻度或读数时看错游码位置。', harm:'称量结果偏大或偏小，数据错误。', fix:'称量前先把游码拨到标尺零刻度处调平，读数时视线与游码左侧对齐。'}
+  ]},
+ {id:'pour', name:'液体药品的倾倒', vol:UP, unit:1,
+  correct:{scene:'pour_ok', point:'瓶塞倒放桌面、标签朝向手心、瓶口紧挨试管口、试管略微倾斜，缓缓倾倒。'},
+  trivia:'倾倒液体时标签向手心，是为了防止残液顺瓶身流下腐蚀标签——标签一旦花了，下次就认不出这瓶是什么。',
+  errors:[
+   {scene:'pour_bad_cap', reason:'瓶塞正放在桌面上。', harm:'瓶塞沾上桌面污物，倒放回去污染整瓶药品。', fix:'瓶塞倒放（凹面朝上）或拿在手中，不接触桌面。'},
+   {scene:'pour_bad_label', reason:'倾倒时标签没有朝向手心。', harm:'残留在瓶口的药液沿瓶身流下，腐蚀、模糊标签，下次无法辨认药品。', fix:'标签始终朝向手心，倾倒后及时盖好瓶塞。'},
+   {scene:'pour_bad_apart', reason:'瓶口与试管口没有紧挨，悬空倾倒。', harm:'液体洒出试管外，污染桌面、造成浪费，还可能溅到身上。', fix:'瓶口紧贴试管口，缓慢倾倒，倒完立即盖塞放回。'},
+   {scene:'pour_bad_vertical', reason:'试管竖直，没有倾斜就倾倒液体。', harm:'液体沿试管内壁流下不畅、易溅出，且倾倒量不易控制。', fix:'试管略微倾斜，瓶口紧挨管口缓缓倾倒。'}
+  ]},
+ {id:'measure', name:'液体药品的量取（量筒）', vol:UP, unit:1,
+  correct:{scene:'measure_ok', point:'根据需量体积选择合适量程的量筒（量程略大于需量体积）；量筒放平稳，视线与量筒内凹液面最低处保持水平，不仰视、不俯视；量筒不能加热、不能溶解固体、不能作反应容器。'},
+  trivia:'量筒的刻度是在 20℃ 标定的，加热后玻璃膨胀、刻度失真，所以量筒不能加热、不能溶解、不能作反应容器。',
+  errors:[
+   {scene:'measure_bad_low', reason:'仰视读数（视线低于凹液面最低处）。', harm:'读数偏小，实际量取的液体偏多，配制溶液浓度不准确。', fix:'蹲下或调整视线，使视线与凹液面最低处相平。'},
+   {scene:'measure_bad_high', reason:'俯视读数（视线高于凹液面最低处）。', harm:'读数偏大，实际量取的液体偏少。', fix:'视线与凹液面最低处保持水平后再读数。'},
+   {scene:'measure_bad_use', reason:'在量筒中直接溶解固体、或用量筒加热。', harm:'量筒只能用于量取液体，不能作反应（溶解）容器，搅拌易损坏量筒且不精确。', fix:'在烧杯中溶解固体，用玻璃棒搅拌，量筒只用于量取。'},
+   {scene:'measure_bad_range', reason:'所量液体很少却选用了量程过大的量筒（如量 8 mL 用 100 mL 量筒）。', harm:'量筒分度值大，读数误差大，量取不准。', fix:'选用略大于所需体积的量筒，减小误差。'},
+   {scene:'measure_bad_hold', reason:'量筒拿在手中读数（没有放在平稳桌面上）。', harm:'量筒倾斜、液面不稳定，读数不准确。', fix:'量筒必须放在水平平稳的桌面上，再蹲下使视线与凹液面最低处相平。'},
+   {scene:'measure_bad_top', reason:'读数时视线对准了量筒内液体凹液面的最高处（上缘）。', harm:'把凹液面的上缘当成刻度线，读数偏大，实际量取液体偏少。', fix:'读数时视线应与液体凹液面的最低处保持水平。'},
+   {scene:'measure_bad_noscale', reason:'站在量筒没有刻度示数的一侧（背面）观察读数。', harm:'看不到刻度线，读数偏差大、不准确。', fix:'读数时应站在有刻度示数的一侧，使视线与凹液面最低处相平。'}
+  ]},
+ {id:'drip', name:'用胶头滴管滴加液体', vol:UP, unit:1,
+  correct:{scene:'drip_ok', point:'胶头滴管保持竖直、悬空于容器口正上方滴加，不伸入容器内；不能平放、倒放；吸液时不能把空气挤入试剂瓶（防止冒泡）；用后立即清洗，滴瓶上的专用滴管用后不洗。'},
+  trivia:'胶头滴管上的胶帽是橡胶做的，一旦被药液腐蚀变硬，就再也吸不上液体了——所以滴管绝不能平放或倒放。',
+  errors:[
+   {scene:'drip_bad_in', reason:'滴管伸入试管（容器）内滴加。', harm:'滴管管口接触容器内液体或器壁，污染滴管，再取药时污染整瓶试剂。', fix:'滴管悬空、竖直，在容器口正上方滴加。'},
+   {scene:'drip_bad_tilt', reason:'滴管横拿或倒置滴加。', harm:'药液倒流进胶帽，腐蚀胶帽并污染试剂。', fix:'始终保持胶帽在上、管口朝下竖直滴加。'},
+   {scene:'drip_bad_bubble', reason:'吸液时把胶头中的空气挤入试剂瓶，瓶内液体冒气泡。', harm:'空气挤入试剂瓶会使试剂变质、被污染；气泡还可能把试剂溅到胶帽里。', fix:'先在瓶外挤出胶头中的空气，再伸入液面下吸取液体。'},
+   {scene:'drip_bad_wash', reason:'滴瓶上配套的滴管用完后，又用自来水冲洗。', harm:'滴瓶上的滴管只吸取该瓶试剂，水洗后带进水珠会稀释、污染整瓶试剂；自来水中的杂质也会污染试剂。', fix:'滴瓶上的滴管专管专用，用完后直接放回原滴瓶，不能用水冲洗；独立胶头滴管用完后才需洗净。'}
+  ]},
+ {id:'lamp_use', name:'酒精灯的使用', vol:UP, unit:1,
+  correct:{scene:'light_ok', point:'用火柴（或打火机）点燃酒精灯；熄灭时用灯帽盖灭并盖两次（盖灭后轻提一下灯帽再盖好，防止灯帽被吸住）；酒精不超过灯壶容积的 2/3。'},
+  trivia:'酒精灯外焰温度最高（约 400~500℃），因为外焰与氧气接触最充分；灯芯处温度最低，加热时试管底不能碰到灯芯。',
+  errors:[
+   {scene:'light_bad_cross', reason:'用燃着的酒精灯去点燃另一盏酒精灯。', harm:'倾斜时酒精洒出着火，极易引发火灾。', fix:'熄灭后用火柴（或打火机）点燃，严禁灯对灯引燃。'},
+   {scene:'add_bad_lit', reason:'酒精灯还在燃烧时就添加酒精。', harm:'酒精外溢遇明火猛烈燃烧，引发火灾甚至爆炸。', fix:'必须先熄灭酒精灯并冷却，再用漏斗添加酒精。'},
+   {scene:'putout_bad_blow', reason:'用嘴吹灭酒精灯。', harm:'火焰可能倒燃进入灯内，引起灯内酒精燃烧甚至爆炸。', fix:'用灯帽盖灭，不可用嘴吹。'}
+  ]},
+ {id:'heat_liq', name:'给试管中的液体加热', vol:UP, unit:1,
+  correct:{scene:'heat_ok', point:'试管倾斜约 45°，试管夹从试管底部套上、夹在距管口约 1/3 处；加热前先预热、试管外壁的水要擦干；用外焰加热；试管口不朝向自己或他人；液体不超过容积的 1/3；热的试管不能立即用冷水冲洗。'},
+  trivia:'给试管里的液体加热时管口约 45° 倾斜，这个角度受热面积最大，且一旦暴沸液体是斜着喷出，不会直接对着人。',
+  errors:[
+   {scene:'heat_bad_person', reason:'试管口朝向自己或他人加热。', harm:'液体暴沸喷出，烫伤面部和身体。', fix:'试管口始终斜向上且不得朝向任何人。'},
+   {scene:'heat_bad_full', reason:'试管内液体超过容积的 1/3。', harm:'液体沸腾时溢出试管，烫伤皮肤、污染实验台。', fix:'液体量控制在试管容积 1/3 以内。'},
+   {scene:'flame_bad_inner', reason:'用内焰（或焰心）加热，试管底接触灯芯。', harm:'内焰温度低、加热慢，接触灯芯处温度不足易使试管底炸裂。', fix:'用外焰加热，试管底距灯芯保持一定距离。'},
+   {scene:'heat_bad_clamp', reason:'试管夹没有夹在距离试管口约 1/3 处（夹在中部或太靠下）。', harm:'手持不便，加热位置不对，甚至手接触到火焰。', fix:'试管夹从底部往上套，夹在距管口约 1/3 处。'},
+   {scene:'heat_bad_no45', reason:'试管没有倾斜约 45°（竖直加热）。', harm:'液体受热面小、沸腾剧烈时容易暴沸喷出，也不利于均匀加热。', fix:'试管应与桌面约成 45° 角倾斜加热。'},
+   {scene:'heat_bad_clamp_dir', reason:'试管夹从试管口部往下套（方向错误）。', harm:'容易沾污试管内壁，且操作不便、易把试管弄破。', fix:'试管夹应从试管底部往上套，夹在距管口约 1/3 处。'},
+   {scene:'heat_bad_hand', reason:'直接用手拿着试管加热，没有使用试管夹。', harm:'试管受热温度高，会烫伤手指；手持不稳还容易把试管碰翻。', fix:'必须用试管夹夹持试管中上部，手握长柄加热，绝不能用手直接拿试管。'}
+  ]},
+ {id:'connect', name:'连接仪器（玻璃管与橡胶塞等）', vol:UP, unit:1,
+  correct:{scene:'connect_ok', point:'玻璃导管与橡胶塞（乳胶管）：管口先蘸水润湿，右手握玻璃管、左手拿橡胶塞，旋转着缓慢插入；橡胶塞与试管：管口不沾水，稍用力转动组装。'},
+  trivia:'玻璃管插橡胶管前蘸水，起润滑作用；不沾水硬塞最容易把玻璃管折断、扎伤手。',
+  errors:[
+   {scene:'connect_bad_press', reason:'把试管放在桌面上，另一只手往下压橡胶塞。', harm:'试管受力不匀，极易被压破，玻璃碎片割伤手。', fix:'应把试管拿在手中，稍用力转动橡胶塞塞紧，不可在桌面上向下按压。'}
+  ]},
+ {id:'leak', name:'检查装置的气密性', vol:UP, unit:1,
+  correct:{scene:'leak_ok', point:'导管入水、手捂试管法：导管口浸入水中，双手紧握试管外壁，导管口有气泡冒出、松手后形成一段水柱，则装置不漏气。'},
+  trivia:'检查气密性的三种方法其实对应装置不同：手捂法适合小型试管装置，注射器法适合有活塞的装置，注水法适合带长颈漏斗的装置。',
+  corrects:[
+   {scene:'leak_ok', point:'导管入水、手捂法：将导管一端放入水中，双手紧握试管外壁；导管口有气泡冒出，松手后导管内形成一段水柱，说明装置不漏气。'},
+   {scene:'leak_syringe', point:'注射器法：把注射器与装置导管相连，拉（或推）动活塞后松手，若活塞能回到原来位置，说明装置气密性良好。'},
+   {scene:'leak_funnel', point:'长颈漏斗法：从长颈漏斗向锥形瓶中加水，使漏斗下端液封；继续加水，若漏斗颈内形成一段稳定水柱、液面不下降，说明气密性良好。'},
+   {scene:'leak_sepfunnel', point:'分液漏斗装置可用手握法：分液漏斗上口有玻璃塞、活塞关闭时整个装置密闭，手握容器外壁，若导管口有气泡冒出、松手后形成一段水柱，说明气密性良好（与长颈漏斗不同）。'}
+  ],
+  errors:[
+   {scene:'leak_bad_funnel_warm', reason:'装置中带有长颈漏斗时，仍然采用手握容器外壁、看导管口是否冒气泡的方法检查气密性。', harm:'长颈漏斗上口与大气相通，手捂升温后气体从长颈漏斗逸出，导管口不会冒气泡，无法判断装置是否漏气，容易误判。', fix:'带长颈漏斗的装置应先从漏斗加水液封下端，再用注水法（漏斗颈形成稳定水柱）或弹簧夹夹紧胶皮管后再注水检验；不能直接用手握法。'}
+  ]},
+ {id:'wash', name:'洗涤玻璃仪器（试管）', vol:UP, unit:1,
+  correct:{scene:'wash_ok', point:'将剩余废液倒入废液桶，注入约 1/2 容积的水，震荡，倒掉，重复 2~3 次；难洗的用试管刷转动刷洗；洗净标准：内壁的水既不聚成水滴、也不成股流下。'},
+  trivia:'玻璃仪器洗净的标准——"既不聚成水滴，也不成股流下"，这是因为干净的玻璃表面被水完全润湿，水会形成均匀的水膜。',
+  errors:[]},
+ {id:'oxygen', name:'实验室制取氧气', vol:UP, unit:2,
+  correct:{scene:'o2_ok', point:'高锰酸钾（固固加热型）：试管口略向下倾斜、管口放一团棉花；导管口气泡连续均匀冒出后再收集；实验完毕先撤出导气管、再熄灭酒精灯。过氧化氢（固液不加热型）：长颈漏斗下端伸入液面以下形成液封。'},
+  trivia:'高锰酸钾制氧气时试管口要塞棉花，因为高锰酸钾颗粒细，加热时会随氧气流冲进导管和水槽，把水染成紫红色。',
+  errors:[
+   {scene:'o2_bad_up', reason:'试管口向上倾斜（固体加热）。', harm:'药品受热产生的水蒸气冷凝成水倒流，炸裂试管。', fix:'试管口略向下倾斜，防止冷凝水倒流。'},
+   {scene:'o2_bad_nocotton', reason:'试管口不放棉花（高锰酸钾制氧时）。', harm:'高锰酸钾粉末随气流进入导管、水槽，污染水并可能堵塞导管。', fix:'试管口放一团棉花，防止粉末进入导管。'},
+   {scene:'o2_bad_duct_long', reason:'用排水法收集时，导管伸入集气瓶中过长。', harm:'集满水后取出集气瓶时导管不好撤出，操作不便。', fix:'排水法收集时导管只需伸到集气瓶瓶口即可。'},
+   {scene:'o2_bad_stopper', reason:'玻璃导管伸出橡胶塞过长。', harm:'导管伸入试管内太长，气体不易导出。', fix:'导管稍露出橡胶塞即可（约 0.5 cm）。'}
+  ]},
+ {id:'gas_o2', name:'氧气的检验和验满', vol:UP, unit:2,
+  correct:{scene:'gas_ok', point:'检验：将带火星的木条伸入集气瓶内，若木条复燃，证明是氧气。验满：将带火星的木条放在集气瓶口，若木条复燃，说明氧气已收集满。'},
+  trivia:'氧气能使带火星的木条复燃，是因为氧气本身不燃烧但能支持燃烧，木条在纯氧中燃烧比在空气中剧烈得多。',
+  errors:[
+   {scene:'gas_bad_deep', reason:'验满时把带火星的木条伸入集气瓶内部。', harm:'伸入瓶内是“检验”操作，不能判断是否已收集满。', fix:'验满时木条应放在集气瓶口处。'},
+   {scene:'gas_bad_mouth', reason:'检验氧气时把带火星的木条放在集气瓶口上方，没有伸入瓶中。', harm:'瓶口上方氧气浓度低，木条不易复燃，无法可靠检验瓶内是否是氧气。', fix:'检验时应把带火星的木条伸入集气瓶内，观察是否复燃。'}
+  ]},
+ {id:'filter', name:'过滤操作（分离不溶性杂质）', vol:UP, unit:4,
+  correct:{scene:'filter_ok', point:'一贴（滤纸紧贴漏斗内壁）二低（滤纸边缘低于漏斗口、液面低于滤纸边缘）三靠（烧杯嘴靠玻璃棒、玻璃棒靠三层滤纸处、漏斗下端靠烧杯内壁）。'},
+  trivia:'"一贴二低三靠"里的"三靠"——烧杯靠玻璃棒、玻璃棒靠三层滤纸、漏斗下端靠烧杯内壁，每一条都是为了让液体沿一个方向平稳流动。',
+  errors:[
+   {scene:'filter_bad_norod', reason:'倾倒液体时没有用玻璃棒引流。', harm:'液体易冲破滤纸、溅出，过滤失败。', fix:'液体沿玻璃棒缓缓倒入，玻璃棒下端靠在三层滤纸处。'},
+   {scene:'filter_bad_notouch', reason:'漏斗下端管口没有紧靠烧杯内壁。', harm:'滤液溅出烧杯，过滤时液滴飞溅。', fix:'漏斗下端尖嘴要紧靠烧杯内壁。'}
+  ]},
+ {id:'h2check', name:'检验氢气纯度（爆鸣法）', vol:UP, unit:4,
+  correct:{scene:'h2_ok', point:'用排水法收集一试管氢气，试管口朝下，用拇指堵住管口移近火焰，松开手指点燃；发出“噗”的轻微声音说明纯净，若有尖锐爆鸣声则不纯。'},
+  trivia:'检验氢气纯度时听到"噗"的一声说明氢气较纯；如果听到尖锐爆鸣声，说明氢气里混有空气，点燃会爆炸——所以试管口一定要朝下。',
+  errors:[]},
+ {id:'co2', name:'实验室制取二氧化碳', vol:UP, unit:6,
+  correct:{scene:'co2_ok', point:'大理石（石灰石）与稀盐酸反应：固液不加热型发生装置；长颈漏斗下端要伸入液面以下形成液封；二氧化碳能溶于水、密度比空气大，用向上排空气法收集，验满用燃着木条放瓶口。'},
+  trivia:'启普发生器是 19 世纪荷兰化学家启普发明的，最大的好处是"随开随用、随关随停"，但它只能用于块状固体和液体不加热反应。',
+  corrects:[
+   {scene:'co2_ok', point:'长颈漏斗装置：大理石+稀盐酸，长颈漏斗下端液封，向上排空气法收集。'},
+   {scene:'co2_ok_sepfunnel', point:'分液漏斗代替长颈漏斗：分液漏斗有玻璃塞和活塞，可以通过控制活塞来调节稀盐酸的滴加速率，从而控制反应速率。'},
+   {scene:'co2_ok_syringe', point:'注射器代替长颈漏斗：注射器可以精确控制液体加入量和加入速率，便于控制反应速率，也便于添加酸液。'},
+   {scene:'co2_ok_kipp', point:'启普发生器（带多孔隔板）：固体大理石放在多孔隔板上，打开活塞酸液与固体接触反应，关闭活塞生成的气体把酸液压回球形漏斗、固液分离，反应即停止——可随时控制反应的发生和停止。'}
+  ],
+  errors:[
+   {scene:'co2_bad_noseal', reason:'长颈漏斗下端管口未伸入液面以下（没有形成液封）。', harm:'生成的气体从长颈漏斗逸出，收集不到 CO₂。', fix:'长颈漏斗下端管口要浸到液面以下，形成液封。'},
+   {scene:'co2_bad_down', reason:'用向下排空气法收集二氧化碳。', harm:'CO₂ 密度比空气大，向下排空气法收集不到气体。', fix:'CO₂ 密度比空气大，应用向上排空气法收集。'},
+   {scene:'co2_bad_high', reason:'用向上排空气法收集时，导气管没有伸到集气瓶瓶底。', harm:'瓶底的空气排不尽，收集的 CO₂ 不纯。', fix:'导气管应伸到集气瓶底部，便于排尽空气。'},
+   {scene:'co2_bad_water', reason:'用排水法收集二氧化碳。', harm:'二氧化碳能溶于水且能与水反应（CO₂ + H₂O ⇌ H₂CO₃），会损失大量 CO₂，收集不到气体。', fix:'CO₂ 能溶于水，不能用排水法；应用向上排空气法收集（CO₂ 密度比空气大）。'}
+  ]},
+ {id:'co2test', name:'二氧化碳的检验', vol:UP, unit:6,
+  correct:{scene:'co2test_ok', point:'将气体通入澄清石灰水中，若澄清石灰水变浑浊，证明该气体是二氧化碳（CO₂ + Ca(OH)₂ = CaCO₃↓ + H₂O）。'},
+  trivia:'能使燃着木条熄灭的气体不只有 CO₂——氮气、稀有气体都行；所以实验室唯一可靠的 CO₂ 检验方法就是通入澄清石灰水。',
+  errors:[
+   {scene:'co2test_bad', reason:'用燃着的小木条（或火柴）伸入瓶中，木条熄灭就认为是二氧化碳。', harm:'能使燃着木条熄灭的气体不只有 CO₂（如氮气、稀有气体等也不支持燃烧），结论不可靠。', fix:'检验 CO₂ 的唯一方法是把气体通入澄清石灰水，观察是否变浑浊；燃着木条只能用于 CO₂ 验满。'}
+  ]},
+ {id:'solution', name:'配制一定溶质质量分数的溶液', vol:DOWN,
+  correct:{scene:'sol_ok', point:'步骤：计算 → 称量（托盘天平）→ 量取（量筒）→ 溶解（烧杯+玻璃棒搅拌）→ 装瓶、贴标签。'},
+  trivia:'用托盘天平称氯化钠时两张称量纸要一样重；如果两张纸质量不同，就要用"减量法"称量。',
+  errors:[
+   {scene:'sol_bad_cylinder', reason:'在量筒中直接溶解固体。', harm:'量筒只能用于量取液体，不能作反应（溶解）容器，搅拌易损坏量筒且不精确。', fix:'先在烧杯中溶解，用玻璃棒搅拌，再转移到试剂瓶。'},
+   {scene:'sol_bad_dropper_stir', reason:'用胶头滴管代替玻璃棒搅拌溶液。', harm:'胶头滴管易折断、损坏，且搅拌不均匀；还可能污染胶帽。', fix:'溶解时必须用玻璃棒搅拌，胶头滴管只用于滴加少量液体。'},
+   {scene:'sol_bad_cap', reason:'用药匙取氯化钠时，试剂瓶瓶塞正放在桌面上（没有倒放）。', harm:'瓶塞内侧接触桌面沾上杂质，盖回试剂瓶后会污染整瓶药品。', fix:'取下瓶塞后应倒放在桌面上，取完药品立即盖回。'}
+  ]},
+ {id:'dilute', name:'稀释浓硫酸', vol:DOWN,
+  correct:{scene:'dilute_ok', point:'将浓硫酸沿器壁慢慢倒入水中，并用玻璃棒不断搅拌（酸入水），切不可把水倒入浓硫酸中。'},
+  trivia:'稀释浓硫酸时必须"酸入水"——因为浓硫酸密度比水大、且遇水放出大量热；若水入酸，水浮在上面瞬间沸腾，酸液飞溅会严重灼伤。',
+  errors:[
+   {scene:'dilute_bad_water', reason:'把水倒入浓硫酸中（水入酸）。', harm:'水浮在浓硫酸表面，放出的热使水剧烈沸腾，酸液向四周飞溅，严重灼伤皮肤。', fix:'必须把浓硫酸沿器壁缓缓倒入水中，边倒边搅拌。'}
+  ]},
+ {id:'ph', name:'测定溶液的 pH（pH 试纸）', vol:DOWN,
+  correct:{scene:'ph_ok', point:'pH 试纸不能伸入待测液中；试纸必须干燥、不能润湿；用洁净干燥的玻璃棒蘸取少量待测液滴在试纸上，与标准比色卡对照读数。'},
+  trivia:'pH 试纸是用多种酸碱指示剂浸泡滤纸晾干制成的；它只能给出 pH 的大致范围（整数），要精确值需用 pH 计。',
+  errors:[
+   {scene:'ph_bad_dip', reason:'把 pH 试纸直接浸入待测溶液中。', harm:'污染整瓶（整杯）待测溶液，测得结果也不准。', fix:'用玻璃棒蘸取待测液滴到试纸上。'},
+   {scene:'ph_bad_wet', reason:'pH 试纸先用水润湿再测。', harm:'水稀释了待测液，测得的 pH 不准确（酸性偏大、碱性偏小）。', fix:'使用干燥的 pH 试纸，不润湿。'},
+   {scene:'ph_bad_corrosive', reason:'用 pH 试纸直接测定浓硫酸等强腐蚀性液体。', harm:'浓硫酸等强腐蚀性液体会使 pH 试纸脱水炭化变黑，无法读出真实 pH；还会腐蚀、灼伤操作者。', fix:'浓硫酸等强腐蚀性液体不能用 pH 试纸直接测定，需先稀释后再测，或用 pH 计测量。'}
+  ]},
+ {id:'evap', name:'蒸发结晶操作', vol:DOWN,
+  correct:{scene:'evap_ok', point:'用蒸发皿蒸发，玻璃棒不断搅拌，出现较多固体时停止加热，用余热蒸干。'},
+  trivia:'蒸发时不能把水分完全蒸干，要在出现较多固体时就停止加热，用余热蒸干——否则固体飞溅、精盐结块。',
+  errors:[
+   {scene:'evap_bad_nostir', reason:'蒸发过程中不搅拌。', harm:'局部温度过高，液体暴沸，液滴飞溅伤人。', fix:'蒸发过程中玻璃棒持续搅拌，使受热均匀。'},
+   {scene:'evap_bad_hand', reason:'实验刚结束时，直接用手拿取热的蒸发皿。', harm:'热蒸发皿温度很高，会烫伤手指。', fix:'应用坩埚钳夹取热的蒸发皿，放在石棉网上冷却。'}
+  ]}
+];
+
+/* ============ 状态 ============ */
+var state={ vol:'all', unitRange:6, unitSel:0, mode:'home' };
+var EXAM={ list:[], idx:0, answers:[], score:0 };
+var PK={ list:[], idx:0, A:{score:0,times:[],answers:[]}, B:{score:0,times:[],answers:[]}, t0:0 };
+
+/* ============ 视图切换 ============ */
+function show(name){
+  document.body.classList.remove('pk-mode');
+  ['homeView','learnView','examView'].forEach(function(v){ $(v).classList.toggle('active', v===name+'View'); });
+  state.mode=name;
+  window.scrollTo(0,0);
+  if(name==='learn') renderLearn();
+  if(name==='exam') renderExamSetup();
+}
+$('homeBtn').onclick=function(){ sndClick(); show('home'); };
+$('learnModeCard').onclick=function(){ sndClick(); show('learn'); };
+$('examModeCard').onclick=function(){ sndClick(); show('exam'); };
+
+/* 全屏 */
+$('fsBtn').onclick=function(){
+  sndClick();
+  try{
+    if(document.fullscreenElement||document.webkitFullscreenElement){ document.exitFullscreen&&document.exitFullscreen(); document.webkitExitFullscreen&&document.webkitExitFullscreen(); }
+    else{
+      var el=document.documentElement;
+      (el.requestFullscreen||el.webkitRequestFullscreen).call(el);
+    }
+  }catch(e){ toast('全屏已被浏览器限制'); }
+};
+
+var _zoomLevels=[1,1.1,1.2,1.5,2.0,0.9];
+var _zoomIdx=0;
+$('fontBtn').onclick=function(){
+  sndClick();
+  _zoomIdx=(_zoomIdx+1)%_zoomLevels.length;
+  var z=_zoomLevels[_zoomIdx];
+  document.body.style.zoom=z;
+  var lbl=['标准','大','超大','超超大','巨大','小'][_zoomIdx];
+  toast('字体大小：'+lbl);
+};
+
+/* 解析文字显示/隐藏 */
+$('expBtn').onclick=function(){
+  sndClick();
+  var off=document.body.classList.toggle('hide-explain');
+  this.textContent=off?'💡 解析：关':'💡 解析：开';
+  toast(off?'解析已隐藏（只看图片自己想）':'解析已显示');
+};
+
+/* ============ 分册选择 ============ */
+function volSeg(containerId,cur,cb){
+  var c=$(containerId); c.innerHTML='';
+  var opts=[['all','全册'],['up','上册'],['down','下册']];
+  opts.forEach(function(o){
+    var b=document.createElement('button');
+    b.className='btn '+(cur===o[0]?'on':'off');
+    b.textContent=o[1];
+    b.onclick=function(){ sndClick(); cb(o[0]); };
+    c.appendChild(b);
+  });
+}
+function filtered(){
+  var list = (state.vol==='all') ? TOPICS : TOPICS.filter(function(t){ return t.vol===state.vol; });
+  if(state.vol==='up'){
+    if(state.mode==='exam'){
+      // 考试模式：累计范围 1/2/4/6（含 ≤该单元的所有单元）
+      if(state.unitRange>0) list = list.filter(function(t){ return t.unit && t.unit<=state.unitRange; });
+    }else{
+      // 学习模式：精确单元 1/2/4/6；0=全部
+      if(state.unitSel>0) list = list.filter(function(t){ return t.unit===state.unitSel; });
+    }
+  }
+  return list;
+}
+/* 单元筛选（仅上册）。mode:'exact'=精确单元；'cum'=累计范围 */
+function unitSeg(containerId,cur,cb,mode){
+  var c=$(containerId); c.innerHTML='';
+  if(state.vol!=='up'){ c.style.display='none'; return; }
+  c.style.display='';
+  var opts;
+  if(mode==='cum'){
+    opts=[[1,'第1单元'],[2,'第1~2单元'],[4,'第1~4单元'],[6,'第1~6单元']];
+  }else{
+    opts=[[0,'全部单元'],[1,'第1单元'],[2,'第2单元'],[4,'第4单元'],[6,'第6单元']];
+  }
+  opts.forEach(function(o){
+    var b=document.createElement('button');
+    b.className='btn '+(cur===o[0]?'on':'off');
+    b.textContent=o[1];
+    b.onclick=function(){ sndClick(); cb(o[0]); };
+    c.appendChild(b);
+  });
+}
+
+/* ============ 学习模式 ============ */
+function renderLearn(){
+  volSeg('learnVolSeg',state.vol,function(v){ state.vol=v; if(v!=='up'){ state.unitSel=0; } renderLearn(); });
+  unitSeg('learnUnitSeg',state.unitSel,function(u){ state.unitSel=u; renderLearn(); },'exact');
+  $('learnNav').innerHTML='<button class="btn gray" onclick="sndClick();show(\'home\')">← 返回首页</button>';
+  var g=$('learnGrid'); g.innerHTML='';
+  filtered().forEach(function(t,i){
+    var card=document.createElement('div');
+    card.className='card topic-card';
+    var volTxt=t.vol===UP?'上册':'下册';
+    var unitBadge = (t.vol===UP && t.unit) ? '<span class="vol-badge unit-badge">第'+t.unit+'单元</span>' : '';
+    card.innerHTML=
+      '<div class="pic">'+IMG(t.correct.scene)+'</div>'+
+      '<div class="nm">'+t.name+'</div>'+
+      '<div class="vol"><span class="vol-badge '+(t.vol===UP?'vol-up':'vol-down')+'">'+volTxt+'</span>'+unitBadge+'</div>';
+    card.onclick=function(){ sndClick(); openModal(t); };
+    g.appendChild(card);
+  });
+}
+function openModal(t){
+  var m=$('modal'); m.innerHTML='';
+  var h=document.createElement('h3');
+  h.innerHTML='<span>🔬 '+t.name+'</span><button class="x">✕</button>';
+  h.querySelector('.x').onclick=closeModal;
+  m.appendChild(h);
+
+  /* 正确操作区：支持单个 correct 或多个 corrects */
+  var okWrap=document.createElement('div');
+  if(t.corrects){
+    t.corrects.forEach(function(c,ci){
+      var row=document.createElement('div'); row.className='ok-row';
+      row.innerHTML=
+        '<div class="pic">'+IMG(c.scene)+'</div>'+
+        '<div class="info"><div class="t">✓ 正确操作'+(t.corrects.length>1?'（'+(ci+1)+'）':'')+'</div><div class="pt">'+c.point+'</div></div>';
+      okWrap.appendChild(row);
+    });
+  }else{
+    var row=document.createElement('div'); row.className='ok-row';
+    row.innerHTML=
+      '<div class="pic">'+IMG(t.correct.scene)+'</div>'+
+      '<div class="info"><div class="t">✓ 正确操作</div><div class="pt">'+t.correct.point+'</div></div>';
+    okWrap.appendChild(row);
+  }
+  m.appendChild(okWrap);
+
+  /* 小知识 */
+  if(t.trivia){
+    var tb=document.createElement('button');
+    tb.className='trivia-btn'; tb.textContent='💡 仪器小知识';
+    var tq=document.createElement('div');
+    tq.className='trivia-box'; tq.innerHTML='📚 '+t.trivia;
+    tb.onclick=function(){ sndClick(); tq.classList.toggle('show'); tb.textContent=tq.classList.contains('show')?'💡 收起小知识':'💡 仪器小知识'; };
+    m.appendChild(tb);
+    m.appendChild(tq);
+  }
+
+  if(t.errors && t.errors.length>0){
+    var title=document.createElement('div');
+    title.className='h2'; title.innerHTML='<span style="color:var(--red)">✗ 常见错误操作</span><span class="tag">'+t.errors.length+' 种</span>';
+    m.appendChild(title);
+
+    var list=document.createElement('div'); list.className='err-list';
+    t.errors.forEach(function(e){
+      var item=document.createElement('div'); item.className='err-item';
+      item.innerHTML=
+        '<div class="hd">⚠ 错误操作</div>'+
+        '<div class="body">'+
+          '<div class="pic">'+IMG(e.scene)+'</div>'+
+          '<div class="meta">'+
+            '<div class="e-reason"><span class="k">错因：</span>'+e.reason+'</div>'+
+            '<div class="e-harm"><span class="k">危害后果：</span>'+e.harm+'</div>'+
+            '<div class="e-fix"><span class="k">改正方法：</span>'+e.fix+'</div>'+
+          '</div>'+
+        '</div>';
+      list.appendChild(item);
+    });
+    m.appendChild(list);
+  }else{
+    var none=document.createElement('div');
+    none.style.cssText='margin-top:14px;padding:12px 16px;background:#f1f5f9;border-radius:10px;color:var(--sub);font-size:13px;';
+    none.textContent='本操作以规范正确做法为主，无常见错误操作对比。';
+    m.appendChild(none);
+  }
+  $('mask').classList.add('show');
+  m.scrollTop=0;
+}
+function closeModal(){ $('mask').classList.remove('show'); }
+$('mask').onclick=function(e){ if(e.target===this) closeModal(); };
+
+/* ============ 考试模式 ============ */
+function renderExamSetup(){
+  volSeg('examVolSeg',state.vol,function(v){ state.vol=v; if(v!=='up') state.unitRange=6; renderExamSetup(); });
+  unitSeg('examUnitSeg',state.unitRange,function(u){ state.unitRange=u; renderExamSetup(); },'cum');
+  $('examNav').innerHTML='<button class="btn gray" onclick="sndClick();show(\'home\')">← 返回首页</button>';
+  var body=$('examBody');
+  body.innerHTML='<div class="exam-stage">'+
+    '<div style="font-size:40px">✍️</div>'+
+    '<div class="q-title">下列实验操作正确的是？</div>'+
+    '<div style="color:var(--sub);font-size:13px;margin-bottom:18px">范围：'+(state.vol==='all'?'全册（上册+下册）':state.vol===UP?'上册':'下册')+' · 共 4 题，每题 4 个操作图（A/B/C/D），选出正确的一项</div>'+
+    '<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">'+
+      '<button class="btn blue big" id="startSingleBtn">👤 单人考试</button>'+
+      '<button class="btn orange big" id="startPKBtn">⚔️ 双人 PK</button>'+
+    '</div>'+
+    '<div style="color:var(--sub);font-size:12px;margin-top:12px">双人 PK：两人做同一套题，左右两组 A/B/C/D 按钮分别作答，看谁又快又准</div>'+
+  '</div>';
+  $('startSingleBtn').onclick=function(){ sndClick(); startExamSingle(); };
+  $('startPKBtn').onclick=function(){ sndClick(); startExamPK(); };
+}
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+/* 生成一轮：1个正确 + 3个错误（来自不同条目），ABCD 打乱 */
+function buildRound(){
+  var pool=filtered();
+  // 收集该范围内所有"正确场景"：主正确 + 正确补充（corrects）
+  var allCorrectScenes=[];
+  pool.forEach(function(t){
+    allCorrectScenes.push({scene:t.correct.scene, point:t.correct.point, topic:t});
+    if(t.corrects){
+      t.corrects.forEach(function(c){
+        allCorrectScenes.push({scene:c.scene, point:c.point, topic:t});
+      });
+    }
+  });
+  var errPool=pool.filter(function(t){ return t.errors && t.errors.length>0; });
+  if(errPool.length<3){ toast('当前分册错误题不足 3 道'); return null; }
+  var opts=[];
+  // 正确选项从全部正确场景中随机抽一个
+  var rc=allCorrectScenes[Math.floor(Math.random()*allCorrectScenes.length)];
+  opts.push({scene:rc.scene, isRight:true, topic:rc.topic, point:rc.point});
+  var usedScenes={}; usedScenes[rc.scene]=true;
+  var idxs=shuffle(errPool.map(function(_,i){return i;}));
+  for(var k=0;k<3;k++){
+    var t=errPool[idxs[k]];
+    var e=t.errors[Math.floor(Math.random()*t.errors.length)];
+    // 避免和正确场景同图（理论上不会，但保险去重）
+    if(usedScenes[e.scene]){ k--; continue; }
+    usedScenes[e.scene]=true;
+    opts.push({scene:e.scene, isRight:false, topic:t, reason:e.reason, harm:e.harm, fix:e.fix});
+  }
+  opts=shuffle(opts);
+  opts.forEach(function(o,i){ o.label=String.fromCharCode(65+i); });
+  return opts;
+}
+/* ============ 单人 ============ */
+function startExamSingle(){
+  var rounds=[];
+  for(var r=0;r<4;r++){ var rd=buildRound(); if(!rd) return; rounds.push(rd); }
+  EXAM={ list:rounds, idx:0, answers:[], score:0 };
+  renderQuestion();
+}
+function renderQuestion(){
+  var opts=EXAM.list[EXAM.idx];
+  var body=$('examBody');
+  var cards='';
+  opts.forEach(function(o){
+    cards+='<div class="mcq-card" data-label="'+o.label+'" id="card'+o.label+'">'+
+      '<div class="letter">'+o.label+'</div><div class="pic">'+IMG(o.scene)+'</div></div>';
+  });
+  body.innerHTML='<div class="exam-stage">'+
+    '<div class="q-no">第 '+(EXAM.idx+1)+' / 4 题</div>'+
+    '<div class="q-title">下列实验操作正确的是？</div>'+
+    '<div class="mcq-grid">'+cards+'</div>'+
+    '<div id="fb" style="max-width:860px;margin:10px auto;text-align:left"></div>'+
+  '</div>';
+  opts.forEach(function(o){
+    $('card'+o.label).onclick=function(){ answer(o.label, opts); };
+  });
+}
+function answer(label, opts){
+  var chosen=opts.filter(function(o){return o.label===label;})[0];
+  var correctLabel=opts.filter(function(o){return o.isRight;})[0].label;
+  var ok=(label===correctLabel);
+  EXAM.answers.push({opts:opts, chosen:label, correct:correctLabel, ok:ok});
+  if(ok){ EXAM.score++; sndRight(); } else { sndWrong(); }
+  opts.forEach(function(o){
+    var card=$('card'+o.label);
+    card.onclick=null;
+    if(o.isRight) card.classList.add('picked-right');
+    else if(o.label===label) card.classList.add('picked-wrong');
+    else card.classList.add('dim');
+  });
+  var rightOpt=opts.filter(function(o){return o.isRight;})[0];
+  var fb=$('fb');
+  var html='<div class="feedback '+(ok?'right':'wrong')+'"><div class="fb-t">'+(ok?'✓ 回答正确':'✗ 回答错误，正确答案是 '+correctLabel)+'</div>';
+  html+='<div>正确选项 '+correctLabel+'（'+rightOpt.topic.name+'）：'+rightOpt.point+'</div>';
+  if(!ok){
+    var badOpt=chosen;
+    html+='<div style="margin-top:6px">你选了 '+label+'（'+badOpt.topic.name+'）的问题：'+badOpt.point+'</div>';
+  }
+  html+='</div><div style="margin-top:12px;text-align:center"><button class="btn blue" id="nextBtn">'+(EXAM.idx===3?'查看成绩':'下一题')+'</button></div>';
+  fb.innerHTML=html;
+  $('nextBtn').onclick=function(){ sndClick(); EXAM.idx++; EXAM.idx>=4? renderScore() : renderQuestion(); };
+}
+function renderScore(){
+  var body=$('examBody');
+  var grade=EXAM.score===4?'满分！实验操作规范意识很强！':EXAM.score>=3?'很不错，继续保持！':EXAM.score>=2?'还需加强，仔细看看解析吧。':'要重视实验规范，安全第一！';
+  var html='<div class="score-board">'+
+    '<div class="score">'+EXAM.score+' / 4</div>'+
+    '<div class="score-desc">'+grade+'</div>'+
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+      '<button class="btn blue" id="againBtn">再考一次</button>'+
+      '<button class="btn gray" id="homeBtn2">返回首页</button>'+
+    '</div>'+
+  '</div>';
+  html+='<div class="h2">逐题回顾</div><div class="review-list">';
+  EXAM.answers.forEach(function(a,idx){
+    var pill=a.ok?'<span class="pill right">答对</span>':'<span class="pill wrong">答错</span>';
+    var rightOpt=a.opts.filter(function(o){return o.isRight;})[0];
+    var badOpt=a.opts.filter(function(o){return o.label===a.chosen;})[0];
+    html+='<div class="review-item"><div class="r-pic">'+IMG(rightOpt.scene)+'</div>'+
+      '<div class="r-info"><div class="nm">'+(idx+1)+'. 正确答案 '+a.correctLabel+'（'+rightOpt.topic.name+'）'+pill+'</div>'+
+      '<div>你选 '+a.chosen+(a.ok?'':'（'+badOpt.topic.name+'）：'+badOpt.reason)+'</div></div></div>';
+  });
+  html+='</div>';
+  body.innerHTML=html;
+  $('againBtn').onclick=function(){ sndClick(); startExamSingle(); };
+  $('homeBtn2').onclick=function(){ sndClick(); show('home'); };
+}
+/* 兼容旧调用 */
+function startExam(){ startExamSingle(); }
+/* ============ 双人 PK（ABCD 选择） ============ */
+function startExamPK(){
+  document.body.classList.add('pk-mode');
+  var rounds=[];
+  for(var r=0;r<4;r++){ var rd=buildRound(); if(!rd) return; rounds.push(rd); }
+  PK={ list:rounds, idx:0, A:{score:0,times:[],answers:[]}, B:{score:0,times:[],answers:[]}, t0:0 };
+  renderQuestionPK();
+}
+function renderQuestionPK(){
+  var opts=PK.list[PK.idx];
+  PK.t0=performance.now();
+  var body=$('examBody');
+  var cards='';
+  opts.forEach(function(o){
+    cards+='<div class="mcq-card" id="card'+o.label+'"><div class="letter">'+o.label+'</div><div class="pic">'+IMG(o.scene)+'</div></div>';
+  });
+  function sideHtml(who, pkey){
+    var btns='<div class="pk-abtn">';
+    ['A','B','C','D'].forEach(function(l){
+      btns+='<button class="btn gray" id="'+pkey+l+'">'+l+'</button>';
+    });
+    btns+='</div>';
+    return '<div class="pk-side '+who+'" id="side'+who+'"><div class="who">'+(who==='A'?'🔵 玩家 A':'🟠 玩家 B')+'</div>'+btns+'<div class="picked" id="'+pkey+'Picked"></div></div>';
+  }
+  body.innerHTML='<div class="exam-stage">'+
+    '<div class="q-no">第 '+(PK.idx+1)+' / 4 题</div>'+
+    '<div class="q-title">下列实验操作正确的是？</div>'+
+    '<div class="mcq-grid">'+cards+'</div>'+
+    '<div class="pk-wrap">'+
+      sideHtml('A','a')+
+      '<div style="flex:0 0 20px"></div>'+
+      sideHtml('B','b')+
+    '</div>'+
+    '<div id="pkFb" style="max-width:860px;margin:10px auto;text-align:left"></div>'+
+  '</div>';
+  PK.A.done=false; PK.B.done=false;
+  ['A','B','C','D'].forEach(function(l){
+    $('a'+l).onclick=function(){ pkAnswer('A',l); };
+    $('b'+l).onclick=function(){ pkAnswer('B',l); };
+  });
+}
+function pkAnswer(who, label){
+  var p=PK[who];
+  if(p.done) return;
+  var t=((performance.now()-PK.t0)/1000).toFixed(1);
+  var opts=PK.list[PK.idx];
+  var correctLabel=opts.filter(function(o){return o.isRight;})[0].label;
+  var ok=(label===correctLabel);
+  p.done=true; p.times.push(parseFloat(t));
+  p.answers.push({opts:opts, chosen:label, correct:correctLabel, ok:ok, time:parseFloat(t)});
+  if(ok){ p.score++; sndRight(); } else { sndWrong(); }
+  var side=$('side'+who);
+  side.classList.add('done');
+  side.querySelectorAll('button').forEach(function(b){ b.disabled=true; });
+  var pkey=who==='A'?'a':'b';
+  var picked=$(pkey+'Picked');
+  picked.textContent='你选 '+label+' · 用时 '+t+'s';
+  picked.style.color=ok?'#16a34a':'#dc2626';
+  if(PK.A.done && PK.B.done){
+    opts.forEach(function(o){
+      var card=$('card'+o.label);
+      if(o.label===correctLabel) card.classList.add('picked-right');
+    });
+    var a=PK.A.answers[PK.A.answers.length-1], b=PK.B.answers[PK.B.answers.length-1];
+    var rightOpt=opts.filter(function(o){return o.isRight;})[0];
+    var fb=$('pkFb');
+    fb.innerHTML='<div class="pk-result">'+
+      '<div>正确答案：<b>'+correctLabel+'</b>（'+rightOpt.topic.name+'）—— '+rightOpt.point+'</div>'+
+      '<div style="margin-top:6px">🔵 A 选 '+a.chosen+'：'+(a.ok?'<span style="color:#16a34a;font-weight:800">答对</span>':'<span style="color:#dc2626;font-weight:800">答错</span>')+'　　🟠 B 选 '+b.chosen+'：'+(b.ok?'<span style="color:#16a34a;font-weight:800">答对</span>':'<span style="color:#dc2626;font-weight:800">答错</span>')+'</div>'+
+      '<div style="margin-top:10px;text-align:center"><button class="btn blue" id="pkNextBtn">'+(PK.idx===3?'查看成绩':'下一题')+'</button></div>'+
+    '</div>';
+    $('pkNextBtn').onclick=function(){ sndClick(); PK.idx++; PK.idx>=4? renderScorePK() : renderQuestionPK(); };
+  }
+}
+function renderScorePK(){
+  var body=$('examBody');
+  var aT=PK.A.times.reduce(function(s,x){return s+x;},0);
+  var bT=PK.B.times.reduce(function(s,x){return s+x;},0);
+  var winner;
+  if(PK.A.score>PK.B.score) winner='🔵 玩家 A 获胜！';
+  else if(PK.B.score>PK.A.score) winner='🟠 玩家 B 获胜！';
+  else if(aT<bT) winner='🔵 玩家 A 用时更短，获胜！';
+  else if(bT<aT) winner='🟠 玩家 B 用时更短，获胜！';
+  else winner='🤝 平局！再来一局吧！';
+  var html='<div class="score-board">'+
+    '<div class="winner-banner">'+winner+'</div>'+
+    '<div class="pk-score-row">'+
+      '<div class="pk-score-card A"><div class="who">🔵 玩家 A</div><div class="big-num">'+PK.A.score+' / 4</div><div class="tt">总用时 '+aT.toFixed(1)+' 秒</div></div>'+
+      '<div class="pk-score-card B"><div class="who">🟠 玩家 B</div><div class="big-num">'+PK.B.score+' / 4</div><div class="tt">总用时 '+bT.toFixed(1)+' 秒</div></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'+
+      '<button class="btn orange" id="againPKBtn">再来一局 PK</button>'+
+      '<button class="btn gray" id="homeBtn2">返回首页</button>'+
+    '</div>'+
+  '</div>';
+  html+='<div class="h2">逐题回顾</div><div class="review-list">';
+  PK.list.forEach(function(opts,idx){
+    var a=PK.A.answers[idx], b=PK.B.answers[idx];
+    var rightOpt=opts.filter(function(o){return o.isRight;})[0];
+    var pillA=a.ok?'<span class="pill right">A'+a.chosen+'对</span>':'<span class="pill wrong">A'+a.chosen+'错</span>';
+    var pillB=b.ok?'<span class="pill right">B'+b.chosen+'对</span>':'<span class="pill wrong">B'+b.chosen+'错</span>';
+    html+='<div class="review-item"><div class="r-pic">'+IMG(rightOpt.scene)+'</div>'+
+      '<div class="r-info"><div class="nm">'+(idx+1)+'. 正确答案 '+a.correctLabel+'（'+rightOpt.topic.name+'） '+pillA+' '+pillB+'</div>'+
+      '<div>'+rightOpt.point+'</div></div></div>';
+  });
+  html+='</div>';
+  body.innerHTML=html;
+  $('againPKBtn').onclick=function(){ sndClick(); startExamPK(); };
+  $('homeBtn2').onclick=function(){ sndClick(); show('home'); };
+}
+
+/* ============ 初始化 ============ */
+function homeVolCb(v){ state.vol=v; volSeg('homeVolSeg',state.vol,homeVolCb); }
+volSeg('homeVolSeg',state.vol,homeVolCb);
+
+/* 全局禁用鼠标右键 */
+document.addEventListener('contextmenu', function(e){ e.preventDefault(); e.stopPropagation(); return false; });
+
+/* 打开页面默认全屏：先尝试自动进入，被浏览器拦截则在用户首次点击/触摸时再进入一次 */
+function tryFullscreen(){
+  try{
+    var el=document.documentElement;
+    if(!document.fullscreenElement && !document.webkitFullscreenElement){
+      (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
+    }
+  }catch(e){}
+}
+window.addEventListener('load', tryFullscreen);
+document.addEventListener('pointerdown', function once(){
+  tryFullscreen();
+  document.removeEventListener('pointerdown', once);
+}, {once:true});
+
+</script>
+</body>
+</html>
