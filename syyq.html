@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>化学实验仪器识别记忆</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft Yahei","PingFang SC",sans-serif;background:linear-gradient(135deg,#e0f2fe 0%,#f0fdf4 100%);min-height:100vh;padding:20px;overflow-x:hidden}
+.header{text-align:center;margin-bottom:24px}
+.header h1{color:#1e40af;font-size:28px;margin-bottom:8px}
+.header p{color:#64748b;font-size:14px}
+.toolbar{max-width:1200px;margin:0 auto 20px;background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;padding:10px 14px 10px 38px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;outline:none}
+.search-box input:focus{border-color:#3b82f6}
+.search-box::before{content:"🔍";position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:16px}
+.category-group{display:flex;gap:6px;flex-wrap:wrap}
+.cat-btn{padding:8px 14px;border:2px solid #e2e8f0;border-radius:20px;background:#fff;cursor:pointer;font-size:13px;color:#475569;transition:all .2s}
+.cat-btn:hover{border-color:#3b82f6;color:#3b82f6}
+.cat-btn.active{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.action-group{display:flex;gap:8px;flex-wrap:wrap}
+.action-btn{padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all .2s}
+.btn-expand{background:#dbeafe;color:#1d4ed8}
+.btn-quiz{background:#dcfce7;color:#15803d}
+.btn-zoom{background:#e0e7ff;color:#3730a3}
+.container{max-width:1200px;margin:0 auto}
+.instrument-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}
+.item-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);cursor:pointer;transition:all .25s;border:2px solid transparent;position:relative}
+.item-card:hover{transform:translateY(-4px);box-shadow:0 8px 20px rgba(0,0,0,.12);border-color:#93c5fd}
+.item-card.expanded{border-color:#3b82f6;background:#f8fafc}
+.cat-tag{position:absolute;top:10px;right:10px;font-size:11px;padding:2px 8px;border-radius:10px;background:#f1f5f9;color:#64748b}
+.img-box{width:100%;height:150px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;background:#f8fafc;border-radius:8px;overflow:hidden;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.img-box:hover{border-color:#93c5fd;background:#eff6ff}
+.img-box img{max-width:100%;max-height:100%;object-fit:contain;border-radius:4px}
+.click-hint{text-align:center;font-size:12px;color:#94a3b8}
+.info-area{display:none;border-top:1px solid #e2e8f0;padding-top:12px;margin-top:8px}
+.info-area.show{display:block;animation:fadeIn .3s ease}
+.info-name{font-size:17px;font-weight:700;color:#1e40af;text-align:center;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #dbeafe}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.info-row{margin-bottom:8px}
+.info-label{font-size:13px;font-weight:600;color:#2563eb;margin-bottom:2px}
+.info-text{font-size:13px;color:#475569;line-height:1.6}
+.meta-tags{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+.meta-tag{font-size:12px;padding:4px 10px;border-radius:8px;background:#f1f5f9;color:#334155}
+.meta-tag.unit{background:#dbeafe;color:#1e40af}
+.meta-tag.page{background:#dcfce7;color:#15803d}
+.meta-tag.freq{background:#fef3c7;color:#92400e}
+.no-result{text-align:center;padding:60px 20px;color:#94a3b8;font-size:16px;grid-column:1/-1}
+
+/* ===== 全屏测试弹窗 ===== */
+.quiz-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:1000;overflow-y:auto}
+.quiz-overlay.show{display:block}
+.quiz-box{max-width:1200px;margin:0 auto;padding:24px 32px;position:relative;min-height:100vh}
+.quiz-close{position:fixed;top:16px;right:24px;font-size:28px;cursor:pointer;color:#64748b;background:#f1f5f9;border:none;border-radius:50%;width:40px;height:40px;line-height:36px;z-index:10}
+.quiz-close:hover{color:#1e293b;background:#e2e8f0}
+.quiz-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-right:48px}
+.quiz-top h2{color:#1e40af;font-size:22px}
+.quiz-mode-select{display:flex;gap:8px}
+.qmode-btn{padding:8px 18px;border:2px solid #e2e8f0;border-radius:20px;background:#fff;cursor:pointer;font-size:14px;color:#475569}
+.qmode-btn.active{background:#3b82f6;border-color:#3b82f6;color:#fff}
+.quiz-status{display:flex;justify-content:space-around;align-items:center;background:#f1f5f9;border-radius:10px;padding:10px 16px;margin-bottom:16px;font-size:16px}
+.quiz-status .p1{color:#1d4ed8;font-weight:600}
+.quiz-status .p2{color:#b91c1c;font-weight:600}
+.quiz-status .turn{color:#334155}
+.quiz-progress{color:#64748b;font-size:15px;margin-bottom:12px;text-align:center}
+.quiz-img{width:100%;height:260px;display:flex;align-items:center;justify-content:center;background:#f8fafc;border-radius:12px;margin-bottom:20px}
+.quiz-img img{max-width:100%;max-height:100%;object-fit:contain}
+.opt-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.opt-row.double{grid-template-columns:1fr 1fr;gap:24px}
+.player-col{padding:14px;border-radius:12px;background:#f8fafc}
+.player-col.p1{border:2px solid #bfdbfe}
+.player-col.p2{border:2px solid #fecaca}
+.player-col h4{text-align:center;margin-bottom:10px;font-size:15px}
+.player-col.p1 h4{color:#1d4ed8}
+.player-col.p2 h4{color:#b91c1c}
+.opt-inner{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quiz-option{padding:12px 8px;border:2px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;color:#334155;transition:all .15s;text-align:center}
+.quiz-option .key{display:inline-block;width:22px;height:22px;line-height:20px;border-radius:50%;background:#e2e8f0;color:#334155;font-weight:700;margin-right:6px;font-size:12px}
+.quiz-option:hover{border-color:#3b82f6;background:#eff6ff}
+.quiz-option.correct{border-color:#22c55e;background:#f0fdf4;color:#15803d}
+.quiz-option.correct .key{background:#22c55e;color:#fff}
+.quiz-option.wrong{border-color:#ef4444;background:#fef2f2;color:#b91c1c}
+.quiz-option.wrong .key{background:#ef4444;color:#fff}
+.quiz-option:disabled{cursor:not-allowed;opacity:.7}
+.quiz-result{display:none;margin-bottom:16px;padding:12px;border-radius:8px;font-size:15px;text-align:center}
+.quiz-result.show{display:block}
+.quiz-result.right{background:#f0fdf4;color:#15803d}
+.quiz-result.wrong-ans{background:#fef2f2;color:#b91c1c}
+.quiz-next-wrap{text-align:center}
+.quiz-restart{padding:10px 28px;background:#3b82f6;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px}
+.quiz-restart:hover{background:#2563eb}
+
+/* 单元筛选 */
+.unit-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.unit-row .ulabel{font-size:13px;color:#64748b;margin-right:4px}
+.unit-btn{padding:6px 12px;border:2px solid #e2e8f0;border-radius:16px;background:#fff;cursor:pointer;font-size:12px;color:#475569;transition:all .2s}
+.unit-btn:hover{border-color:#8b5cf6;color:#8b5cf6}
+.unit-btn.active{background:#8b5cf6;border-color:#8b5cf6;color:#fff}
+
+/* 设置面板 */
+.settings-panel{flex-basis:100%;margin-top:10px;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.sp-section{margin-bottom:10px}
+.sp-section:last-child{margin-bottom:0}
+.sp-title{font-size:12px;color:#64748b;margin-bottom:6px;font-weight:600}
+.sp-row{display:flex;flex-wrap:wrap;gap:6px}
+.sp-btn{padding:7px 12px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;cursor:pointer;font-size:13px;color:#334155}
+
+/* 顺序默写模式 */
+.dict-input{width:100%;padding:14px;font-size:18px;border:2px solid #e2e8f0;border-radius:10px;text-align:center;outline:none;margin-bottom:12px}
+.dict-input:focus{border-color:#3b82f6}
+.dict-progress{color:#64748b;font-size:15px;margin-bottom:8px;text-align:center}
+.dict-score{font-size:18px;color:#1e40af;text-align:center;margin-bottom:10px}
+.dict-tip{font-size:13px;color:#94a3b8;text-align:center;margin-bottom:12px}
+
+@media (max-width:768px){
+ .instrument-wrap{grid-template-columns:repeat(2,1fr);gap:14px}
+ .item-card{padding:12px}
+ .img-box{height:180px}
+ .click-hint{font-size:14px}
+ .header h1{font-size:22px}
+ .toolbar{padding:12px}
+ .opt-row{grid-template-columns:1fr 1fr}
+ .opt-row.double{grid-template-columns:1fr}
+ .quiz-img{height:180px}
+ .quiz-box{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🧪 化学实验仪器识别记忆</h1>
+  <p>点击仪器图片查看名称、单元、页码、考频、用途和注意事项 | 共 47 种常用仪器</p>
+</div>
+<div class="toolbar">
+  <div class="search-box"><input type="text" id="searchInput" placeholder="搜索仪器名称..." oninput="filterInstruments()"></div>
+  <div class="action-group">
+    <button class="action-btn btn-quiz" onclick="openQuiz()">🎯 选择题测试</button>
+    <button class="action-btn" style="background:#fce7f3;color:#be185d" onclick="openDict()">✍️ 顺序默写</button>
+    <button class="action-btn" style="background:#f1f5f9;color:#334155" onclick="toggleSettings(event)">⚙️ 设置</button>
+  </div>
+  <div class="settings-panel" id="settingsPanel" style="display:none">
+    <div class="sp-section">
+      <div class="sp-title">视图</div>
+      <div class="sp-row">
+        <button class="sp-btn" onclick="toggleZoom()">🔍 页面缩放：<span id="zoomLabel">100%</span></button>
+        <button class="sp-btn" onclick="toggleAll()">📂 全部展开/收起</button>
+        <button class="sp-btn" onclick="resetFilters()">🔄 重置筛选</button>
+      </div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-title">按分类</div>
+      <div class="sp-row" id="categoryGroup">
+        <button class="cat-btn active" data-cat="all" onclick="setCategory('all',this)">全部</button>
+        <button class="cat-btn" data-cat="反应容器" onclick="setCategory('反应容器',this)">反应容器</button>
+        <button class="cat-btn" data-cat="计量仪器" onclick="setCategory('计量仪器',this)">计量仪器</button>
+        <button class="cat-btn" data-cat="加热仪器" onclick="setCategory('加热仪器',this)">加热仪器</button>
+        <button class="cat-btn" data-cat="取用仪器" onclick="setCategory('取用仪器',this)">取用仪器</button>
+        <button class="cat-btn" data-cat="夹持固定" onclick="setCategory('夹持固定',this)">夹持固定</button>
+        <button class="cat-btn" data-cat="辅助仪器" onclick="setCategory('辅助仪器',this)">辅助仪器</button>
+      </div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-title">按单元</div>
+      <div class="sp-row" id="unitRow">
+        <button class="unit-btn active" data-unit="all" onclick="setUnit('all',this)">全部</button>
+        <button class="unit-btn" data-unit="第1单元" onclick="setUnit('第1单元',this)">第1单元</button>
+        <button class="unit-btn" data-unit="第2单元" onclick="setUnit('第2单元',this)">第2单元</button>
+        <button class="unit-btn" data-unit="第4单元" onclick="setUnit('第4单元',this)">第4单元</button>
+        <button class="unit-btn" data-unit="第5单元" onclick="setUnit('第5单元',this)">第5单元</button>
+        <button class="unit-btn" data-unit="第6单元" onclick="setUnit('第6单元',this)">第6单元</button>
+        <button class="unit-btn" data-unit="第7单元" onclick="setUnit('第7单元',this)">第7单元</button>
+        <button class="unit-btn" data-unit="补充" onclick="setUnit('补充',this)">补充</button>
+      </div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-title">考试范围</div>
+      <div class="sp-row">
+        <button class="unit-btn pool-btn active" data-m="common" onclick="setPoolMode('common')" style="background:#dcfce7;color:#15803d;border-color:#86efac">常用仪器（36）</button>
+        <button class="unit-btn pool-btn" data-m="uncommon" onclick="setPoolMode('uncommon')" style="background:#fee2e2;color:#b91c1c;border-color:#fca5a5">不常用仪器（11）</button>
+      </div>
+    </div>
+    <div class="sp-section">
+      <div class="sp-title">考频分类（按★个数，高→低；无★不显示）</div>
+      <div class="sp-row" id="freqRow">
+        <button class="unit-btn freq-btn active" data-freq="" onclick="setFreq('',this)">全部</button>
+        <button class="unit-btn freq-btn" data-freq="☆☆☆☆☆" onclick="setFreq('☆☆☆☆☆',this)">★★★★★（3种）</button>
+        <button class="unit-btn freq-btn" data-freq="☆☆☆☆" onclick="setFreq('☆☆☆☆',this)">★★★★（1种）</button>
+        <button class="unit-btn freq-btn" data-freq="☆☆☆" onclick="setFreq('☆☆☆',this)">★★★（1种）</button>
+        <button class="unit-btn freq-btn" data-freq="☆☆" onclick="setFreq('☆☆',this)">★★（2种）</button>
+        <button class="unit-btn freq-btn" data-freq="☆" onclick="setFreq('☆',this)">★（2种）</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container"><div class="instrument-wrap" id="instrumentWrap"></div></div>
+
+<div class="quiz-overlay" id="quizOverlay">
+  <div class="quiz-box">
+    <button class="quiz-close" onclick="closeQuiz()">×</button>
+    <div class="quiz-top">
+      <h2>🎯 仪器识别测试</h2>
+      <div class="quiz-mode-select">
+        <button class="qmode-btn active" onclick="setQMode('single')">单人模式</button>
+        <button class="qmode-btn" onclick="setQMode('double')">双人PK模式</button>
+      </div>
+    </div>
+    <div class="quiz-status" id="quizStatus" style="display:none">
+      <span class="p1">玩家1：<span id="p1Score">0</span> 分</span>
+      <span class="turn" id="turnText">—</span>
+      <span class="p2">玩家2：<span id="p2Score">0</span> 分</span>
+    </div>
+    <div class="quiz-progress" id="quizProgress"></div>
+    <div class="quiz-img" id="quizImg"></div>
+    <div id="optArea"></div>
+    <div class="quiz-result" id="quizResult"></div>
+    <div class="quiz-next-wrap" id="nextWrap" style="display:none">
+      <button class="quiz-restart" id="quizNextBtn">下一题 →</button>
+    </div>
+    <div class="dict-tip" style="margin-top:14px">提示：常用仪器（除坩埚、表面皿、研钵、分液漏斗、酒精喷灯、培养皿、玻璃燃烧匙、具支试管、抽滤瓶、蒸馏头、尾接管和牛角管共11种外）；不常用仪器即这11种。</div>
+  </div>
+</div>
+
+<!-- 顺序默写弹窗 -->
+<div class="quiz-overlay" id="dictOverlay">
+  <div class="quiz-box">
+    <button class="quiz-close" onclick="closeDict()">×</button>
+    <div class="quiz-top">
+      <h2>✍️ 顺序默写仪器名称</h2>
+      <div class="quiz-mode-select">
+        <button class="qmode-btn active" onclick="setDictOrder('seq',this)">按教材顺序</button>
+        <button class="qmode-btn" onclick="setDictOrder('rand',this)">随机乱序</button>
+      </div>
+    </div>
+    <div class="dict-progress" id="dictProgress"></div>
+    <div class="dict-score" id="dictScore"></div>
+    <div class="quiz-img" id="dictImg"></div>
+    <input type="text" class="dict-input" id="dictInput" placeholder="输入仪器名称，按回车确认" autocomplete="off">
+    <div class="dict-tip">提示：常用仪器（除坩埚、表面皿、研钵、分液漏斗、酒精喷灯、培养皿、玻璃燃烧匙、具支试管、抽滤瓶、蒸馏头、尾接管和牛角管共11种外）；不常用仪器即这11种。</div>
+    <div class="quiz-result" id="dictResult"></div>
+    <div class="quiz-next-wrap" id="dictNextWrap" style="display:none">
+      <button class="quiz-restart" id="dictNextBtn">下一个 →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* 页面缩放：100→150→300→500→100 */
+var zoomLevels=[100,150,300,500], zoomIndex=0;
+function toggleZoom(){
+  zoomIndex=(zoomIndex+1)%zoomLevels.length;
+  var v=zoomLevels[zoomIndex];
+  document.body.style.zoom=(v/100);
+  var lbl=document.getElementById("zoomLabel");
+  if(lbl) lbl.textContent=v+"%";
+  try{localStorage.setItem("chemZoom",v);}catch(e){}
+}
+function toggleSettings(e){
+  if(e) e.stopPropagation();
+  var p=document.getElementById("settingsPanel");
+  p.style.display=(p.style.display==="none"||!p.style.display)?"block":"none";
+}
+document.addEventListener("click",function(e){
+  var p=document.getElementById("settingsPanel");
+  if(!p||p.style.display!=="block")return;
+  if(!p.contains(e.target)&&!e.target.closest("button[onclick='toggleSettings(event)']")){
+    p.style.display="none";
+  }
+});
+
+/* 仪器数据（研钵已移到辅助仪器末尾；quizExclude=true 不参加测试） */
+var instruments=[
+ {name:"药匙",category:"取用仪器",img:"images/20260901SWspoon.png",unit:"第1单元",page:"P15",freq:"",use:"用于取用粉末状或小颗粒状的固体药品。",note:"取用药品前要用干净的纸擦拭干净；取用不同药品时要擦拭，防止交叉污染；用过之后要及时清洗擦干。"},,
+ {name:"镊子",category:"取用仪器",img:"images/20260901SWtweezers.png",unit:"第1单元",page:"P15",freq:"",use:"用于取用块状或较大颗粒的固体药品，也可用于夹取砝码、金属片等。",note:"取用块状固体时，先将容器横放，把固体放在容器口，再慢慢竖立容器，防止打破容器底部；使用前后擦拭干净。"},,
+ {name:"蒸发皿",category:"反应容器",img:"images/20260901SWevaporatingdish.png",unit:"第1单元",page:"P15",freq:"",use:"用于蒸发液体、浓缩溶液或干燥固体。",note:"可直接加热；加热时用玻璃棒不断搅拌；出现较多固体时停止加热，利用余热蒸干；热蒸发皿用坩埚钳夹取。"},,
+ {name:"坩埚钳",category:"夹持固定",img:"images/20260901SWcrucibletongs.png",unit:"第1单元",page:"P15、P53",freq:"",use:"用于夹持高温的坩埚、蒸发皿等，也可用于夹持金属进行燃烧实验。",note:"使用时保持钳头清洁干燥；夹持高温物体后钳头朝上放在桌面，防止烫坏。"},,
+ {name:"燃烧匙",category:"反应容器",img:"images/20260901SWcombustionspoon.png",unit:"第1单元",page:"P15",freq:"",use:"用于盛放可燃性固体物质，进行燃烧实验。",note:"做某些燃烧实验时匙底可垫少量细沙或石棉；使用后及时清洗。"},,
+ {name:"玻璃燃烧匙",category:"反应容器",img:"images/20260901SWglasscombustionspoon.png",unit:"第1单元",page:"P15",freq:"",use:"玻璃材质燃烧匙，化学性质稳定，适合硫等会腐蚀金属匙体的固体燃烧实验。",note:"玻璃易碎，轻拿轻放；不可骤冷骤热；实验后及时清洗残留药品。",quizExclude:true},,
+ {name:"漏斗",category:"辅助仪器",img:"images/20260901SWfunnel.png",unit:"第1单元",page:"P15",freq:"",use:"用于过滤操作，也可用于向小口容器中添加液体。",note:"过滤时注意'一贴二低三靠'；漏斗下端要紧靠烧杯内壁；不能加热。"},,
+ {name:"锥形瓶",category:"反应容器",img:"images/20260901SWconicalflask.png",unit:"第1单元",page:"P15",freq:"☆",use:"用作较多量试剂的反应容器，也常用于气体发生装置和滴定实验。",note:"加热时必须垫陶土网；振荡时用手腕力量；瓶塞要塞紧。"},,
+ {name:"集气瓶",category:"反应容器",img:"images/20260901SWgasbottle.png",unit:"第1单元",page:"P15",freq:"☆",use:"收集或储存少量气体，也可用于某些物质与气体的反应容器。",note:"不能加热；收集气体后用毛玻璃片盖住；做铁丝燃烧实验时瓶底放少量水或细沙。"},,
+ {name:"玻璃片",category:"辅助仪器",img:"images/20260901SWglasssheet.png",unit:"第1单元",page:"P15",freq:"",use:"用于盖住集气瓶口，防止气体逸出。",note:"毛玻璃面（磨砂面）朝下，与集气瓶口磨砂面贴合。"},,
+ {name:"烧杯",category:"反应容器",img:"images/20260901SWbreaker.png",unit:"第1单元",page:"P15",freq:"☆☆",use:"配制溶液、较多量试剂的反应容器，可在常温或加热时使用。",note:"加热时必须垫陶土网，不能直接加热；溶解固体时用玻璃棒搅拌。"},,
+ {name:"胶头滴管",category:"取用仪器",img:"images/20260901SWdropper.png",unit:"第1单元",page:"P15",freq:"☆☆",use:"吸取和滴加少量液体试剂。",note:"垂直悬空在容器口上方；不能平放或倒置；用完立即清洗（滴瓶上的滴管除外）。"},,
+ {name:"玻璃棒",category:"辅助仪器",img:"images/20260901SWglassrod.png",unit:"第1单元",page:"P15",freq:"",use:"用于搅拌、引流、转移固体或蘸取少量液体。",note:"搅拌时不要撞击容器壁和底部；引流时下端靠在三层滤纸处；使用后及时清洗。"},,
+ {name:"滴瓶",category:"辅助仪器",img:"images/20260901SWdroppingbottle.png",unit:"第1单元",page:"P15",freq:"",use:"盛放少量液体试剂，配套专用滴管。",note:"滴瓶上的滴管专用，不可交叉使用；滴管不能平放或倒置；不盛放强碱溶液。"},,
+ {name:"广口瓶",category:"辅助仪器",img:"images/20260901SWwidemouthbottle.png",unit:"第1单元",page:"P15、P49",freq:"",use:"用于存放固体药品。",note:"不能加热；取用后及时盖好瓶塞；磨砂瓶口与瓶塞配套；见光易分解用棕色瓶。"},,
+ {name:"细口瓶",category:"辅助仪器",img:"images/20260901SWnarrowmouthbottle.png",unit:"第1单元",page:"P15、P49",freq:"",use:"用于存放液体药品。",note:"不能加热；倾倒时标签向手心；碱性液体用橡胶塞；见光易分解用棕色瓶。"},,
+ {name:"点滴板",category:"反应容器",img:"images/20260901SWspotplate.png",unit:"第1单元",page:"P15、P49",freq:"",use:"用于少量试剂的显色反应、对比实验和微型反应。",note:"不能高温加热；白点滴板观察有色溶液，黑点滴板观察浅色沉淀。"},,
+ {name:"量筒",category:"计量仪器",img:"images/20260901SWgraduatedcylinder.png",unit:"第1单元",page:"P15",freq:"☆☆☆",use:"量取一定体积的液体。",note:"不能加热，不能作反应容器；读数时视线与凹液面最低处保持水平；选择合适量程。"},,
+ {name:"铁架台",category:"夹持固定",img:"images/20260901SWironstand.png",unit:"第1单元",page:"P15",freq:"",use:"用于固定和夹持各种实验仪器。",note:"铁夹夹持玻璃仪器松紧要适度；装置平稳、重心低。"},,
+ {name:"酒精灯",category:"加热仪器",img:"images/20260901SWalclamp.png",unit:"第1单元",page:"P15",freq:"☆☆☆☆",use:"实验室常用加热工具。",note:"酒精量不超过容积2/3、不少于1/4；禁止向燃着的灯里加酒精；用灯帽盖灭，不可用嘴吹。"},,
+ {name:"陶土网",category:"辅助仪器",img:"images/20260901SWasbestosnet.png",unit:"第1单元",page:"P15、P113",freq:"",use:"垫在烧杯、锥形瓶等不能直接加热的仪器下，使受热均匀。",note:"不能摔打弯折；石棉脱落不能继续使用。"},,
+ {name:"烧瓶",category:"反应容器",img:"images/20260901SWflask.png",unit:"第1单元",page:"P15、P88",freq:"",use:"较多量液体反应容器，常用于蒸馏、气体制备。",note:"加热必须垫陶土网；液体体积不超过容积1/2。"},,
+ {name:"橡胶塞",category:"辅助仪器",img:"images/20260901SWrubberstopper.png",unit:"第1单元",page:"P15",freq:"",use:"用于密封试管、烧瓶、集气瓶等容器口，可打孔插入玻璃导管。",note:"选择大小与瓶口匹配的橡胶塞；转动塞入，不要硬塞。"},,
+ {name:"玻璃导管",category:"辅助仪器",img:"images/20260901SWglasstube.png",unit:"第1单元",page:"P15",freq:"",use:"用于导出或导入气体，连接反应装置与收集装置。",note:"弯折前先预热；插入橡胶塞时沾水润滑；检查是否有裂纹。"},,
+ {name:"三脚架",category:"夹持固定",img:"images/20260901SWtripod.png",unit:"第1单元",page:"P15",freq:"",use:"放置陶土网、坩埚等，配合酒精灯加热。",note:"放置平稳；加热烧杯、烧瓶时上面放陶土网。"},,
+ {name:"水槽",category:"辅助仪器",img:"images/20260901SWwatertrough.png",unit:"第1单元",page:"P15",freq:"☆☆☆☆☆",use:"排水法收集气体时盛装水。",note:"不能加热；实验后及时倒掉废水清洗。"},,
+ {name:"试管架",category:"夹持固定",img:"images/20260901SWtesttuberack.png",unit:"第1单元",page:"P15",freq:"",use:"放置试管，洗净后倒放在架上晾干。",note:"热试管不能直接放在塑料架上。"},,
+ {name:"试管夹",category:"夹持固定",img:"images/20260901SWtesttubeclamp.png",unit:"第1单元",page:"P15",freq:"",use:"夹持试管进行加热。",note:"从试管底部往上套，夹在距管口约1/3处；手握长柄，拇指不按短柄。"},,
+ {name:"试管刷",category:"辅助仪器",img:"images/20260901SWtesttubebrush.png",unit:"第1单元",page:"P15",freq:"",use:"刷洗试管等玻璃仪器。",note:"刷洗时转动或上下移动，不要用力过猛；选合适规格。"},,
+ {name:"试管",category:"反应容器",img:"images/20260901SWtesttube.png",unit:"第1单元",page:"P15",freq:"☆☆☆☆☆",use:"少量试剂的反应容器，可常温或加热使用。",note:"加热前擦干外壁；加热液体不超过容积1/3；管口不对人；不能骤冷。"},,
+ {name:"乳胶管",category:"辅助仪器",img:"images/20260901SWrubbertube.png",unit:"第1单元",page:"P20、P31",freq:"",use:"连接两段玻璃导管，配合止水夹控制液体滴加。",note:"套接时沾水润滑；老化开裂及时更换。"},,
+ {name:"升降台",category:"夹持固定",img:"images/20260901SWliftingtable.png",unit:"第2单元",page:"P43",freq:"",use:"调节酒精灯等仪器高度。",note:"调节平稳；调好后锁紧固定旋钮。"},,
+ {name:"具支试管",category:"反应容器",img:"images/20260901SWsidearmtesttube.png",unit:"第2单元",page:"P49",freq:"",use:"普通试管带支管，密封后相当于单孔塞的普通试管，常用于气体制备。",note:"支管用于导出气体，不可掰折；液体不超过容积1/3。",quizExclude:true},,
+ {name:"滤纸",category:"辅助仪器",img:"images/20260901SWfilterpaper.png",unit:"第4单元",page:"P87",freq:"",use:"过滤实验分离固液混合物。",note:"过滤前紧贴漏斗内壁，不能戳破；不能加热。"},,
+ {name:"蒸馏头",category:"辅助仪器",img:"images/20260901SWdistillationhead.png",unit:"第4单元",page:"P88",freq:"",use:"连接蒸馏烧瓶与冷凝管，引导蒸汽进入冷凝管。",note:"不能直接加热；磨砂口涂少量凡士林。",quizExclude:true},,
+ {name:"温度计",category:"计量仪器",img:"images/20260901SWthermometer.png",unit:"第4单元",page:"P88",freq:"",use:"测量物质温度。",note:"不能当玻璃棒搅拌；玻璃泡完全浸入被测物质；水银温度计打碎用硫粉处理。"},,
+ {name:"冷凝管",category:"辅助仪器",img:"images/20260901SWcondenser.png",unit:"第4单元",page:"P88",freq:"",use:"蒸馏/回流时冷凝蒸汽。",note:"下口进水、上口出水；不能直接加热。"},,
+ {name:"尾接管（牛角管）",category:"辅助仪器",img:"images/20260901SWadapter.png",unit:"第4单元",page:"P88",freq:"",use:"蒸馏末端承接冷凝液，导入接收瓶。",note:"不能加热；尖嘴不紧贴接收瓶内壁，防止倒吸。",quizExclude:true},,
+ {name:"托盘天平",category:"计量仪器",img:"images/20260901SWbalance.png",unit:"第5单元",page:"P113",freq:"",use:"粗略称量固体药品质量，精确到0.1g。",note:"左物右码；药品放称量纸或烧杯中；镊子夹砝码；称完游码归零。"},,
+ {name:"酒精喷灯",category:"加热仪器",img:"images/20260901SWalcoholblastlamp.png",unit:"第6单元",page:"P133",freq:"",use:"高温加热工具，火焰温度高于酒精灯。",note:"预热充分再点燃；按规范熄灭，不能用水浇；远离易燃物。",quizExclude:true},,
+ {name:"长颈漏斗",category:"辅助仪器",img:"images/20260901SWlongneckfunnel.png",unit:"第6单元",page:"P147",freq:"☆☆☆☆☆",use:"气体发生装置中添加液体药品。",note:"下端管口必须伸入液面以下形成液封；不能加热。"},,
+ {name:"抽滤瓶（吸滤瓶/布氏烧瓶）",category:"辅助仪器",img:"images/20260901SWfilterflask.png",unit:"第7单元",page:"P162",freq:"",use:"厚壁带支管锥形瓶，配合布氏漏斗减压抽滤，支管接真空泵。",note:"禁止直接加热；停止抽滤先拔管再关泵，防倒吸；液面不超过支管接口。",quizExclude:true},,
+ {name:"培养皿",category:"反应容器",img:"images/20260901SWpetridish.png",unit:"第7单元",page:"P169",freq:"",use:"微生物培养，也可盛放固体药品、简单对比实验。",note:"不能直接加热；不触碰皿盖内侧。",quizExclude:true},,
+ {name:"坩埚",category:"反应容器",img:"images/20260901SWcrucible.png",unit:"补充",page:"—",freq:"",use:"高温灼烧固体，可直接在酒精灯或泥三角上加热。",note:"用坩埚钳夹取；放陶土网上冷却；瓷坩埚不灼烧碱性物质。",quizExclude:true},,
+ {name:"表面皿",category:"辅助仪器",img:"images/20260901SWwatchglass.png",unit:"补充",page:"—",freq:"",use:"盛放少量固体/液体，作烧杯盖，观察晶体析出。",note:"不能直接高温加热；易碎，不作反应容器。",quizExclude:true},,
+ {name:"研钵",category:"辅助仪器",img:"images/20260901SWmortar.png",unit:"补充",page:"—",freq:"",use:"配合研杵研磨粉碎固体药品。",note:"不能加热；只研磨不敲击；不研磨强腐蚀物。",quizExclude:true},
+ {name:"分液漏斗",category:"辅助仪器",img:"images/20260901SWsepfunnel.png",unit:"补充",page:"—",freq:"",use:"向反应容器加液并控制滴速，也可分离互不相溶液体。",note:"用前检查漏液；不需要液封；分液时下出上倒。",quizExclude:true},
+];
+
+var currentCategory="all", allExpanded=false, currentUnit="all", poolFilter="all", currentFreq="";
+function setFreq(f,btn){
+  currentFreq=f;
+  document.querySelectorAll(".freq-btn").forEach(function(b){b.classList.toggle("active",b.dataset.freq===f);});
+  renderInstruments();
+}
+function vibrateWrong(){ if(navigator.vibrate){ try{ navigator.vibrate(200); }catch(e){} } }
+function setUnit(u,btn){
+  currentUnit=u;
+  document.querySelectorAll(".unit-btn").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
+  renderInstruments();
+}
+/* 常用/不常用 同时作用于首页展示和题目抽题池；再次点击当前按钮回到"全部" */
+function setPoolMode(m){
+  poolFilter = (poolFilter===m) ? "all" : m;
+  document.querySelectorAll(".pool-btn").forEach(function(b){
+    b.classList.toggle("active", b.dataset.m===poolFilter);
+  });
+  renderInstruments();
+  if(document.getElementById("quizOverlay").classList.contains("show")) startQuiz();
+  if(document.getElementById("dictOverlay").classList.contains("show")) startDict();
+}
+function renderInstruments(){
+  var wrap=document.getElementById("instrumentWrap");
+  var kw=document.getElementById("searchInput").value.trim().toLowerCase();
+  var filtered=instruments.filter(function(it){
+    var mc=currentCategory==="all"||it.category===currentCategory;
+    var mu=currentUnit==="all"||it.unit===currentUnit;
+    var mp = (currentUnit!=="all" || currentCategory!=="all") ? true
+             : (poolFilter==="common" ? !it.quizExclude : (poolFilter==="uncommon" ? !!it.quizExclude : true));
+    var mf = (currentFreq==="") ? true : (it.freq===currentFreq);
+    var ms=!kw||it.name.toLowerCase().indexOf(kw)>=0||it.use.toLowerCase().indexOf(kw)>=0||it.category.toLowerCase().indexOf(kw)>=0;
+    return mc&&mu&&mp&&mf&&ms;
+  });
+  if(filtered.length===0){wrap.innerHTML='<div class="no-result">😕 没有找到匹配的仪器</div>';return;}
+  wrap.innerHTML=filtered.map(function(it){
+    var tags="";
+    if(it.unit) tags+='<span class="meta-tag unit">📘 '+it.unit+'</span>';
+    if(it.page) tags+='<span class="meta-tag page">📄 '+it.page+'</span>';
+    if(it.freq) tags+='<span class="meta-tag freq">🔥 '+it.freq+'</span>';
+    return '<div class="item-card">'+
+      '<span class="cat-tag">'+it.category+'</span>'+
+      '<div class="img-box" onclick="toggleInfo(this)"><img src="'+it.img+'" alt="'+it.name+'" loading="lazy"></div>'+
+      '<div class="click-hint">点击图片查看详情</div>'+
+      '<div class="info-area">'+
+        '<div class="info-name">'+it.name+'</div>'+
+        (tags?'<div class="meta-tags">'+tags+'</div>':'')+
+        '<div class="info-row"><div class="info-label">📌 用途</div><div class="info-text">'+it.use+'</div></div>'+
+        '<div class="info-row"><div class="info-label">⚠️ 注意事项</div><div class="info-text">'+it.note+'</div></div>'+
+      '</div></div>';
+  }).join("");
+}
+function toggleInfo(box){
+  var card=box.parentElement,info=card.querySelector(".info-area"),hint=card.querySelector(".click-hint");
+  info.classList.toggle("show");card.classList.toggle("expanded");
+  hint.textContent=info.classList.contains("show")?"点击图片收起":"点击图片查看详情";
+}
+function toggleAll(){
+  allExpanded=!allExpanded;
+  document.querySelectorAll(".item-card").forEach(function(c){
+    var info=c.querySelector(".info-area"),hint=c.querySelector(".click-hint");
+    info.classList.toggle("show",allExpanded);c.classList.toggle("expanded",allExpanded);
+    hint.textContent=allExpanded?"点击图片收起":"点击图片查看详情";
+  });
+}
+function setCategory(cat,btn){
+  currentCategory=cat;
+  document.querySelectorAll(".cat-btn").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");renderInstruments();
+}
+function filterInstruments(){renderInstruments();}
+function resetFilters(){
+  document.getElementById("searchInput").value="";
+  currentCategory="all";
+  document.querySelectorAll(".cat-btn").forEach(function(b){b.classList.toggle("active",b.dataset.cat==="all");});
+  currentUnit="all";
+  document.querySelectorAll(".unit-btn").forEach(function(b){b.classList.toggle("active",b.dataset.unit==="all");});
+  poolFilter="all";
+  document.querySelectorAll(".pool-btn").forEach(function(b){b.classList.remove("active");});
+  currentFreq="";
+  document.querySelectorAll(".freq-btn").forEach(function(b){b.classList.toggle("active",b.dataset.freq==="");});
+  try{localStorage.removeItem("chemCat");localStorage.removeItem("chemUnit");localStorage.removeItem("chemPool");}catch(e){}
+  renderInstruments();
+}
+
+/* ===== 记忆测试 ===== */
+var qMode="single", quizPoolMode="common";
+var qz={list:[],idx:0,score:0,p1:0,p2:0,lockedP1:false,lockedP2:false,choices:{},correct:""};
+var KEYS=["A","B","C","D"];
+
+function getPool(){
+  if(poolFilter==="uncommon") return instruments.filter(function(i){return i.quizExclude;});
+  if(poolFilter==="common") return instruments.filter(function(i){return !i.quizExclude;});
+  return instruments.filter(function(i){return !i.quizExclude;});
+}
+function setPoolModeVis(){}
+document.querySelectorAll(".pool-btn").forEach(function(b){
+  b.classList.toggle("active", b.dataset.m===poolFilter);
+});
+
+function openQuiz(){
+  document.getElementById("quizOverlay").classList.add("show");
+  startQuiz();
+}
+function closeQuiz(){document.getElementById("quizOverlay").classList.remove("show");}
+function setQMode(m){
+  qMode=m;
+  var btns=document.querySelectorAll("#quizOverlay .qmode-btn");
+  if(btns.length>=2){
+    btns[0].classList.toggle("active",m==="single");
+    btns[1].classList.toggle("active",m==="double");
+  }
+  document.getElementById("quizStatus").style.display=(m==="double")?"flex":"none";
+  startQuiz();
+}
+function startQuiz(){
+  var pool=getPool();
+  qz.list=pool.slice().sort(function(){return Math.random()-.5;}).slice(0,10);
+  qz.idx=0;qz.score=0;qz.p1=0;qz.p2=0;
+  document.getElementById("p1Score").textContent="0";
+  document.getElementById("p2Score").textContent="0";
+  showQ();
+}
+function showQ(){
+  qz.lockedP1=false;qz.lockedP2=false;qz.choices={};
+  var q=qz.list[qz.idx];
+  qz.correct=q.name;
+  document.getElementById("quizProgress").textContent="第 "+(qz.idx+1)+" / "+qz.list.length+" 题";
+  document.getElementById("quizImg").innerHTML='<img src="'+q.img+'" alt="">';
+  document.getElementById("quizResult").className="quiz-result";
+  document.getElementById("quizResult").textContent="";
+  document.getElementById("nextWrap").style.display="none";
+  var pool=getPool();
+  var wrong=pool.filter(function(i){return i.name!==q.name;}).sort(function(){return Math.random()-.5;}).slice(0,3).map(function(i){return i.name;});
+  var opts=wrong.concat([q.name]).sort(function(){return Math.random()-.5;});
+  var optArea=document.getElementById("optArea");
+
+  if(qMode==="single"){
+    document.getElementById("turnText").textContent="单人答题";
+    optArea.className="opt-row";
+    optArea.innerHTML=opts.map(function(o,i){
+      return '<button class="quiz-option" data-player="0" data-key="'+KEYS[i]+'" onclick="pick(this,\''+o+'\',0)">'+
+             '<span class="key">'+KEYS[i]+'</span>'+o+'</button>';
+    }).join("");
+  }else{
+    document.getElementById("turnText").textContent="抢答中…";
+    optArea.className="opt-row double";
+    function colHtml(p,title,color){
+      var btns=opts.map(function(o,i){
+        return '<button class="quiz-option" data-player="'+p+'" data-key="'+KEYS[i]+'" onclick="pick(this,\''+o+'\','+p+')">'+
+               '<span class="key">'+KEYS[i]+'</span>'+o+'</button>';
+      }).join("");
+      return '<div class="player-col p'+p+'"><h4>'+title+'</h4><div class="opt-inner">'+btns+'</div></div>';
+    }
+    optArea.innerHTML=colHtml(1,"👤 玩家1（左）")+colHtml(2,"👤 玩家2（右）");
+  }
+}
+function pick(btn,choice,player){
+  var correct=qz.correct;
+  if(choice!==correct) vibrateWrong();
+  if(qMode==="single"){
+    if(qz.lockedP1)return;
+    qz.lockedP1=true;
+    var correct=qz.correct,right=choice===correct;
+    document.querySelectorAll(".quiz-option").forEach(function(b){b.disabled=true;});
+    if(right){
+      qz.score++;btn.classList.add("correct");
+      showResult("right","✅ 回答正确！");
+    }else{
+      btn.classList.add("wrong");
+      document.querySelectorAll(".quiz-option").forEach(function(b){
+        if(b.textContent.indexOf(correct)>=0)b.classList.add("correct");
+      });
+      showResult("wrong-ans","❌ 答错了，正确答案：<strong>"+correct+"</strong>");
+    }
+    if(qz.idx===qz.list.length-1){
+      var pct=Math.round(qz.score/qz.list.length*100);
+      appendResult("<br>🏆 得分："+qz.score+" / "+qz.list.length+"（正确率 "+pct+"%）");
+      nextBtn("再来一次 🔄",startQuiz);
+    }else{
+      nextBtn("下一题 →",function(){qz.idx++;showQ();});
+    }
+    return;
+  }
+  /* 双人PK */
+  if(player===1&&qz.lockedP1)return;
+  if(player===2&&qz.lockedP2)return;
+  qz.choices[player]=choice;
+  var correct=qz.correct;
+  var right=(choice===correct);
+  if(right){
+    btn.classList.add("correct");
+    if(player===1){qz.p1++;qz.lockedP1=true;qz.lockedP2=true;}
+    else{qz.p2++;qz.lockedP1=true;qz.lockedP2=true;}
+    document.getElementById("p1Score").textContent=qz.p1;
+    document.getElementById("p2Score").textContent=qz.p2;
+    document.getElementById("turnText").textContent="玩家"+player+" 答对！";
+    /* 高亮全部正确选项 */
+    document.querySelectorAll(".quiz-option").forEach(function(b){
+      b.disabled=true;
+      if(b.textContent.indexOf(correct)>=0)b.classList.add("correct");
+    });
+    showResult("right","✅ 玩家"+player+" 抢到并答对！");
+  }else{
+    btn.classList.add("wrong");
+    if(player===1){qz.lockedP1=true;document.getElementById("turnText").textContent="玩家1 答错，玩家2 继续";}
+    else{qz.lockedP2=true;document.getElementById("turnText").textContent="玩家2 答错，玩家1 继续";}
+    /* 只有两人都答错过才公布正确答案，避免给对方漏题 */
+    var bothWrong=qz.choices[1]&&qz.choices[2];
+    if(bothWrong){
+      showResult("wrong-ans","❌ 两位玩家都未答对，正确答案：<strong>"+correct+"</strong>");
+      document.querySelectorAll(".quiz-option").forEach(function(b){
+        b.disabled=true;
+        if(b.textContent.indexOf(correct)>=0)b.classList.add("correct");
+      });
+    }else{
+      showResult("wrong-ans","❌ 玩家"+player+" 答错了，继续加油！");
+    }
+  }
+  /* 双方都答完或有人答对 → 进入下一题 */
+  var bothDone=(qz.choices[1]&&qz.choices[2])||right;
+  if(bothDone){
+    if(qz.idx===qz.list.length-1){
+      var msg="🏆 PK结束！玩家1："+qz.p1+" 分，玩家2："+qz.p2+" 分";
+      if(qz.p1>qz.p2)msg+="　🎉 玩家1获胜！";
+      else if(qz.p2>qz.p1)msg+="　🎉 玩家2获胜！";
+      else msg+="　🤝 平局！";
+      appendResult("<br>"+msg);
+      nextBtn("再来一次 🔄",startQuiz);
+    }else{
+      nextBtn("下一题 →",function(){qz.idx++;showQ();});
+    }
+  }
+}
+function showResult(cls,html){
+  var r=document.getElementById("quizResult");
+  r.className="quiz-result show "+cls;
+  r.innerHTML=html;
+}
+function appendResult(html){
+  var r=document.getElementById("quizResult");
+  r.innerHTML+=html;
+}
+function nextBtn(label,fn){
+  var b=document.getElementById("quizNextBtn");
+  b.textContent=label;b.onclick=fn;
+  document.getElementById("nextWrap").style.display="block";
+}
+
+/* ===== 顺序默写模式 ===== */
+var dict={list:[],idx:0,right:0,wrong:0,order:"seq"};
+function setDictOrder(o,btn){
+  dict.order=o;
+  document.querySelectorAll("#dictOverlay .qmode-btn").forEach(function(b){b.classList.remove("active");});
+  btn.classList.add("active");
+  startDict();
+}
+function openDict(){
+  document.getElementById("dictOverlay").classList.add("show");
+  startDict();
+}
+function closeDict(){document.getElementById("dictOverlay").classList.remove("show");}
+function startDict(){
+  var pool=getPool();
+  dict.list=dict.order==="rand"?pool.slice().sort(function(){return Math.random()-.5;}):pool.slice();
+  dict.idx=0;dict.right=0;dict.wrong=0;
+  document.getElementById("dictScore").textContent="✓ 0　✗ 0";
+  showDict();
+}
+function showDict(){
+  var it=dict.list[dict.idx];
+  document.getElementById("dictProgress").textContent="第 "+(dict.idx+1)+" / "+dict.list.length+" 个";
+  document.getElementById("dictImg").innerHTML='<img src="'+it.img+'" alt="">';
+  document.getElementById("dictResult").className="quiz-result";
+  document.getElementById("dictResult").textContent="";
+  document.getElementById("dictNextWrap").style.display="none";
+  var input=document.getElementById("dictInput");
+  input.value="";input.disabled=false;input.focus();
+}
+function checkDict(){
+  var it=dict.list[dict.idx];
+  var input=document.getElementById("dictInput");
+  var ans=input.value.trim();
+  input.disabled=true;
+  function norm(s){return s.replace(/[\s（）()·]/g,"");}
+  var correct=norm(it.name), user=norm(ans);
+  var ok = user && (user===correct || correct.indexOf(user)===0 || user.indexOf(correct)===0);
+  var r=document.getElementById("dictResult");
+  if(ok){
+    dict.right++;
+    r.className="quiz-result show right";
+    r.innerHTML="✅ 正确！就是：<strong>"+it.name+"</strong>";
+  }else{
+    dict.wrong++;vibrateWrong();
+    r.className="quiz-result show wrong-ans";
+    r.innerHTML="❌ 正确答案：<strong>"+it.name+"</strong>";
+  }
+  document.getElementById("dictScore").textContent="✓ "+dict.right+"　✗ "+dict.wrong;
+  var nextBtn=document.getElementById("dictNextBtn");
+  if(dict.idx===dict.list.length-1){
+    var pct=Math.round(dict.right/dict.list.length*100);
+    r.innerHTML+="<br>🏁 完成！正确 "+dict.right+" / "+dict.list.length+"（正确率 "+pct+"%）";
+    nextBtn.textContent="再来一次 🔄";
+    nextBtn.onclick=startDict;
+  }else{
+    nextBtn.textContent="下一个 →";
+    nextBtn.onclick=function(){dict.idx++;showDict();};
+  }
+  document.getElementById("dictNextWrap").style.display="block";
+}
+document.addEventListener("keydown",function(e){
+  if(e.key==="Enter" && document.getElementById("dictOverlay").classList.contains("show")){
+    var inp=document.getElementById("dictInput");
+    if(!inp.disabled) checkDict();
+  }
+});
+
+/* 禁用右键菜单、禁止拖拽 */
+document.addEventListener("contextmenu",function(e){e.preventDefault();return false;});
+document.addEventListener("dragstart",function(e){e.preventDefault();});
+/* 默认尝试全屏；浏览器要求用户手势时，首次点击自动进入 */
+function tryFullscreen(){
+  var el=document.documentElement;
+  if(!document.fullscreenElement && !document.webkitFullscreenElement){
+    (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
+  }
+}
+window.addEventListener("load",function(){
+  tryFullscreen();
+  var once=function(){ if(!document.fullscreenElement && !document.webkitFullscreenElement){tryFullscreen();} document.removeEventListener("click",once); };
+  setTimeout(function(){document.addEventListener("click",once);},300);
+});
+
+/* 记住上次选择 */
+(function(){
+  try{
+    var z=parseInt(localStorage.getItem("chemZoom")||"100",10);
+    var i=zoomLevels.indexOf(z); if(i>0){zoomIndex=i-1;toggleZoom();}
+    var c=localStorage.getItem("chemCat"); if(c){currentCategory=c;document.querySelectorAll(".cat-btn").forEach(function(b){b.classList.toggle("active",b.dataset.cat===c);});}
+    var u=localStorage.getItem("chemUnit"); if(u){currentUnit=u;document.querySelectorAll(".unit-btn").forEach(function(b){b.classList.toggle("active",b.dataset.unit===u);});}
+    var p=localStorage.getItem("chemPool"); if(p){poolFilter=p;document.querySelectorAll(".pool-btn").forEach(function(b){b.classList.toggle("active",b.dataset.m===p);});}
+  }catch(e){}
+})();
+document.querySelectorAll(".cat-btn").forEach(function(b){b.addEventListener("click",function(){try{localStorage.setItem("chemCat",b.dataset.cat);}catch(e){}});});
+document.querySelectorAll(".unit-btn").forEach(function(b){b.addEventListener("click",function(){try{localStorage.setItem("chemUnit",b.dataset.unit||"all");}catch(e){}});});
+/* 保存考试范围 */
+var _origSetPool=setPoolMode;
+setPoolMode=function(m){_origSetPool(m);try{localStorage.setItem("chemPool",poolFilter);}catch(e){}};
+
+renderInstruments();
+</script>
+</body>
+</html>
